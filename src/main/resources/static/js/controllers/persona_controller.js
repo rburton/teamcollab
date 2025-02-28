@@ -1,10 +1,17 @@
-import { Controller } from "@hotwired/stimulus"
+import {Controller} from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = ["modal", "list", "container"]
     static values = {
         selected: String,
         selectedName: String
+    }
+
+    getCsrfToken() {
+        return {
+            header: document.querySelector('meta[name="csrf-header"]').getAttribute('content'),
+            token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
     }
 
     connect() {
@@ -27,39 +34,46 @@ export default class extends Controller {
         const personaName = event.currentTarget.dataset.personaName
         this.selectedValue = personaId
         this.selectedNameValue = personaName
-        
+
         // Update the conversation
+        const csrf = this.getCsrfToken();
         fetch(`/api/conversations/${this.element.dataset.personaConversationIdValue}/persona`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                [csrf.header]: csrf.token,
             },
             body: JSON.stringify({
-                personaId: personaId
+                personaId
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok')
-            }
-            return response.json()
-        })
-        .then(() => {
-            this.close()
-        })
-        .catch(error => {
-            console.error('Error:', error)
-            const errorDiv = document.getElementById('errorMessage')
-            errorDiv.textContent = 'Failed to update persona'
-            errorDiv.classList.remove('hidden')
-            setTimeout(() => {
-                errorDiv.classList.add('hidden')
-            }, 5000)
-        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok')
+                }
+                return response.json()
+            })
+            .then(() => {
+                this.close()
+            })
+            .catch(error => {
+                console.error('Error:', error)
+                const errorDiv = document.getElementById('errorMessage')
+                errorDiv.textContent = 'Failed to update persona'
+                errorDiv.classList.remove('hidden')
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden')
+                }, 5000)
+            })
     }
 
     loadPersonas() {
-        fetch('/api/personas/all')
+        const csrf = this.getCsrfToken();
+        fetch('/api/personas/all', {
+            headers: {
+                [csrf.header]: csrf.token
+            }
+        })
             .then(response => response.json())
             .then(personas => {
                 this.listTarget.innerHTML = ''

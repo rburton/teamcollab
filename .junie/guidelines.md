@@ -34,12 +34,16 @@
 3. Excessive use of inheritance over composition
 4. Not leveraging Java standard library functions
 5. Using var when val would suffice
-6. Using Java-style loops instead of functional operations
-7. Do not use != or == null, instead use Objects.isNull or Objects.nonNull
+6. Using mutability when immutability is possible 
+7. Using Java-style loops instead of functional operations 
+8. Do not use != or == null, instead use Objects.isNull or Objects.nonNull
 
 ### Best Practices
 1. Implement proper exception handling
 2. Use static imports for constants and functions
+3. Always put domain classes in a domain package 
+4. Always put custom exception classes in an exception package
+5. Always sort annotations by length of name from smallest to largest
 
 ### Code Organization
 1. Group related functionality into packages

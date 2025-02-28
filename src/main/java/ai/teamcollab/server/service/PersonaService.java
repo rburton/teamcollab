@@ -2,7 +2,6 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Persona;
-import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.PersonaRepository;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -53,6 +51,7 @@ public class PersonaService {
         return personaRepository.save(persona);
     }
 
+    @Transactional
     public void addToConversation(Long personaId, Long conversationId) {
         logger.debug("Adding persona {} to conversation {}", personaId, conversationId);
 
