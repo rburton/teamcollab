@@ -66,7 +66,7 @@
     <div class="flex flex-1 overflow-hidden">
         <!-- Left Sidebar with Personas -->
         <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
-             id="sidebar">
+             id="sidebar" data-controller="persona" th:data-persona-conversation-id-value="${conversation.id}">
             <!-- Focus Dropdown -->
             <div class="relative mb-4">
                 <a href="/conversations" class="text-blue-500 hover:text-blue-700">← Back to Conversations</a>
@@ -93,7 +93,7 @@
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
                     <h2 class="text-lg font-semibold">Personas</h2>
-                    <button onclick="openPersonasModal()" class="text-blue-500 hover:text-blue-700">
+                    <button data-action="click->persona#open" class="text-blue-500 hover:text-blue-700">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -102,22 +102,26 @@
                 </div>
             </div>
 
+            <!-- Personas Container -->
+            <div data-persona-target="container"></div>
+
             <!-- Personas Modal -->
-            <div id="personasModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div data-persona-target="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold">All Personas</h3>
-                        <button onclick="closePersonasModal()" class="text-gray-500 hover:text-gray-700">
+                        <button data-action="click->persona#close" class="text-gray-500 hover:text-gray-700">
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-                    <div id="personasModalContent" class="space-y-4 max-h-96 overflow-y-auto">
-                        <!-- Personas will be loaded here -->
+                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                        <div data-persona-target="list"></div>
+                        <!-- Personas Template -->
                         <template id="personaTemplate">
                             <div class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between"
-                                 onclick="addPersonaToConversation(this.dataset.personaId)">
+                                 data-action="click->persona#select">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
                                     </div>
@@ -134,79 +138,12 @@
                 </div>
             </div>
 
-            <script th:inline="javascript">
-                const conversationId = /*[[${conversation.id}]]*/ null;
-
-                function addPersonaToConversation(personaId) {
-                    fetch(`/api/personas/add-to-conversation?conversationId=${conversationId}&personaId=${personaId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(response.status === 403 ? 'Access denied' : 'Failed to add persona');
-                        }
-                        // Reload the page to show the updated conversation
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        const errorDiv = document.getElementById('errorMessage');
-                        errorDiv.textContent = error.message;
-                        errorDiv.classList.remove('hidden');
-                        setTimeout(() => {
-                            errorDiv.classList.add('hidden');
-                        }, 5000);
-                    });
-                }
-
-                function loadPersonas() {
-                    fetch('/api/personas/all')
-                        .then(response => response.json())
-                        .then(personas => {
-                            const container = document.getElementById('personasModalContent');
-                            const template = document.getElementById('personaTemplate');
-                            container.innerHTML = '';
-
-                            personas.forEach(persona => {
-                                const element = template.content.cloneNode(true);
-                                const div = element.querySelector('div');
-                                div.dataset.personaId = persona.id;
-
-                                const initial = element.querySelector('.rounded-full');
-                                initial.textContent = persona.name.charAt(0);
-
-                                const name = element.querySelector('h4');
-                                name.textContent = persona.name;
-
-                                const expertise = element.querySelector('p');
-                                expertise.textContent = persona.expertises;
-
-                                container.appendChild(element);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error loading personas:', error);
-                        });
-                }
-
-                function openPersonasModal() {
-                    const modal = document.getElementById('personasModal');
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                    loadPersonas();
-                }
-
-                function closePersonasModal() {
-                    const modal = document.getElementById('personasModal');
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }
-            </script>
             <ul class="space-y-2" id="personaList">
                 <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                    <div class="flex items-center cursor-pointer" onclick="selectPersona('All', 'All Personas')">
+                    <div class="flex items-center cursor-pointer" 
+                         data-action="click->persona#select"
+                         data-persona-id="All"
+                         data-persona-name="All Personas">
                         <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">
                             A
                         </div>
@@ -214,7 +151,9 @@
                         <span class="ml-2 text-xs text-green-500">Online</span>
                     </div>
                     <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
-                         onclick="editPersona('All', 'All Personas')"
+                         data-action="click->persona#edit"
+                         data-persona-id="All"
+                         data-persona-name="All Personas"
                          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -222,7 +161,9 @@
                 </li>
                 <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
                     <div class="flex items-center cursor-pointer"
-                         onclick="selectPersona('Marketing', 'Sarah - Marketing')">
+                         data-action="click->persona#select"
+                         data-persona-id="Marketing"
+                         data-persona-name="Sarah - Marketing">
                         <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
                             S
                         </div>
@@ -295,7 +236,7 @@
             </div>
 
             <!-- Chat Messages -->
-            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
+            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4 h-[calc(100vh-16rem)]">
                 <div th:each="message : ${messages}" class="flex items-start"
                      th:classappend="${message.user != null} ? ' justify-end'">
 
@@ -354,58 +295,6 @@
         let currentPersonaName = 'All Personas';
         let currentUser = 'User1'; // Default user
         let currentFocus = 'Main Discussion'; // Default focus
-
-        function openPersonasModal() {
-            const modal = document.getElementById('personasModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            fetchPersonas();
-        }
-
-        function closePersonasModal() {
-            const modal = document.getElementById('personasModal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        function fetchPersonas() {
-            fetch('/personas/all')
-                .then(response => response.json())
-                .then(personas => {
-                    const modalContent = document.getElementById('personasModalContent');
-                    modalContent.innerHTML = personas.map(persona => `
-                        <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-semibold"
-                                     style="background-color: ${getRandomColor()}">
-                                    ${persona.name.charAt(0)}
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold text-lg">${persona.name}</h4>
-                                    <p class="text-sm text-gray-600">${persona.expertises || 'No expertise specified'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                })
-                .catch(error => {
-                    console.error('Error fetching personas:', error);
-                    const modalContent = document.getElementById('personasModalContent');
-                    modalContent.innerHTML = '<p class="text-red-500">Error loading personas. Please try again later.</p>';
-                });
-        }
-
-        function getRandomColor() {
-            const colors = [
-                '#3B82F6', // blue-500
-                '#8B5CF6', // purple-500
-                '#EC4899', // pink-500
-                '#10B981', // emerald-500
-                '#F59E0B', // amber-500
-                '#EF4444'  // red-500
-            ];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
 
         function selectPersona(persona, personaName) {
             currentPersona = persona;
@@ -478,17 +367,6 @@
             }
         }
 
-        function toggleProfileDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        function changeProfile(user) {
-            currentUser = user;
-            alert(`Profile changed to ${user}`);
-            toggleProfileDropdown();
-        }
-
         function toggleFocusDropdown() {
             const dropdown = document.getElementById('focusDropdown');
             dropdown.classList.toggle('hidden');
@@ -502,81 +380,6 @@
             // In a real app, this could trigger context-specific behavior for personas
         }
 
-        function sendMessage(event) {
-            event.preventDefault();
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-
-            if (message) {
-                const chatMessages = document.getElementById('chatMessages');
-                const timestamp = new Date().toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                });
-                const userMessage = `
-                    <div class="flex items-start justify-end">
-                        <div class="bg-green-100 p-3 rounded-lg max-w-[70%]">
-                            <p class="text-sm font-semibold text-green-800">${currentUser}</p>
-                            <p class="text-gray-800">${message}</p>
-                            <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
-                        </div>
-                    </div>
-                `;
-                chatMessages.innerHTML += userMessage;
-                input.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                setTimeout(() => {
-                    const personaResponses = {
-                        'All': 'All Personas',
-                        'Marketing': 'Sarah - Marketing',
-                        'Product': 'Mike - Product',
-                        'Technical': 'Emma - Technical',
-                        'Legal': 'John - Legal'
-                    };
-                    const avatarInitials = {
-                        'All': 'A',
-                        'Marketing': 'S',
-                        'Product': 'M',
-                        'Technical': 'E',
-                        'Legal': 'J'
-                    };
-                    const avatarColors = {
-                        'All': 'bg-green-500',
-                        'Marketing': 'bg-blue-500',
-                        'Product': 'bg-purple-500',
-                        'Technical': 'bg-yellow-500',
-                        'Legal': 'bg-red-500'
-                    };
-                    const responseName = currentPersona === 'All'
-                        ? personaResponses[Math.random() > 0.5 ? 'Marketing' : 'Product']
-                        : personaResponses[currentPersona];
-                    const responseInitial = avatarInitials[currentPersona === 'All'
-                        ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
-                        : currentPersona];
-                    const responseColor = avatarColors[currentPersona === 'All'
-                        ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
-                        : currentPersona];
-
-                    const response = `
-                        <div class="flex items-start">
-                            <div class="w-8 h-8 ${responseColor} rounded-full flex items-center justify-center text-white mr-2">${responseInitial}</div>
-                            <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
-                                <p class="text-sm font-semibold text-blue-800">${responseName}</p>
-                                <p class="text-gray-800">Thanks for your message! We're working on a response.</p>
-                                <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
-                            </div>
-                        </div>
-                    `;
-                    chatMessages.innerHTML += response;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 1000);
-            }
-        }
     </script>
 </div>
 </body>
