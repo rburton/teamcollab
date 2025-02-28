@@ -8,7 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RoleTest {
 
@@ -19,7 +23,7 @@ class RoleTest {
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        role = new Role("USER");
+        role = new Role(null, "USER");
     }
 
     @Test
@@ -55,7 +59,7 @@ class RoleTest {
     @Test
     void setAndGetId_ShouldWorkCorrectly() {
         assertNull(role.getId()); // Initial value should be null
-        
+
         role.setId(1L);
         assertEquals(1L, role.getId());
     }

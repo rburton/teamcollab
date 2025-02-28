@@ -22,12 +22,8 @@ public class ConversationService {
 
     @Transactional
     public Conversation createConversation(Conversation conversation, Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found with id: " + userId);
-        }
-
         final var user = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         conversation.setUser(user);
         conversation.setCreatedAt(java.time.LocalDateTime.now());
 
@@ -35,9 +31,8 @@ public class ConversationService {
     }
 
     public List<Conversation> getUserConversations(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found with id: " + userId);
-        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         return conversationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 

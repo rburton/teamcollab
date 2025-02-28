@@ -1,7 +1,15 @@
 package ai.teamcollab.server.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PersonaAddedResponse {
     @JsonProperty("id")
     private Long id;
@@ -11,34 +19,4 @@ public class PersonaAddedResponse {
 
     @JsonProperty("expertises")
     private String expertises;
-
-    public PersonaAddedResponse(Long id, String name, String expertises) {
-        this.id = id;
-        this.name = name;
-        this.expertises = expertises;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(String expertises) {
-        this.expertises = expertises;
-    }
 }

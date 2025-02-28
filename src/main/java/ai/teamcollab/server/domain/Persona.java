@@ -11,14 +11,23 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "personas")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Persona {
 
     @Id
@@ -44,52 +53,9 @@ public class Persona {
     @ManyToMany(mappedBy = "personas")
     private Set<Conversation> conversations = new HashSet<>();
 
-    public Persona() {
-    }
-
     public Persona(String name, String expertises) {
         this.name = name;
         this.expertises = expertises;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(String expertises) {
-        this.expertises = expertises;
-    }
-
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public Set<Conversation> getConversations() {
-        return conversations;
-    }
-
-    public void setConversations(Set<Conversation> conversations) {
-        this.conversations = conversations;
     }
 
     public void addToConversation(Conversation conversation) {
@@ -98,17 +64,5 @@ public class Persona {
 
     public void removeFromConversation(Conversation conversation) {
         this.conversations.remove(conversation);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Persona persona = (Persona) o;
-        return Objects.equals(id, persona.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }

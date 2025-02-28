@@ -6,23 +6,28 @@ import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MessageService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import ai.teamcollab.server.config.TestConfig;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,8 +35,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(ConversationController.class)
-@Import(TestConfig.class)
+@Import(ConversationControllerTest.TestConfig.class)
 class ConversationControllerTest {
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @Primary
+        public ConversationService conversationService() {
+            return mock(ConversationService.class);
+        }
+
+        @Bean
+        @Primary
+        public MessageService messageService() {
+            return mock(MessageService.class);
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -63,8 +83,14 @@ class ConversationControllerTest {
         message = new Message();
         message.setContent("Test message");
 
-        // Set up mock responses
+        // Reset and set up mock responses
+        reset(conversationService, messageService);
         when(conversationService.getConversationById(1L)).thenReturn(conversation);
+    }
+
+    @AfterEach
+    void tearDown() {
+        reset(conversationService, messageService);
     }
 
 //    @Test

@@ -50,7 +50,7 @@ class ConversationServiceTest {
 
     @Test
     void createConversationShouldSucceed() {
-        when(userRepository.existsById(testUser.getId())).thenReturn(true);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
         when(conversationRepository.save(any(Conversation.class))).thenReturn(testConversation);
 
         Conversation result = conversationService.createConversation(testConversation, testUser.getId());
@@ -64,7 +64,7 @@ class ConversationServiceTest {
 
     @Test
     void createConversationShouldThrowExceptionForInvalidUser() {
-        when(userRepository.existsById(testUser.getId())).thenReturn(false);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> conversationService.createConversation(testConversation, testUser.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -76,7 +76,7 @@ class ConversationServiceTest {
     @Test
     void getUserConversationsShouldReturnUserConversations() {
         List<Conversation> conversations = Arrays.asList(testConversation);
-        when(userRepository.existsById(testUser.getId())).thenReturn(true);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
         when(conversationRepository.findByUserIdOrderByCreatedAtDesc(testUser.getId())).thenReturn(conversations);
 
         List<Conversation> result = conversationService.getUserConversations(testUser.getId());
@@ -88,7 +88,7 @@ class ConversationServiceTest {
 
     @Test
     void getUserConversationsShouldThrowExceptionForInvalidUser() {
-        when(userRepository.existsById(testUser.getId())).thenReturn(false);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> conversationService.getUserConversations(testUser.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
