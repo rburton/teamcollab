@@ -4,10 +4,10 @@
     - Implement comprehensive error handling
     - Add informative logging in critical paths
 
-2. **Testing**
-    - Write unit tests for new features
-    - Maintain test coverage of at least 75%
-    - Include integration tests for critical paths
+[//]: # (2. **Testing**)
+[//]: # (    - Write unit tests for new features)
+[//]: # (    - Maintain test coverage of at least 75%)
+[//]: # (    - Include integration tests for critical paths)
 
 ### Key Features
 
@@ -24,9 +24,9 @@
     - JUnit Jupiter for testing
     - TailWind CSS for styling
    
-### Testing Requirements
-1. Always run all tests in project to make sure you didn't introduce regression before submitting the task.
-2. Use @ParameterizedTest for tests with multiple examples.
+[//]: # (### Testing Requirements)
+[//]: # (1. Always run all tests in project to make sure you didn't introduce regression before submitting the task.)
+[//]: # (2. Use @ParameterizedTest for tests with multiple examples.)
 
 ### Anti-patterns to Avoid
 1. Overuse of `!!` operator
@@ -59,7 +59,8 @@
 - Use message properties files for translations
 
 ## Best Practices
-1. Write tests for new features
+
+[//]: # (1. Write tests for new features)
 2. Keep components focused and small
 3. Follow security best practices
 4. Document API changes
