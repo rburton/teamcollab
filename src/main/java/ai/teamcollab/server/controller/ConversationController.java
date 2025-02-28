@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import static java.util.Objects.isNull;
+
 @Controller
 @RequestMapping("/conversations")
 public class ConversationController {
@@ -25,7 +27,7 @@ public class ConversationController {
     private final MessageService messageService;
 
     public ConversationController(ConversationService conversationService,
-                                MessageService messageService) {
+                                  MessageService messageService) {
         this.conversationService = conversationService;
         this.messageService = messageService;
     }
@@ -41,9 +43,9 @@ public class ConversationController {
 
     @PostMapping
     public String create(@Valid @ModelAttribute("conversation") Conversation conversation,
-                        BindingResult bindingResult,
-                        @AuthenticationPrincipal User user,
-                        RedirectAttributes redirectAttributes) {
+                         BindingResult bindingResult,
+                         @AuthenticationPrincipal User user,
+                         RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.conversation", bindingResult);
@@ -68,7 +70,7 @@ public class ConversationController {
             throw new IllegalArgumentException("User not authenticated");
         }
 
-        Conversation conversation = conversationService.getConversationById(id);
+        final var conversation = conversationService.getConversationById(id);
         if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");
         }
@@ -79,38 +81,39 @@ public class ConversationController {
         return "conversations/show";
     }
 
-    @PostMapping("/{id}/messages")
-    public String postMessage(@PathVariable Long id,
-                            @Valid @ModelAttribute("newMessage") Message message,
-                            BindingResult bindingResult,
-                            @AuthenticationPrincipal User user,
-                            RedirectAttributes redirectAttributes) {
+    @PostMapping("/{conversationId}/messages")
+    public String postMessage(@PathVariable Long conversationId,
+                              @Valid @ModelAttribute("newMessage") Message message,
+                              BindingResult bindingResult,
+                              @AuthenticationPrincipal User user,
+                              RedirectAttributes redirectAttributes) {
 
-        if (user == null) {
+        if (isNull(user)) {
             throw new IllegalArgumentException("User not authenticated");
         }
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newMessage", bindingResult);
             redirectAttributes.addFlashAttribute("newMessage", message);
-            return "redirect:/conversations/" + id;
+            return "redirect:/conversations/" + conversationId;
         }
 
         if (message.getContent() == null || message.getContent().trim().isEmpty()) {
             bindingResult.rejectValue("content", "NotEmpty", "Message content cannot be empty");
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newMessage", bindingResult);
             redirectAttributes.addFlashAttribute("newMessage", message);
-            return "redirect:/conversations/" + id;
+            return "redirect:/conversations/" + conversationId;
         }
 
         try {
-            messageService.createMessage(message, id, user);
+            messageService.createMessage(message, conversationId, user);
             redirectAttributes.addFlashAttribute("successMessage", "Message posted successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("newMessage", message);
         }
 
-        return "redirect:/conversations/" + id;
+        return "redirect:/conversations/" + conversationId;
     }
+
 }

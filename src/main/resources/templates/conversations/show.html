@@ -6,251 +6,302 @@
     <title>View Conversation</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <!-- Action Bar -->
-        <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md flex justify-between items-center gap-6">
-            <div class="flex justify-start gap-6">
-                <button onclick="exportPersonaThoughts('Marketing', 'Sarah - Marketing')"
-                        class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
-                        title="Export Sarah's Thoughts">
-                    <svg class="w-6 h-6 text-blue-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4" />
+<div layout:fragment="content">
+    <!-- Action Bar -->
+    <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md flex justify-between items-center gap-6">
+        <div class="flex justify-start gap-6">
+            <button onclick="exportPersonaThoughts('Marketing', 'Sarah - Marketing')"
+                    class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
+                    title="Export Sarah's Thoughts">
+                <svg class="w-6 h-6 text-blue-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4"/>
+                </svg>
+                <span class="hidden md:inline font-medium">Sarah</span>
+            </button>
+            <button onclick="exportPersonaThoughts('Product', 'Mike - Product')"
+                    class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
+                    title="Export Mike's Thoughts">
+                <svg class="w-6 h-6 text-purple-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4"/>
+                </svg>
+                <span class="hidden md:inline font-medium">Mike</span>
+            </button>
+            <button onclick="exportPersonaThoughts('Technical', 'Emma - Technical')"
+                    class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
+                    title="Export Emma's Thoughts">
+                <svg class="w-6 h-6 text-yellow-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4"/>
+                </svg>
+                <span class="hidden md:inline font-medium">Emma</span>
+            </button>
+            <button onclick="exportPersonaThoughts('Legal', 'John - Legal')"
+                    class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
+                    title="Export John's Thoughts">
+                <svg class="w-6 h-6 text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4"/>
+                </svg>
+                <span class="hidden md:inline font-medium">John</span>
+            </button>
+            <button onclick="exportAllThoughts()"
+                    class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
+                    title="Export All Thoughts">
+                <svg class="w-6 h-6 text-green-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4"/>
+                </svg>
+                <span class="hidden md:inline font-medium">All</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Left Sidebar with Personas -->
+        <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
+             id="sidebar">
+            <!-- Focus Dropdown -->
+            <div class="relative mb-4">
+                <a href="/conversations" class="text-blue-500 hover:text-blue-700">← Back to Conversations</a>
+                <button onclick="toggleFocusDropdown()"
+                        class="w-full flex items-center justify-between p-2 bg-gray-100 rounded-lg text-gray-800 hover:bg-gray-200 transition-colors">
+                    <span id="focusLabel">Main Discussion</span>
+                    <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
-                    <span class="hidden md:inline font-medium">Sarah</span>
                 </button>
-                <button onclick="exportPersonaThoughts('Product', 'Mike - Product')"
-                        class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
-                        title="Export Mike's Thoughts">
-                    <svg class="w-6 h-6 text-purple-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4" />
+                <div id="focusDropdown" class="hidden absolute w-full mt-1 bg-white rounded-lg shadow-lg z-10">
+                    <button onclick="changeFocus('Main Discussion')"
+                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Main Discussion
+                    </button>
+                    <button onclick="changeFocus('Brainstorming')"
+                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Brainstorming
+                    </button>
+                    <button onclick="changeFocus('Q&A')"
+                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Q&A
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Personas</h2>
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
+                    <svg id="sidebarToggleIcon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
-                    <span class="hidden md:inline font-medium">Mike</span>
-                </button>
-                <button onclick="exportPersonaThoughts('Technical', 'Emma - Technical')"
-                        class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
-                        title="Export Emma's Thoughts">
-                    <svg class="w-6 h-6 text-yellow-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4" />
-                    </svg>
-                    <span class="hidden md:inline font-medium">Emma</span>
-                </button>
-                <button onclick="exportPersonaThoughts('Legal', 'John - Legal')"
-                        class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
-                        title="Export John's Thoughts">
-                    <svg class="w-6 h-6 text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4" />
-                    </svg>
-                    <span class="hidden md:inline font-medium">John</span>
-                </button>
-                <button onclick="exportAllThoughts()"
-                        class="flex items-center gap-2 bg-white bg-opacity-20 rounded-lg px-3 py-2 text-white hover:bg-opacity-30 transition-all duration-300 shadow-sm"
-                        title="Export All Thoughts">
-                    <svg class="w-6 h-6 text-green-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0111 4a5 5 0 014.9 4.097A4 4 0 0115 16H7zm5-12v8m-4-4l4-4 4 4" />
-                    </svg>
-                    <span class="hidden md:inline font-medium">All</span>
                 </button>
             </div>
+            <ul class="space-y-2" id="personaList">
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                    <div class="flex items-center cursor-pointer" onclick="selectPersona('All', 'All Personas')">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">
+                            A
+                        </div>
+                        All Personas
+                        <span class="ml-2 text-xs text-green-500">Online</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
+                         onclick="editPersona('All', 'All Personas')"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </li>
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                    <div class="flex items-center cursor-pointer"
+                         onclick="selectPersona('Marketing', 'Sarah - Marketing')">
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
+                            S
+                        </div>
+                        Sarah - Marketing
+                        <span class="ml-2 text-xs text-green-500">Online</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
+                         onclick="editPersona('Marketing', 'Sarah - Marketing')"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </li>
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                    <div class="flex items-center cursor-pointer" onclick="selectPersona('Product', 'Mike - Product')">
+                        <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white mr-2">
+                            M
+                        </div>
+                        Mike - Product
+                        <span class="ml-2 text-xs text-yellow-500">Busy</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
+                         onclick="editPersona('Product', 'Mike - Product')"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </li>
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                    <div class="flex items-center cursor-pointer"
+                         onclick="selectPersona('Technical', 'Emma - Technical')">
+                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white mr-2">
+                            E
+                        </div>
+                        Emma - Technical
+                        <span class="ml-2 text-xs text-green-500">Online</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
+                         onclick="editPersona('Technical', 'Emma - Technical')"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </li>
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                    <div class="flex items-center cursor-pointer" onclick="selectPersona('Legal', 'John - Legal')">
+                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white mr-2">
+                            J
+                        </div>
+                        John - Legal
+                        <span class="ml-2 text-xs text-gray-500">Offline</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
+                         onclick="editPersona('Legal', 'John - Legal')"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </li>
+            </ul>
         </div>
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Left Sidebar with Personas -->
-            <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300" id="sidebar">
-                <!-- Focus Dropdown -->
-                <div class="relative mb-4">
-                    <a href="/conversations" class="text-blue-500 hover:text-blue-700">← Back to Conversations</a>
-                    <button onclick="toggleFocusDropdown()"
-                            class="w-full flex items-center justify-between p-2 bg-gray-100 rounded-lg text-gray-800 hover:bg-gray-200 transition-colors">
-                        <span id="focusLabel">Main Discussion</span>
-                        <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <div id="focusDropdown" class="hidden absolute w-full mt-1 bg-white rounded-lg shadow-lg z-10">
-                        <button onclick="changeFocus('Main Discussion')" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Main Discussion</button>
-                        <button onclick="changeFocus('Brainstorming')" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Brainstorming</button>
-                        <button onclick="changeFocus('Q&A')" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Q&A</button>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Personas</h2>
-                    <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
-                        <svg id="sidebarToggleIcon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </div>
-                <ul class="space-y-2" id="personaList">
-                    <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                        <div class="flex items-center cursor-pointer" onclick="selectPersona('All', 'All Personas')">
-                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">A</div>
-                            All Personas
-                            <span class="ml-2 text-xs text-green-500">Online</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer" onclick="editPersona('All', 'All Personas')"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </li>
-                    <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                        <div class="flex items-center cursor-pointer" onclick="selectPersona('Marketing', 'Sarah - Marketing')">
-                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">S</div>
-                            Sarah - Marketing
-                            <span class="ml-2 text-xs text-green-500">Online</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer" onclick="editPersona('Marketing', 'Sarah - Marketing')"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </li>
-                    <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                        <div class="flex items-center cursor-pointer" onclick="selectPersona('Product', 'Mike - Product')">
-                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white mr-2">M</div>
-                            Mike - Product
-                            <span class="ml-2 text-xs text-yellow-500">Busy</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer" onclick="editPersona('Product', 'Mike - Product')"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </li>
-                    <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                        <div class="flex items-center cursor-pointer" onclick="selectPersona('Technical', 'Emma - Technical')">
-                            <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white mr-2">E</div>
-                            Emma - Technical
-                            <span class="ml-2 text-xs text-green-500">Online</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer" onclick="editPersona('Technical', 'Emma - Technical')"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </li>
-                    <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                        <div class="flex items-center cursor-pointer" onclick="selectPersona('Legal', 'John - Legal')">
-                            <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white mr-2">J</div>
-                            John - Legal
-                            <span class="ml-2 text-xs text-gray-500">Offline</span>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer" onclick="editPersona('Legal', 'John - Legal')"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </li>
-                </ul>
+        <!-- Right Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Header -->
+            <div class="bg-white p-4 border-b border-gray-200">
+                <h2 id="chatHeader" class="text-lg font-semibold" th:text="${conversation.topic}">Chat with All
+                    Personas</h2>
+                <small class="text-gray-400" th:text="${conversation.purpose}"></small>
             </div>
 
-            <!-- Right Chat Area -->
-            <div class="flex-1 flex flex-col">
-                <!-- Chat Header -->
-                <div class="bg-white p-4 border-b border-gray-200">
-                    <h2 id="chatHeader" class="text-lg font-semibold" th:text="${conversation.topic}">Chat with All Personas</h2>
-                    <small class="text-gray-400" th:text="${conversation.purpose}"></small>
-                </div>
-
-                <!-- Chat Messages -->
-                <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">S</div>
-                        <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
-                            <p class="text-sm font-semibold text-blue-800">Sarah - Marketing</p>
-                            <p class="text-gray-800">Welcome to the chat! How can we assist you today?</p>
-                            <p class="text-xs text-gray-500 mt-1">Feb 23, 2025, 10:15 AM</p>
-                        </div>
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">S
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
+                        <p class="text-sm font-semibold text-blue-800">Sarah - Marketing</p>
+                        <p class="text-gray-800">Welcome to the chat! How can we assist you today?</p>
+                        <p class="text-xs text-gray-500 mt-1">Feb 23, 2025, 10:15 AM</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Message Input -->
-                <div class="bg-white p-4 border-t border-gray-200">
-                    <form onsubmit="sendMessage(event)" class="flex gap-2 items-center">
-                        <label for="fileUpload" class="cursor-pointer text-gray-500 hover:text-gray-700" title="Attach a file">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586a4 4 0 00-5.656-5.656l-6.586 6.586a6 6 0 108.486 8.486L20.5 8" />
-                            </svg>
-                            <input type="file" id="fileUpload" class="hidden" onchange="handleFileUpload(event)" />
-                        </label>
-                        <input
-                                id="messageInput"
-                                type="text"
-                                placeholder="Type your message..."
-                                class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                        <button
-                                type="submit"
-                                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                            Send
-                        </button>
-                    </form>
+            <!-- Message Input -->
+            <div class="bg-white p-4 border-t border-gray-200">
+                <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+                    <p th:text="${errorMessage}"></p>
                 </div>
+                <div th:if="${successMessage}" class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                    <p th:text="${successMessage}"></p>
+                </div>
+                <form th:action="@{/conversations/{conversationId}/messages(conversationId=${conversation.id})}"
+                      th:object="${newMessage}" method="post" class="flex gap-2 items-center">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <label for="fileUpload" class="cursor-pointer text-gray-500 hover:text-gray-700"
+                           title="Attach a file">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586a4 4 0 00-5.656-5.656l-6.586 6.586a6 6 0 108.486 8.486L20.5 8"/>
+                        </svg>
+                        <input type="file" id="fileUpload" class="hidden" onchange="handleFileUpload(event)"/>
+                    </label>
+                    <div class="flex-1">
+                        <input type="text"
+                               th:field="*{content}"
+                               placeholder="Type your message..."
+                               class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               th:classappend="${#fields.hasErrors('content')} ? 'border-red-500'">
+                        <div th:if="${#fields.hasErrors('content')}" class="mt-1 text-sm text-red-600"
+                             th:errors="*{content}"></div>
+                    </div>
+                    <button type="submit"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Send
+                    </button>
+                </form>
             </div>
         </div>
+    </div>
 
-        <script>
-            let currentPersona = 'All';
-            let currentPersonaName = 'All Personas';
-            let currentUser = 'User1'; // Default user
-            let currentFocus = 'Main Discussion'; // Default focus
+    <script>
+        let currentPersona = 'All';
+        let currentPersonaName = 'All Personas';
+        let currentUser = 'User1'; // Default user
+        let currentFocus = 'Main Discussion'; // Default focus
 
-            function selectPersona(persona, personaName) {
-                currentPersona = persona;
-                currentPersonaName = personaName;
-                document.getElementById('chatHeader').textContent = `Chat with ${personaName}`;
+        function selectPersona(persona, personaName) {
+            currentPersona = persona;
+            currentPersonaName = personaName;
+            document.getElementById('chatHeader').textContent = `Chat with ${personaName}`;
+        }
+
+        function editPersona(persona, personaName) {
+            const newName = prompt(`Edit persona name for ${persona}:`, personaName);
+            if (newName) {
+                alert(`Would update ${persona} to "${newName}" - refresh to see original names`);
             }
+        }
 
-            function editPersona(persona, personaName) {
-                const newName = prompt(`Edit persona name for ${persona}:`, personaName);
-                if (newName) {
-                    alert(`Would update ${persona} to "${newName}" - refresh to see original names`);
-                }
-            }
+        function exportPersonaThoughts(persona, personaName) {
+            const thoughts = getPersonaThoughts(persona);
+            alert(`${personaName}'s thoughts would be exported to Google Docs:\n\n${thoughts}`);
+        }
 
-            function exportPersonaThoughts(persona, personaName) {
-                const thoughts = getPersonaThoughts(persona);
-                alert(`${personaName}'s thoughts would be exported to Google Docs:\n\n${thoughts}`);
-            }
+        function exportAllThoughts() {
+            const personas = ['Marketing', 'Product', 'Technical', 'Legal'];
+            let allThoughts = '';
+            personas.forEach(p => {
+                allThoughts += getPersonaThoughts(p) + '\n\n';
+            });
+            alert(`All personas' thoughts would be exported to Google Docs:\n\n${allThoughts}`);
+        }
 
-            function exportAllThoughts() {
-                const personas = ['Marketing', 'Product', 'Technical', 'Legal'];
-                let allThoughts = '';
-                personas.forEach(p => {
-                    allThoughts += getPersonaThoughts(p) + '\n\n';
+        function getPersonaThoughts(persona) {
+            const chatMessages = document.getElementById('chatMessages').innerHTML;
+            return `Thoughts from ${persona} (${currentFocus}):\n- Sample thought 1\n- Sample thought 2\n(Extracted from chat: ${chatMessages.length} characters)`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('sidebarToggleIcon');
+            sidebar.classList.toggle('w-1/4');
+            sidebar.classList.toggle('w-16');
+            document.getElementById('personaList').classList.toggle('hidden');
+            icon.innerHTML = sidebar.classList.contains('w-16')
+                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />`
+                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const chatMessages = document.getElementById('chatMessages');
+                const timestamp = new Date().toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
                 });
-                alert(`All personas' thoughts would be exported to Google Docs:\n\n${allThoughts}`);
-            }
-
-            function getPersonaThoughts(persona) {
-                const chatMessages = document.getElementById('chatMessages').innerHTML;
-                return `Thoughts from ${persona} (${currentFocus}):\n- Sample thought 1\n- Sample thought 2\n(Extracted from chat: ${chatMessages.length} characters)`;
-            }
-
-            function toggleSidebar() {
-                const sidebar = document.getElementById('sidebar');
-                const icon = document.getElementById('sidebarToggleIcon');
-                sidebar.classList.toggle('w-1/4');
-                sidebar.classList.toggle('w-16');
-                document.getElementById('personaList').classList.toggle('hidden');
-                icon.innerHTML = sidebar.classList.contains('w-16')
-                    ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />`
-                    : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`;
-            }
-
-            function handleFileUpload(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const timestamp = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-                    const attachmentMessage = `
+                const attachmentMessage = `
                     <div class="flex items-start justify-end">
                         <div class="bg-green-100 p-3 rounded-lg max-w-[70%]">
                             <p class="text-sm font-semibold text-green-800">${currentUser}</p>
@@ -259,46 +310,53 @@
                         </div>
                     </div>
                 `;
-                    chatMessages.innerHTML += attachmentMessage;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    event.target.value = '';
-                    alert(`File "${file.name}" would be uploaded. Size: ${(file.size / 1024).toFixed(2)} KB`);
-                }
+                chatMessages.innerHTML += attachmentMessage;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                event.target.value = '';
+                alert(`File "${file.name}" would be uploaded. Size: ${(file.size / 1024).toFixed(2)} KB`);
             }
+        }
 
-            function toggleProfileDropdown() {
-                const dropdown = document.getElementById('profileDropdown');
-                dropdown.classList.toggle('hidden');
-            }
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
 
-            function changeProfile(user) {
-                currentUser = user;
-                alert(`Profile changed to ${user}`);
-                toggleProfileDropdown();
-            }
+        function changeProfile(user) {
+            currentUser = user;
+            alert(`Profile changed to ${user}`);
+            toggleProfileDropdown();
+        }
 
-            function toggleFocusDropdown() {
-                const dropdown = document.getElementById('focusDropdown');
-                dropdown.classList.toggle('hidden');
-            }
+        function toggleFocusDropdown() {
+            const dropdown = document.getElementById('focusDropdown');
+            dropdown.classList.toggle('hidden');
+        }
 
-            function changeFocus(focus) {
-                currentFocus = focus;
-                document.getElementById('focusLabel').textContent = focus;
-                toggleFocusDropdown();
-                alert(`Focus changed to ${focus}`);
-                // In a real app, this could trigger context-specific behavior for personas
-            }
+        function changeFocus(focus) {
+            currentFocus = focus;
+            document.getElementById('focusLabel').textContent = focus;
+            toggleFocusDropdown();
+            alert(`Focus changed to ${focus}`);
+            // In a real app, this could trigger context-specific behavior for personas
+        }
 
-            function sendMessage(event) {
-                event.preventDefault();
-                const input = document.getElementById('messageInput');
-                const message = input.value.trim();
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
 
-                if (message) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const timestamp = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-                    const userMessage = `
+            if (message) {
+                const chatMessages = document.getElementById('chatMessages');
+                const timestamp = new Date().toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+                const userMessage = `
                     <div class="flex items-start justify-end">
                         <div class="bg-green-100 p-3 rounded-lg max-w-[70%]">
                             <p class="text-sm font-semibold text-green-800">${currentUser}</p>
@@ -307,43 +365,43 @@
                         </div>
                     </div>
                 `;
-                    chatMessages.innerHTML += userMessage;
-                    input.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.innerHTML += userMessage;
+                input.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                    setTimeout(() => {
-                        const personaResponses = {
-                            'All': 'All Personas',
-                            'Marketing': 'Sarah - Marketing',
-                            'Product': 'Mike - Product',
-                            'Technical': 'Emma - Technical',
-                            'Legal': 'John - Legal'
-                        };
-                        const avatarInitials = {
-                            'All': 'A',
-                            'Marketing': 'S',
-                            'Product': 'M',
-                            'Technical': 'E',
-                            'Legal': 'J'
-                        };
-                        const avatarColors = {
-                            'All': 'bg-green-500',
-                            'Marketing': 'bg-blue-500',
-                            'Product': 'bg-purple-500',
-                            'Technical': 'bg-yellow-500',
-                            'Legal': 'bg-red-500'
-                        };
-                        const responseName = currentPersona === 'All'
-                            ? personaResponses[Math.random() > 0.5 ? 'Marketing' : 'Product']
-                            : personaResponses[currentPersona];
-                        const responseInitial = avatarInitials[currentPersona === 'All'
-                            ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
-                            : currentPersona];
-                        const responseColor = avatarColors[currentPersona === 'All'
-                            ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
-                            : currentPersona];
+                setTimeout(() => {
+                    const personaResponses = {
+                        'All': 'All Personas',
+                        'Marketing': 'Sarah - Marketing',
+                        'Product': 'Mike - Product',
+                        'Technical': 'Emma - Technical',
+                        'Legal': 'John - Legal'
+                    };
+                    const avatarInitials = {
+                        'All': 'A',
+                        'Marketing': 'S',
+                        'Product': 'M',
+                        'Technical': 'E',
+                        'Legal': 'J'
+                    };
+                    const avatarColors = {
+                        'All': 'bg-green-500',
+                        'Marketing': 'bg-blue-500',
+                        'Product': 'bg-purple-500',
+                        'Technical': 'bg-yellow-500',
+                        'Legal': 'bg-red-500'
+                    };
+                    const responseName = currentPersona === 'All'
+                        ? personaResponses[Math.random() > 0.5 ? 'Marketing' : 'Product']
+                        : personaResponses[currentPersona];
+                    const responseInitial = avatarInitials[currentPersona === 'All'
+                        ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
+                        : currentPersona];
+                    const responseColor = avatarColors[currentPersona === 'All'
+                        ? (Math.random() > 0.5 ? 'Marketing' : 'Product')
+                        : currentPersona];
 
-                        const response = `
+                    const response = `
                         <div class="flex items-start">
                             <div class="w-8 h-8 ${responseColor} rounded-full flex items-center justify-center text-white mr-2">${responseInitial}</div>
                             <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
@@ -353,12 +411,12 @@
                             </div>
                         </div>
                     `;
-                        chatMessages.innerHTML += response;
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }, 1000);
-                }
+                    chatMessages.innerHTML += response;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
             }
-        </script>
-    </div>
+        }
+    </script>
+</div>
 </body>
 </html>
