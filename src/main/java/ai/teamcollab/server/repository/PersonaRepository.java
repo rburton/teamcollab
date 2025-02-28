@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface PersonaRepository extends CrudRepository<Persona, Long> {
-    List<Persona> findByCompanyId(Long companyId);
+    List<Persona> findByCompanyIdOrCompanyIdIsNull(Long companyId);
 }

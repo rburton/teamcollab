@@ -91,13 +91,38 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Personas</h2>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-semibold">Personas</h2>
+                    <button onclick="openPersonasModal()" class="text-blue-500 hover:text-blue-700">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
                 <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
                     <svg id="sidebarToggleIcon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                 </button>
+            </div>
+
+            <!-- Personas Modal -->
+            <div id="personasModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">All Personas</h3>
+                        <button onclick="closePersonasModal()" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="personasModalContent" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Personas will be loaded here -->
+                    </div>
+                </div>
             </div>
             <ul class="space-y-2" id="personaList">
                 <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
@@ -249,6 +274,58 @@
         let currentPersonaName = 'All Personas';
         let currentUser = 'User1'; // Default user
         let currentFocus = 'Main Discussion'; // Default focus
+
+        function openPersonasModal() {
+            const modal = document.getElementById('personasModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            fetchPersonas();
+        }
+
+        function closePersonasModal() {
+            const modal = document.getElementById('personasModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function fetchPersonas() {
+            fetch('/personas/all')
+                .then(response => response.json())
+                .then(personas => {
+                    const modalContent = document.getElementById('personasModalContent');
+                    modalContent.innerHTML = personas.map(persona => `
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-semibold"
+                                     style="background-color: ${getRandomColor()}">
+                                    ${persona.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg">${persona.name}</h4>
+                                    <p class="text-sm text-gray-600">${persona.expertises || 'No expertise specified'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Error fetching personas:', error);
+                    const modalContent = document.getElementById('personasModalContent');
+                    modalContent.innerHTML = '<p class="text-red-500">Error loading personas. Please try again later.</p>';
+                });
+        }
+
+        function getRandomColor() {
+            const colors = [
+                '#3B82F6', // blue-500
+                '#8B5CF6', // purple-500
+                '#EC4899', // pink-500
+                '#10B981', // emerald-500
+                '#F59E0B', // amber-500
+                '#EF4444'  // red-500
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
 
         function selectPersona(persona, personaName) {
             currentPersona = persona;

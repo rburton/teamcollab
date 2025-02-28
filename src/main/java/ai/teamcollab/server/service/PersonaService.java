@@ -39,7 +39,7 @@ public class PersonaService {
     }
 
     public List<Persona> findByCompany(Long companyId) {
-        return personaRepository.findByCompanyId(companyId);
+        return personaRepository.findByCompanyIdOrCompanyIdIsNull(companyId);
     }
 
     public Persona updatePersona(Long id, String name, String expertiseAreas) {

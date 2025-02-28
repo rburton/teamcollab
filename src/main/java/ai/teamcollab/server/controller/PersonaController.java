@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.List;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -38,6 +40,13 @@ public class PersonaController {
             model.addAttribute("persona", new Persona());
         }
         return "personas/index";
+    }
+
+    @GetMapping("/all")
+    @ResponseBody
+    public List<Persona> getAllPersonas(@AuthenticationPrincipal User user) {
+        final var company = user.getCompany();
+        return personaService.findByCompany(company.getId());
     }
 
     @PostMapping
