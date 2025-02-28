@@ -100,12 +100,6 @@
                         </svg>
                     </button>
                 </div>
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
-                    <svg id="sidebarToggleIcon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </button>
             </div>
 
             <!-- Personas Modal -->
@@ -121,9 +115,95 @@
                     </div>
                     <div id="personasModalContent" class="space-y-4 max-h-96 overflow-y-auto">
                         <!-- Personas will be loaded here -->
+                        <template id="personaTemplate">
+                            <div class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between"
+                                 onclick="addPersonaToConversation(this.dataset.personaId)">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium"></h4>
+                                        <p class="text-sm text-gray-600"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
                 </div>
             </div>
+
+            <script th:inline="javascript">
+                const conversationId = /*[[${conversation.id}]]*/ null;
+
+                function addPersonaToConversation(personaId) {
+                    fetch(`/api/personas/add-to-conversation?conversationId=${conversationId}&personaId=${personaId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.status === 403 ? 'Access denied' : 'Failed to add persona');
+                        }
+                        // Reload the page to show the updated conversation
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        const errorDiv = document.getElementById('errorMessage');
+                        errorDiv.textContent = error.message;
+                        errorDiv.classList.remove('hidden');
+                        setTimeout(() => {
+                            errorDiv.classList.add('hidden');
+                        }, 5000);
+                    });
+                }
+
+                function loadPersonas() {
+                    fetch('/api/personas/all')
+                        .then(response => response.json())
+                        .then(personas => {
+                            const container = document.getElementById('personasModalContent');
+                            const template = document.getElementById('personaTemplate');
+                            container.innerHTML = '';
+
+                            personas.forEach(persona => {
+                                const element = template.content.cloneNode(true);
+                                const div = element.querySelector('div');
+                                div.dataset.personaId = persona.id;
+
+                                const initial = element.querySelector('.rounded-full');
+                                initial.textContent = persona.name.charAt(0);
+
+                                const name = element.querySelector('h4');
+                                name.textContent = persona.name;
+
+                                const expertise = element.querySelector('p');
+                                expertise.textContent = persona.expertises;
+
+                                container.appendChild(element);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading personas:', error);
+                        });
+                }
+
+                function openPersonasModal() {
+                    const modal = document.getElementById('personasModal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    loadPersonas();
+                }
+
+                function closePersonasModal() {
+                    const modal = document.getElementById('personasModal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            </script>
             <ul class="space-y-2" id="personaList">
                 <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
                     <div class="flex items-center cursor-pointer" onclick="selectPersona('All', 'All Personas')">
