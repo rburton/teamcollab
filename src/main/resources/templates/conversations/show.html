@@ -191,13 +191,18 @@
 
             <!-- Chat Messages -->
             <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
-                <div class="flex items-start">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">S
+                <div th:each="message : ${messages}" class="flex items-start">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2" 
+                         th:text="${#strings.substring(message?.user.username, 0, 1)}">
                     </div>
                     <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
-                        <p class="text-sm font-semibold text-blue-800">Sarah - Marketing</p>
-                        <p class="text-gray-800">Welcome to the chat! How can we assist you today?</p>
-                        <p class="text-xs text-gray-500 mt-1">Feb 23, 2025, 10:15 AM</p>
+                        <p class="text-sm font-semibold text-blue-800" 
+                           th:text="${message.user?.username + (message.persona != null ? ' - ' + message.persona?.name : '')}">
+                        </p>
+                        <p class="text-gray-800" th:text="${message.content}"></p>
+                        <p class="text-xs text-gray-500 mt-1" 
+                           th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
+                        </p>
                     </div>
                 </div>
             </div>

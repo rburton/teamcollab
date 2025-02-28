@@ -10,4 +10,5 @@ import java.util.List;
 public interface MessageRepository extends CrudRepository<Message, Long> {
     List<Message> findByConversationIdOrderByCreatedAtDesc(Long conversationId);
     List<Message> findByUserIdOrderByCreatedAtDesc(Long userId);
+    List<Message> findByUserIdOrderByCreatedAtAsc(Long userId);
 }

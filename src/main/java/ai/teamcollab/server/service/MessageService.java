@@ -57,11 +57,11 @@ public class MessageService {
 
     public List<Message> getConversationMessages(Long conversationId) {
         logger.debug("Fetching messages for conversation {}", conversationId);
-        return messageRepository.findByConversationIdOrderByCreatedAtDesc(conversationId);
+        return messageRepository.findByUserIdOrderByCreatedAtAsc(conversationId);
     }
 
     public List<Message> getUserMessages(Long userId) {
         logger.debug("Fetching messages for user {}", userId);
-        return messageRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return messageRepository.findByUserIdOrderByCreatedAtAsc(userId);
     }
 }
