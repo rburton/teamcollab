@@ -1,7 +1,7 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.api.PersonaRestController;
 import ai.teamcollab.server.domain.Company;
-import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
