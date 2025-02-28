@@ -1,6 +1,6 @@
 package ai.teamcollab.server.api;
 
-import ai.teamcollab.server.domain.Persona;
+import ai.teamcollab.server.api.domain.PersonaResponse;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.PersonaService;
@@ -26,9 +26,12 @@ public class PersonaRestController {
     }
 
     @GetMapping("/all")
-    public List<Persona> getAllPersonas(@AuthenticationPrincipal User user) {
+    public List<PersonaResponse> getAllPersonas(@AuthenticationPrincipal User user) {
         final var company = user.getCompany();
-        return personaService.findByCompany(company.getId());
+        return personaService.findByCompany(company.getId())
+                .stream()
+                .map(PersonaResponse::fromPersona)
+                .toList();
     }
 
 }

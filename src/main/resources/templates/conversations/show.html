@@ -94,9 +94,12 @@
                 <div class="flex items-center gap-2">
                     <h2 class="text-lg font-semibold">Personas</h2>
                     <button data-action="click->persona#open" class="text-blue-500 hover:text-blue-700">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                     </button>
                 </div>
@@ -106,13 +109,16 @@
             <div data-persona-target="container"></div>
 
             <!-- Personas Modal -->
-            <div data-persona-target="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div data-persona-target="modal"
+                 class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold">All Personas</h3>
                         <button data-action="click->persona#close" class="text-gray-500 hover:text-gray-700">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
@@ -128,6 +134,9 @@
                                     <div>
                                         <h4 class="font-medium"></h4>
                                         <p class="text-sm text-gray-600"></p>
+                                        <form method="post" action="/api/conversations/1/personas" data-turbo="true">
+                                            <button class="w-full h-14" type="submit">Skip Step</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -139,8 +148,8 @@
             </div>
 
             <ul class="space-y-2" id="personaList">
-                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                    <div class="flex items-center cursor-pointer" 
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group border border-gray-200 cursor-pointer">
+                    <div class="flex items-center"
                          data-action="click->persona#select"
                          data-persona-id="All"
                          data-persona-name="All Personas">
@@ -148,76 +157,23 @@
                             A
                         </div>
                         All Personas
-                        <span class="ml-2 text-xs text-green-500">Online</span>
                     </div>
-                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
-                         data-action="click->persona#edit"
-                         data-persona-id="All"
-                         data-persona-name="All Personas"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
                 </li>
-                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
+                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group border border-gray-200 cursor-pointer"
+                    th:each="persona: ${personas}">
                     <div class="flex items-center cursor-pointer"
                          data-action="click->persona#select"
                          data-persona-id="Marketing"
                          data-persona-name="Sarah - Marketing">
-                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
-                            S
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">S</div>
+                        <div class="flex flex-col">
+                            <span th:text="${persona.name}"></span>
+                            <small th:text="${persona.expertises}"></small>
                         </div>
-                        Sarah - Marketing
-                        <span class="ml-2 text-xs text-green-500">Online</span>
+
                     </div>
                     <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
                          onclick="editPersona('Marketing', 'Sarah - Marketing')"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </li>
-                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                    <div class="flex items-center cursor-pointer" onclick="selectPersona('Product', 'Mike - Product')">
-                        <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white mr-2">
-                            M
-                        </div>
-                        Mike - Product
-                        <span class="ml-2 text-xs text-yellow-500">Busy</span>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
-                         onclick="editPersona('Product', 'Mike - Product')"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </li>
-                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                    <div class="flex items-center cursor-pointer"
-                         onclick="selectPersona('Technical', 'Emma - Technical')">
-                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white mr-2">
-                            E
-                        </div>
-                        Emma - Technical
-                        <span class="ml-2 text-xs text-green-500">Online</span>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
-                         onclick="editPersona('Technical', 'Emma - Technical')"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </li>
-                <li class="p-2 hover:bg-gray-100 rounded flex items-center justify-between group">
-                    <div class="flex items-center cursor-pointer" onclick="selectPersona('Legal', 'John - Legal')">
-                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white mr-2">
-                            J
-                        </div>
-                        John - Legal
-                        <span class="ml-2 text-xs text-gray-500">Offline</span>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-500 hidden group-hover:block cursor-pointer"
-                         onclick="editPersona('Legal', 'John - Legal')"
                          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>

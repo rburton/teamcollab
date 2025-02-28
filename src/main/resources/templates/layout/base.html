@@ -12,6 +12,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script th:src="@{/dist/application.js}"></script>
 </head>
 <body class="bg-gray-100">
     <!-- Navigation -->
@@ -42,7 +43,7 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
+        <div class="px-4 py-1 sm:px-0">
             <div id="content" data-turbo-frame="content" layout:fragment="content">
                 <!-- Page content will be inserted here -->
             </div>
@@ -62,6 +63,5 @@
             event.detail.fetchOptions.headers['[[${_csrf.headerName}]]'] = '[[${_csrf.token}]]';
         });
     </script>
-    <script th:src="@{/dist/application.js}"></script>
 </body>
 </html>

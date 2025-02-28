@@ -78,6 +78,7 @@ public class ConversationController {
         model.addAttribute("conversation", conversation);
         model.addAttribute("messages", messageService.getConversationMessages(id));
         model.addAttribute("newMessage", new Message());
+        model.addAttribute("personas", conversation.getPersonas());
         return "conversations/show";
     }
 
