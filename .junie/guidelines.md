@@ -39,6 +39,7 @@
 
 ### Best Practices
 1. Implement proper exception handling
+2. Use static imports for constants and functions
 
 ### Code Organization
 1. Group related functionality into packages

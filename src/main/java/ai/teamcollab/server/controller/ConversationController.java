@@ -1,8 +1,10 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
+import ai.teamcollab.server.service.MessageService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,9 +22,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ConversationController {
 
     private final ConversationService conversationService;
+    private final MessageService messageService;
 
-    public ConversationController(ConversationService conversationService) {
+    public ConversationController(ConversationService conversationService,
+                                MessageService messageService) {
         this.conversationService = conversationService;
+        this.messageService = messageService;
     }
 
     @GetMapping
@@ -69,7 +74,43 @@ public class ConversationController {
         }
 
         model.addAttribute("conversation", conversation);
+        model.addAttribute("messages", messageService.getConversationMessages(id));
+        model.addAttribute("newMessage", new Message());
         return "conversations/show";
     }
 
+    @PostMapping("/{id}/messages")
+    public String postMessage(@PathVariable Long id,
+                            @Valid @ModelAttribute("newMessage") Message message,
+                            BindingResult bindingResult,
+                            @AuthenticationPrincipal User user,
+                            RedirectAttributes redirectAttributes) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not authenticated");
+        }
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newMessage", bindingResult);
+            redirectAttributes.addFlashAttribute("newMessage", message);
+            return "redirect:/conversations/" + id;
+        }
+
+        if (message.getContent() == null || message.getContent().trim().isEmpty()) {
+            bindingResult.rejectValue("content", "NotEmpty", "Message content cannot be empty");
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newMessage", bindingResult);
+            redirectAttributes.addFlashAttribute("newMessage", message);
+            return "redirect:/conversations/" + id;
+        }
+
+        try {
+            messageService.createMessage(message, id, user);
+            redirectAttributes.addFlashAttribute("successMessage", "Message posted successfully!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("newMessage", message);
+        }
+
+        return "redirect:/conversations/" + id;
+    }
 }
