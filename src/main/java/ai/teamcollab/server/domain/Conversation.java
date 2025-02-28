@@ -1,8 +1,8 @@
 package ai.teamcollab.server.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -41,8 +42,8 @@ public class Conversation {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "created_at")
-    private java.time.LocalDateTime createdAt;
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Message> messages = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -51,6 +52,9 @@ public class Conversation {
             inverseJoinColumns = @JoinColumn(name = "persona_id")
     )
     private Set<Persona> personas = new HashSet<>();
+
+    @Column(name = "created_at")
+    private java.time.LocalDateTime createdAt;
 
     public Conversation() {
     }
@@ -108,6 +112,14 @@ public class Conversation {
 
     public void setPersonas(Set<Persona> personas) {
         this.personas = personas;
+    }
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
     }
 
     @Override

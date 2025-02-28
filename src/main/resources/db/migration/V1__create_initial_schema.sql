@@ -42,7 +42,6 @@ CREATE TABLE conversations
     CONSTRAINT topic_length_check CHECK (LENGTH(topic) >= 3),
     CONSTRAINT purpose_length_check CHECK (LENGTH(purpose) >= 10)
 );
-
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
@@ -55,7 +54,6 @@ CREATE TABLE personas
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 
--- Create persona_conversations join table
 CREATE TABLE conversation_persona
 (
     conversation_id BIGINT NOT NULL,
@@ -69,3 +67,16 @@ INSERT INTO personas (name, expertise_areas)
 VALUES ('Mary', 'Marketing'),
        ('Jack', 'Product Management'),
        ('Frank', 'Legal');
+
+CREATE TABLE messages
+(
+    message_id      BIGSERIAL PRIMARY KEY,
+    conversation_id BIGINT    NOT NULL,
+    persona_id      BIGINT,
+    user_id         BIGINT,
+    content         TEXT      NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas (persona_id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
+);
