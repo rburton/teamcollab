@@ -1,0 +1,18 @@
+services:
+  ollama:
+    image: 'ollama/ollama:0.5.12'
+    ports:
+      - '11434'
+  postgres:
+    image: 'postgres:9.6.24-alpine'
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+#    volumes:
+#      - '.:/app:rw'
+#      - 'database-default:/var/lib/postgresql/data/'
+    env_file:
+      - .env
+
+#volumes:
+#  database-default:

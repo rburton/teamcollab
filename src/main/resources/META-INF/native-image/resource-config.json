@@ -1,0 +1,31 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\QMETA-INF/resources/\\E.*"
+      },
+      {
+        "pattern": "\\QMETA-INF/maven/.*\\E.*"
+      },
+      {
+        "pattern": "\\Qstatic/\\E.*"
+      },
+      {
+        "pattern": "\\Qtemplates/.*\\E.*"
+      },
+      {
+        "pattern": "\\Qdb/migration/.*\\E.*"
+      },
+      {
+        "pattern": "\\Qapplication.*\\E"
+      },
+      {
+        "pattern": "\\Qbanner.txt\\E"
+      },
+      {
+        "pattern": ".*\\.properties"
+      }
+    ]
+  },
+  "bundles": []
+}
