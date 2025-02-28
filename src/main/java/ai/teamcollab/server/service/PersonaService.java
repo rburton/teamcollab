@@ -55,7 +55,7 @@ public class PersonaService {
     public void addToConversation(Long personaId, Long conversationId) {
         logger.debug("Adding persona {} to conversation {}", personaId, conversationId);
 
-        Persona persona = personaRepository.findById(personaId)
+        final var persona = personaRepository.findById(personaId)
                 .orElseThrow(() -> new IllegalArgumentException("Persona not found with ID: " + personaId));
 
         final var conversation = conversationRepository.findById(conversationId)

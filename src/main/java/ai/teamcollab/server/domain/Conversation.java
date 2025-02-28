@@ -114,6 +114,11 @@ public class Conversation {
         this.personas = personas;
     }
 
+    public void addPersona(Persona persona) {
+        personas.add(persona);
+        persona.getConversations().add(this);
+    }
+
     public Set<Message> getMessages() {
         return messages;
     }

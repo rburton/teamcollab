@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Validated
 @RestController
-@RequestMapping(value = "/api/conversations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/conversations", produces = APPLICATION_JSON_VALUE)
 public class ConversationRestController {
     private static final Logger logger = LoggerFactory.getLogger(ConversationRestController.class);
 
@@ -47,7 +50,9 @@ public class ConversationRestController {
             var updatedPersona = personaService.findById(request.getPersonaId())
                     .orElseThrow(() -> new IllegalArgumentException("Persona not found after update"));
 
-            return ResponseEntity.ok(new PersonaAddedResponse(updatedPersona.getId(), updatedPersona.getName(), updatedPersona.getExpertises()));
+            return ResponseEntity.ok()
+                    .contentType(APPLICATION_JSON)
+                    .body(new PersonaAddedResponse(updatedPersona.getId(), updatedPersona.getName(), updatedPersona.getExpertises()));
         } catch (IllegalArgumentException e) {
             logger.error("Bad request while adding persona to conversation", e);
             return ResponseEntity.badRequest().build();

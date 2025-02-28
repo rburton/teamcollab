@@ -9,7 +9,7 @@ public class PersonaAddedResponse {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("name")
+    @JsonProperty("expertises")
     private String expertises;
 
     public PersonaAddedResponse(Long id, String name, String expertises) {

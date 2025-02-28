@@ -93,7 +93,7 @@ public class Persona {
     }
 
     public void addToConversation(Conversation conversation) {
-        this.conversations.add(conversation);
+        conversation.addPersona(this);
     }
 
     public void removeFromConversation(Conversation conversation) {
