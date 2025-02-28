@@ -19,7 +19,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {
@@ -41,7 +43,7 @@ class ConversationServiceTest {
         testUser = new User("testuser", "password", "test@example.com");
         testUser.setId(1L);
 
-        testConversation = new Conversation("Test Topic", "Test Purpose", testUser.getId());
+        testConversation = new Conversation("Test Topic", "Test Purpose", testUser);
         testConversation.setId(1L);
         testConversation.setCreatedAt(LocalDateTime.now());
     }
@@ -56,7 +58,7 @@ class ConversationServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getTopic()).isEqualTo(testConversation.getTopic());
         assertThat(result.getPurpose()).isEqualTo(testConversation.getPurpose());
-        assertThat(result.getCreatedBy()).isEqualTo(testUser.getId());
+        assertThat(result.getUser()).isEqualTo(testUser);
         verify(conversationRepository).save(any(Conversation.class));
     }
 
@@ -75,13 +77,13 @@ class ConversationServiceTest {
     void getUserConversationsShouldReturnUserConversations() {
         List<Conversation> conversations = Arrays.asList(testConversation);
         when(userRepository.existsById(testUser.getId())).thenReturn(true);
-        when(conversationRepository.findByCreatedByOrderByCreatedAtDesc(testUser.getId())).thenReturn(conversations);
+        when(conversationRepository.findByUserIdOrderByCreatedAtDesc(testUser.getId())).thenReturn(conversations);
 
         List<Conversation> result = conversationService.getUserConversations(testUser.getId());
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getTopic()).isEqualTo(testConversation.getTopic());
-        verify(conversationRepository).findByCreatedByOrderByCreatedAtDesc(testUser.getId());
+        verify(conversationRepository).findByUserIdOrderByCreatedAtDesc(testUser.getId());
     }
 
     @Test
@@ -92,7 +94,7 @@ class ConversationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("User not found");
 
-        verify(conversationRepository, never()).findByCreatedByOrderByCreatedAtDesc(any());
+        verify(conversationRepository, never()).findByUserIdOrderByCreatedAtDesc(any());
     }
 
     @Test

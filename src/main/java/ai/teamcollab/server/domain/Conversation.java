@@ -2,17 +2,20 @@ package ai.teamcollab.server.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -34,8 +37,9 @@ public class Conversation {
     @Size(min = 10, max = 1000, message = "Purpose must be between 10 and 1000 characters")
     private String purpose;
 
-    @Column(name = "created_by")
-    private Long createdBy;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "created_at")
     private java.time.LocalDateTime createdAt;
@@ -51,10 +55,10 @@ public class Conversation {
     public Conversation() {
     }
 
-    public Conversation(String topic, String purpose, Long createdBy) {
+    public Conversation(String topic, String purpose, User createdBy) {
         this.topic = topic;
         this.purpose = purpose;
-        this.createdBy = createdBy;
+        this.user = createdBy;
         this.createdAt = java.time.LocalDateTime.now();
     }
 
@@ -82,12 +86,12 @@ public class Conversation {
         this.purpose = purpose;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
+    public User getUser() {
+        return user;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public java.time.LocalDateTime getCreatedAt() {
@@ -106,4 +110,15 @@ public class Conversation {
         this.personas = personas;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Conversation that = (Conversation) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

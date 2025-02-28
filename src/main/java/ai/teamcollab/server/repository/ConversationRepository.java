@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ConversationRepository extends CrudRepository<Conversation, Long> {
-    List<Conversation> findByCreatedByOrderByCreatedAtDesc(Long userId);
+    List<Conversation> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

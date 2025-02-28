@@ -26,7 +26,9 @@ public class ConversationService {
             throw new IllegalArgumentException("User not found with id: " + userId);
         }
 
-        conversation.setCreatedBy(userId);
+        final var user = userRepository.findById(userId)
+                .orElseThrow();
+        conversation.setUser(user);
         conversation.setCreatedAt(java.time.LocalDateTime.now());
 
         return conversationRepository.save(conversation);
@@ -36,7 +38,7 @@ public class ConversationService {
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException("User not found with id: " + userId);
         }
-        return conversationRepository.findByCreatedByOrderByCreatedAtDesc(userId);
+        return conversationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public Conversation getConversationById(Long id) {

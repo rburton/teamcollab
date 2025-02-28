@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -99,4 +100,15 @@ public class Persona {
         this.conversations.remove(conversation);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Persona persona = (Persona) o;
+        return Objects.equals(id, persona.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

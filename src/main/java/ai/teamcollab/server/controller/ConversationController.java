@@ -3,6 +3,7 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/conversations")
@@ -65,7 +64,7 @@ public class ConversationController {
         }
 
         Conversation conversation = conversationService.getConversationById(id);
-        if (!user.getId().equals(conversation.getCreatedBy())) {
+        if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");
         }
 

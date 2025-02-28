@@ -36,14 +36,14 @@ CREATE TABLE conversations
     conversation_id BIGSERIAL PRIMARY KEY,
     topic           VARCHAR(255)  NOT NULL,
     purpose         VARCHAR(1000) NOT NULL,
-    created_by      BIGINT        NOT NULL REFERENCES users (user_id),
+    user_id         BIGINT        NOT NULL REFERENCES users (user_id),
     created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT topic_length_check CHECK (LENGTH(topic) >= 3),
     CONSTRAINT purpose_length_check CHECK (LENGTH(purpose) >= 10)
 );
 
-CREATE INDEX idx_conversations_created_by ON conversations (created_by);
+CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
 CREATE TABLE personas
