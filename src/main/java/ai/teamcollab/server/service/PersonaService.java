@@ -4,18 +4,17 @@ import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.PersonaRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @Service
 @Transactional
 public class PersonaService {
-    private static final Logger logger = LoggerFactory.getLogger(PersonaService.class);
 
     private final PersonaRepository personaRepository;
     private final ConversationRepository conversationRepository;
@@ -26,7 +25,7 @@ public class PersonaService {
     }
 
     public Persona createPersona(String name, String expertise, Company company) {
-        logger.debug("Creating new persona: {} with company ID: {}", name, company.getId());
+        log.debug("Creating new persona: {} with company ID: {}", name, company.getId());
         Persona persona = new Persona(name, expertise);
         persona.setCompany(company);
         return personaRepository.save(persona);
@@ -41,7 +40,7 @@ public class PersonaService {
     }
 
     public Persona updatePersona(Long id, String name, String expertiseAreas) {
-        logger.debug("Updating persona with ID: {}", id);
+        log.debug("Updating persona with ID: {}", id);
 
         Persona persona = personaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Persona not found with ID: " + id));
@@ -52,8 +51,8 @@ public class PersonaService {
     }
 
     @Transactional
-    public void addToConversation(Long personaId, Long conversationId) {
-        logger.debug("Adding persona {} to conversation {}", personaId, conversationId);
+    public Persona addToConversation(Long personaId, Long conversationId) {
+        log.debug("Adding persona {} to conversation {}", personaId, conversationId);
 
         final var persona = personaRepository.findById(personaId)
                 .orElseThrow(() -> new IllegalArgumentException("Persona not found with ID: " + personaId));
@@ -61,11 +60,11 @@ public class PersonaService {
         final var conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
         persona.addToConversation(conversation);
-        personaRepository.save(persona);
+        return personaRepository.save(persona);
     }
 
     public void removeFromConversation(Long personaId, Long conversationId) {
-        logger.debug("Removing persona {} from conversation {}", personaId, conversationId);
+        log.debug("Removing persona {} from conversation {}", personaId, conversationId);
 
         Persona persona = personaRepository.findById(personaId)
                 .orElseThrow(() -> new IllegalArgumentException("Persona not found with ID: " + personaId));
@@ -78,7 +77,8 @@ public class PersonaService {
     }
 
     public void deletePersona(Long id) {
-        logger.debug("Deleting persona with ID: {}", id);
+        log.debug("Deleting persona with ID: {}", id);
         personaRepository.deleteById(id);
     }
+
 }

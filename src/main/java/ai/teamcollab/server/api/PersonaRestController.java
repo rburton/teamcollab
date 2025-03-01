@@ -4,8 +4,7 @@ import ai.teamcollab.server.api.domain.PersonaResponse;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.PersonaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Log4j2
 @RestController
 @RequestMapping(value = "/api/personas", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PersonaRestController {
-    private static final Logger logger = LoggerFactory.getLogger(PersonaRestController.class);
 
     private final PersonaService personaService;
 
