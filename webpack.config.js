@@ -1,11 +1,20 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './src/main/resources/static/js/application.js',
+  entry: {
+    application: './src/main/resources/static/js/application.js',
+    styles: './src/main/resources/static/css/main.css'
+  },
   output: {
-    filename: 'application.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'src/main/resources/static/dist'),
   },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    })
+  ],
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   module: {
     rules: [
@@ -23,6 +32,14 @@ module.exports = {
             ]
           }
         }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          process.env.NODE_ENV === 'production' ? MiniCssExtractPlugin.loader : 'style-loader',
+          'css-loader',
+          'postcss-loader'
+        ]
       }
     ]
   },

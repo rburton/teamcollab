@@ -6,6 +6,8 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +22,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import static java.util.Objects.isNull;
 
 @Controller
-@AllArgsConstructor
 @RequestMapping("/conversations")
 public class ConversationController {
 
     private final ConversationService conversationService;
 
+    @Autowired
+    public ConversationController(@NonNull ConversationService conversationService) {
+        this.conversationService = conversationService;
+    }
+
     @GetMapping
-    public String index(@AuthenticationPrincipal User user, Model model) {
+    public String index(@NonNull @AuthenticationPrincipal User user, Model model) {
         model.addAttribute("conversations", conversationService.getUserConversations(user.getId()));
         if (!model.containsAttribute("conversation")) {
             model.addAttribute("conversation", new Conversation());
@@ -38,7 +44,7 @@ public class ConversationController {
     @PostMapping
     public String create(@Valid @ModelAttribute("conversation") Conversation conversation,
                          BindingResult bindingResult,
-                         @AuthenticationPrincipal User user,
+                         @NonNull @AuthenticationPrincipal User user,
                          RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
@@ -59,11 +65,7 @@ public class ConversationController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable Long id, @AuthenticationPrincipal User user, Model model) {
-        if (user == null) {
-            throw new IllegalArgumentException("User not authenticated");
-        }
-
+    public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal User user, @NonNull Model model) {
         final var conversation = conversationService.findConversationById(id);
         if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");

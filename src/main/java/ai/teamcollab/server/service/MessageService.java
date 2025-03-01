@@ -6,6 +6,7 @@ import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +16,16 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class MessageService {
 
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+
+    @Autowired
+    public MessageService(MessageRepository messageRepository, ConversationRepository conversationRepository) {
+        this.messageRepository = messageRepository;
+        this.conversationRepository = conversationRepository;
+    }
 
     @Transactional
     public Message createMessage(Message message, Long conversationId, User user) {

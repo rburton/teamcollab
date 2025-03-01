@@ -6,9 +6,9 @@ import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
 import ai.teamcollab.server.service.domain.MessageResponse;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
@@ -16,10 +16,14 @@ import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Component
-@AllArgsConstructor
+@Service
 public class ChatServiceImpl implements ChatService {
     private final MessageRepository messageRepository;
+
+    @Autowired
+    public ChatServiceImpl(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
     @Override
     public MessageResponse process(Conversation conversation, Message recent) {

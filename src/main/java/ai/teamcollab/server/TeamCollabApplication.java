@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "ai.teamcollab.server.repository")
 @EntityScan(basePackages = "ai.teamcollab.server.domain")
+@EnableJpaRepositories(basePackages = "ai.teamcollab.server.repository")
 public class TeamCollabApplication {
 
     public static void main(String[] args) {
