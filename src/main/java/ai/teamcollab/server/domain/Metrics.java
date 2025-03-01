@@ -1,16 +1,15 @@
 package ai.teamcollab.server.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,36 +18,37 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "messages")
+@Builder
+@Table(name = "metrics")
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Message {
+public class Metrics {
 
     @Id
-    @Column(name = "message_id")
+    @Column(name = "metric_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content")
-    private String content;
+    @Column(name = "duration")
+    private long duration;
 
-    @ManyToOne
-    @JoinColumn(name = "conversation_id")
-    private Conversation conversation;
+    @Column(name = "input_tokens")
+    private int inputTokens;
 
-    @ManyToOne
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @Column(name = "output_tokens")
+    private int outputTokens;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "provider")
+    private String provider;
 
-    @Column(name = "created_at")
-    private java.time.LocalDateTime createdAt;
+    @Column(name = "model")
+    private String model;
 
-    @OneToOne(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Metrics metrics;
+    @Column(name = "additional_info")
+    private String additionalInfo;
 
+    @OneToOne
+    @JoinColumn(name = "message_id", nullable = false)
+    private Message message;
 }

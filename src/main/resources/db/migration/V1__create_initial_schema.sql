@@ -80,3 +80,16 @@ CREATE TABLE messages
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );
+
+CREATE TABLE metrics
+(
+    metric_id BIGSERIAL PRIMARY KEY,
+    duration BIGINT NOT NULL,
+    input_tokens INT NOT NULL,
+    output_tokens INT NOT NULL,
+    provider VARCHAR(255),
+    model VARCHAR(255),
+    additional_info TEXT,
+    message_id BIGINT UNIQUE,
+    CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE
+);

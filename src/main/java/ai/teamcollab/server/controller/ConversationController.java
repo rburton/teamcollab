@@ -4,8 +4,8 @@ import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
-import ai.teamcollab.server.service.MessageService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,17 +20,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import static java.util.Objects.isNull;
 
 @Controller
+@AllArgsConstructor
 @RequestMapping("/conversations")
 public class ConversationController {
 
     private final ConversationService conversationService;
-    private final MessageService messageService;
-
-    public ConversationController(ConversationService conversationService,
-                                  MessageService messageService) {
-        this.conversationService = conversationService;
-        this.messageService = messageService;
-    }
 
     @GetMapping
     public String index(@AuthenticationPrincipal User user, Model model) {
@@ -70,13 +64,13 @@ public class ConversationController {
             throw new IllegalArgumentException("User not authenticated");
         }
 
-        final var conversation = conversationService.getConversationById(id);
+        final var conversation = conversationService.findConversationById(id);
         if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");
         }
 
         model.addAttribute("conversation", conversation);
-        model.addAttribute("messages", messageService.getConversationMessages(id));
+        model.addAttribute("messages", conversationService.findMessagesByConversation(id));
         model.addAttribute("newMessage", new Message());
         model.addAttribute("personas", conversation.getPersonas());
         return "conversations/show";
@@ -107,7 +101,7 @@ public class ConversationController {
         }
 
         try {
-            messageService.createMessage(message, conversationId, user);
+            conversationService.sendMessage(conversationId, message, user);
             redirectAttributes.addFlashAttribute("successMessage", "Message posted successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

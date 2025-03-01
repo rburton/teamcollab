@@ -5,7 +5,7 @@ import ai.teamcollab.server.api.domain.PersonaResponse;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.PersonaService;
 import jakarta.validation.Valid;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +21,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.internalServerError;
 
-@Log4j2
+@Slf4j
 @Validated
 @RestController
 @RequestMapping(value = "/api/conversations", produces = APPLICATION_JSON_VALUE)

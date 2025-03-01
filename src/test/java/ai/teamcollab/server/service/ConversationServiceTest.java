@@ -98,10 +98,10 @@ class ConversationServiceTest {
     }
 
     @Test
-    void getConversationByIdShouldReturnConversation() {
+    void findConversationByIdShouldReturnConversation() {
         when(conversationRepository.findById(testConversation.getId())).thenReturn(Optional.of(testConversation));
 
-        Conversation result = conversationService.getConversationById(testConversation.getId());
+        Conversation result = conversationService.findConversationById(testConversation.getId());
 
         assertThat(result).isNotNull();
         assertThat(result.getTopic()).isEqualTo(testConversation.getTopic());
@@ -109,10 +109,10 @@ class ConversationServiceTest {
     }
 
     @Test
-    void getConversationByIdShouldThrowExceptionForInvalidId() {
+    void findConversationByIdShouldThrowExceptionForInvalidId() {
         when(conversationRepository.findById(testConversation.getId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> conversationService.getConversationById(testConversation.getId()))
+        assertThatThrownBy(() -> conversationService.findConversationById(testConversation.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Conversation not found");
     }

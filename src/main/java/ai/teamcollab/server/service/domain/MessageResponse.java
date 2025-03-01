@@ -1,5 +1,6 @@
 package ai.teamcollab.server.service.domain;
 
+import ai.teamcollab.server.domain.Metrics;
 import lombok.Builder;
 import lombok.Data;
 

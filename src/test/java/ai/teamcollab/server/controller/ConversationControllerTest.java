@@ -6,6 +6,12 @@ import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MessageService;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.Customizer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +24,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,6 +43,21 @@ class ConversationControllerTest {
 
     @TestConfiguration
     static class TestConfig {
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+            http
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/conversations/**").hasRole("USER")
+                    .anyRequest().authenticated())
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults());
+            return http.build();
+        }
+
+        @Bean
+        public Validator validator() {
+            return new LocalValidatorFactoryBean();
+        }
         @Bean
         @Primary
         public ConversationService conversationService() {
@@ -85,7 +103,7 @@ class ConversationControllerTest {
 
         // Reset and set up mock responses
         reset(conversationService, messageService);
-        when(conversationService.getConversationById(1L)).thenReturn(conversation);
+        when(conversationService.findConversationById(1L)).thenReturn(conversation);
     }
 
     @AfterEach
@@ -112,9 +130,6 @@ class ConversationControllerTest {
 
     @Test
     void postMessage_Success() throws Exception {
-        when(messageService.createMessage(any(Message.class), eq(1L), eq(user)))
-                .thenReturn(message);
-
         mockMvc.perform(post("/conversations/1/messages")
                         .with(csrf())
                         .with(SecurityMockMvcRequestPostProcessors.user(user))
@@ -123,7 +138,7 @@ class ConversationControllerTest {
                 .andExpect(redirectedUrl("/conversations/1"))
                 .andExpect(flash().attributeExists("successMessage"));
 
-        verify(messageService, times(1)).createMessage(any(Message.class), eq(1L), eq(user));
+        verify(conversationService, times(1)).sendMessage(eq(1L), any(Message.class), eq(user));
     }
 
     @Test

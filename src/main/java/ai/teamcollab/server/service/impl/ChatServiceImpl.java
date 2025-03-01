@@ -2,11 +2,13 @@ package ai.teamcollab.server.service.impl;
 
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
+import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
 import ai.teamcollab.server.service.domain.MessageResponse;
-import ai.teamcollab.server.service.domain.Metrics;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
@@ -14,8 +16,10 @@ import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Service
+@Component
+@AllArgsConstructor
 public class ChatServiceImpl implements ChatService {
+    private final MessageRepository messageRepository;
 
     @Override
     public MessageResponse process(Conversation conversation, Message recent) {
@@ -41,6 +45,8 @@ public class ChatServiceImpl implements ChatService {
                     .model("gpt-3.5-turbo") // Placeholder
                     .build();
 
+            recent.setMetrics(metrics);
+            messageRepository.save(recent);
             return MessageResponse.builder()
                     .content(response)
                     .metrics(metrics)
@@ -51,4 +57,5 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("Failed to process message", e);
         }
     }
+
 }
