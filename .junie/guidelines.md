@@ -1,48 +1,40 @@
 ## Development Guidelines
 1. **Code Style**:
-    - Follow Spring Java Format
-    - Implement comprehensive error handling
-    - Add informative logging in critical paths
-
-[//]: # (2. **Testing**)
-[//]: # (    - Write unit tests for new features)
-[//]: # (    - Maintain test coverage of at least 75%)
-[//]: # (    - Include integration tests for critical paths)
-
-### Key Features
-
-1. **Form Validation**
-    - Spring Boot Validation implementation
-    - Real-time form validation with comprehensive error handling
-    - Age and name field validation with specific rules
-    - Internationalized validation messages
+   - Follow Spring Java Format
+   - Implement comprehensive error handling
+   - Add informative logging in critical paths
+   - Always use final var or var when possible.
+   - Use Lombok annotations to reduce boilerplate code
+   - Use Lombok builders when possible
+   - Keep functions concise and focused; less than 25 lines.
+   - Make function names clear and descriptive
+   - Use Lombok @NonNull annotation to avoid null checks
+2. **Form Validation**
+   - Spring Boot Validation implementation
+   - Real-time form validation with comprehensive error handling
+   - Age and name field validation with specific rules
+   - Internationalized validation messages
 2. **Technical Stack**
-    - Java 21
-    - Spring Boot 3.4
-    - Thymeleaf template engine
-    - Maven build system
-    - JUnit Jupiter for testing
-    - TailWind CSS for styling
-   
-[//]: # (### Testing Requirements)
-[//]: # (1. Always run all tests in project to make sure you didn't introduce regression before submitting the task.)
-[//]: # (2. Use @ParameterizedTest for tests with multiple examples.)
+   - Java 21
+   - Spring Boot 3.4
+   - Thymeleaf template engine
+   - Maven build system
+   - JUnit Jupiter for testing
+   - TailWind CSS for styling
 
 ### Anti-patterns to Avoid
-1. Overuse of `!!` operator
-2. Unnecessary use of nullable types
-3. Excessive use of inheritance over composition
-4. Not leveraging Java standard library functions
-5. Using var when val would suffice
-6. Using mutability when immutability is possible 
-7. Using Java-style loops instead of functional operations 
-8. Do not use != or == null, instead use Objects.isNull or Objects.nonNull
-9. Using wild card imports
+- Unnecessary use of nullable types
+- Excessive use of inheritance over composition
+- Not leveraging Java standard library functions
+- Using mutability when immutability is possible
+- Using Java-style loops instead of functional operations
+- Do not use != or == null, instead use Objects.isNull or Objects.nonNull
+- Using wild card imports
 
 ### Best Practices
 1. Implement proper exception handling
 2. Use static imports for constants and functions
-3. Always put domain classes in a domain package 
+3. Always put domain classes in a domain package
 4. Always put custom exception classes in an exception package
 5. Always sort annotations by length of name from smallest to largest
 6. Use static imports for constants and functions
