@@ -48,3 +48,16 @@ The build process will:
 ```
 
 https://www.writesoftwarewell.com/process-turbo-stream-javascript/
+
+
+Create a pulumi script that does the following:
+
+- Creates a RDS Postgres Instance
+- ECR for deploying Docker images
+- Secruity groups for protecting the network
+- Fargate for running the application
+- Update the Github flows so that it can be invoked on each merge in to main to do a release
+
+Make it so a environment name can be provided so a dev and production enviroment can be setup or future environments.
+
+Do this in Java
