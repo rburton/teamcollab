@@ -54,4 +54,7 @@ public class Project {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 }
