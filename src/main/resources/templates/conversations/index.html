@@ -22,6 +22,7 @@
             <div class="bg-white shadow rounded-lg p-6 mb-6">
                 <h2 class="text-lg font-semibold mb-4">Create New Conversation</h2>
                 <form th:action="@{/conversations}" method="post" th:object="${conversation}">
+
                     <div class="mb-4">
                         <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose</label>
                         <textarea id="purpose" name="purpose" th:field="*{purpose}" rows="3"
@@ -47,7 +48,7 @@
                 <div th:unless="${#lists.isEmpty(conversations)}" class="space-y-4">
                     <div th:each="conv : ${conversations}" class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
                         <a th:href="@{/conversations/{id}(id=${conv.id})}" class="block hover:bg-gray-50 rounded-lg p-2 -m-2">
-                            <h3 class="text-lg font-medium text-gray-900" th:text="${conv.topic}"></h3>
+                            <h3 class="text-lg font-medium text-gray-900" th:text="${conv.purpose}"></h3>
                             <p class="mt-1 text-gray-600" th:text="${conv.purpose}"></p>
                             <p class="mt-2 text-sm text-gray-500" th:text="${#temporals.format(conv.createdAt, 'dd MMM yyyy HH:mm')}"></p>
                         </a>

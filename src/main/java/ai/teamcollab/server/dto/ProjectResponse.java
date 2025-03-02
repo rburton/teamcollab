@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class ProjectResponse {
     private Long id;
     private String name;
-    private String topic;
+    private String overview;
     private LocalDateTime createdAt;
     private ConversationResponse conversation;
 

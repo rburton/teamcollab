@@ -43,10 +43,10 @@ public class Project {
     @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
     private String name;
 
-    @Column(name = "topic")
-    @NotBlank(message = "Topic is required")
-    @Size(min = 3, max = 255, message = "Topic must be between 3 and 255 characters")
-    private String topic;
+    @Column(name = "overview")
+    @NotBlank(message = "Overview is required")
+    @Size(min = 3, max = 255, message = "Overview must be between 3 and 255 characters")
+    private String overview;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Conversation> conversations = new HashSet<>();

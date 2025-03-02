@@ -35,7 +35,7 @@ CREATE TABLE projects
 (
     project_id BIGSERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
-    topic      VARCHAR(255) NOT NULL,
+    overview   TEXT         NOT NULL,
     company_id BIGINT,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)

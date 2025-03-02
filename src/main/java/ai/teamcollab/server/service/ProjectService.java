@@ -31,7 +31,7 @@ public class ProjectService {
 
         Project project = new Project();
         project.setName(request.getName());
-        project.setTopic(request.getTopic());
+        project.setOverview(request.getOverview());
         project.setCreatedAt(LocalDateTime.now());
         project.setCompany(user.getCompany());
 
@@ -50,7 +50,7 @@ public class ProjectService {
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
-                .topic(project.getTopic())
+                .overview(project.getOverview())
                 .createdAt(project.getCreatedAt())
                 .conversation(ProjectResponse.ConversationResponse.builder()
                         .id(conversation.getId())

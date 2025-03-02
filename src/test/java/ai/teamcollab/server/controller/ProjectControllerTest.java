@@ -56,13 +56,13 @@ class ProjectControllerTest {
 
         validRequest = new ProjectCreateRequest();
         validRequest.setName("Test Project");
-        validRequest.setTopic("Test Topic");
+        validRequest.setOverview("Test Topic");
         validRequest.setPurpose("This is a test project purpose with sufficient length");
 
         mockResponse = ProjectResponse.builder()
                 .id(1L)
                 .name(validRequest.getName())
-                .topic(validRequest.getTopic())
+                .overview(validRequest.getOverview())
                 .createdAt(LocalDateTime.now())
                 .conversation(ProjectResponse.ConversationResponse.builder()
                         .id(1L)
@@ -84,7 +84,7 @@ class ProjectControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(mockResponse.getId()))
                 .andExpect(jsonPath("$.name").value(mockResponse.getName()))
-                .andExpect(jsonPath("$.topic").value(mockResponse.getTopic()))
+                .andExpect(jsonPath("$.overview").value(mockResponse.getOverview()))
                 .andExpect(jsonPath("$.conversation.id").value(mockResponse.getConversation().getId()))
                 .andExpect(jsonPath("$.conversation.purpose").value(mockResponse.getConversation().getPurpose()));
     }
@@ -94,7 +94,7 @@ class ProjectControllerTest {
     void createProject_InvalidRequest_ReturnsBadRequest() throws Exception {
         ProjectCreateRequest invalidRequest = new ProjectCreateRequest();
         invalidRequest.setName(""); // Invalid name
-        invalidRequest.setTopic(""); // Invalid topic
+        invalidRequest.setOverview(""); // Invalid topic
         invalidRequest.setPurpose("short"); // Invalid purpose
 
         mockMvc.perform(post("/api/projects")

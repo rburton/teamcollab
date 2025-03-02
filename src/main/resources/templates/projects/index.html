@@ -161,9 +161,9 @@
                         </div>
                     </div>
                     <div class="flex flex-none items-center gap-x-4">
-                        <a href="#"
-                           class="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:block">View
-                            project<span class="sr-only">, GraphQL API</span></a>
+                        <a th:href="@{/projects/{id}(id=${project.id})}"
+                           class="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:block">
+                            View project<span class="sr-only">, GraphQL API</span></a>
                         <div class="relative flex-none">
                             <button type="button" class="-m-2.5 block p-2.5 text-gray-500 hover:text-gray-900"
                                     id="options-menu-0-button" aria-expanded="false" aria-haspopup="true">
@@ -184,7 +184,7 @@
                                 From: "transform opacity-100 scale-100"
                                 To: "transform opacity-0 scale-95"
                             -->
-                            <div class="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 focus:outline-hidden"
+                            <div class="hidden absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 focus:outline-hidden"
                                  role="menu" aria-orientation="vertical" aria-labelledby="options-menu-0-button"
                                  tabindex="-1">
                                 <a href="#" class="block px-3 py-1 text-sm/6 text-gray-900" role="menuitem"
