@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="#{metrics.title}">Metrics Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Error Message -->
+        <div th:if="${errorMessage}"
+             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline" th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Statistics Summary -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4" th:text="#{metrics.overview.title}">Metrics Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.duration}">Average Duration</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${#numbers.formatDecimal(statistics.averageDuration, 1, 2)} + ' ms'">0 ms</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.inputTokens}">Total Input Tokens</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${statistics.totalInputTokens}">0</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.outputTokens}">Total Output Tokens</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${statistics.totalOutputTokens}">0</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.model}">Most Used Model</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${statistics.mostUsedModel}">N/A</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Metrics Table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-xl font-semibold" th:text="#{metrics.table.title}">Top 10 Metrics by Duration</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.duration}">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.inputTokens}">Input Tokens</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.outputTokens}">Output Tokens</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.model}">Model</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.provider}">Provider</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="metric : ${metrics}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.duration} + ' ms'"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.inputTokens}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.outputTokens}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.model}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.provider}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(metrics)}">
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500" th:text="#{metrics.table.empty}">No metrics available</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
