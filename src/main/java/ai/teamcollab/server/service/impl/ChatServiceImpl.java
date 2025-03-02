@@ -7,10 +7,16 @@ import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
 import ai.teamcollab.server.service.domain.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
@@ -19,10 +25,12 @@ import static java.util.Objects.requireNonNull;
 @Service
 public class ChatServiceImpl implements ChatService {
     private final MessageRepository messageRepository;
+    private final OpenAiChatModel chatModel;
 
     @Autowired
-    public ChatServiceImpl(MessageRepository messageRepository) {
+    public ChatServiceImpl(MessageRepository messageRepository, OpenAiChatModel chatModel) {
         this.messageRepository = messageRepository;
+        this.chatModel = chatModel;
     }
 
     @Override
@@ -35,30 +43,59 @@ public class ChatServiceImpl implements ChatService {
         final var start = now();
 
         try {
-            // TODO: Implement actual LLM processing logic here
-            final var response = "Sample response"; // Placeholder
+            final var messages = new ArrayList<org.springframework.ai.chat.messages.Message>();
+            for (Message historyMessage : conversation.getMessages()) {
+                if (historyMessage.equals(recent)) {
+                    continue; // Skip the current message
+                }
+                if (Objects.nonNull(historyMessage.getUser())) {
+                    messages.add(new UserMessage(historyMessage.getContent()));
+                } else {
+                    messages.add(new AssistantMessage(historyMessage.getContent()));
+                }
+            }
+
+            messages.add(new UserMessage(recent.getContent()));
+
+            log.debug("Conversation history size: {}", messages.size());
+            Prompt prompt = new Prompt(messages.toArray(new org.springframework.ai.chat.messages.Message[0]));
+
+            log.debug("Sending prompt to OpenAI: {}", prompt);
+
+            final var aiResponse = chatModel.call(prompt);
+            final var assistantMessage = aiResponse.getResult().getOutput();
+            final var response = assistantMessage.getText();
 
             final var end = now();
             long duration = Duration.between(start, end).toMillis();
 
+            final var metadata = aiResponse.getMetadata();
+            final var usage = metadata.getUsage();
+
             final var metrics = Metrics.builder()
                     .duration(duration)
-                    .inputTokens(100)  // Placeholder
-                    .outputTokens(50)   // Placeholder
-                    .provider("OpenAI") // Placeholder
-                    .model("gpt-3.5-turbo") // Placeholder
+                    .inputTokens(usage.getPromptTokens())
+                    .outputTokens(usage.getCompletionTokens())
+                    .provider("OpenAI")
+                    .model("gpt-3.5-turbo")  // Model name from configuration
                     .build();
 
             recent.setMetrics(metrics);
             messageRepository.save(recent);
+
+            log.debug("Received response from OpenAI: {}", response);
+
             return MessageResponse.builder()
                     .content(response)
                     .metrics(metrics)
                     .build();
 
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid argument while processing message: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Invalid input for message processing", e);
         } catch (Exception e) {
             log.error("Error processing message: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to process message", e);
+            throw new RuntimeException("Failed to process message: " + e.getMessage(), e);
         }
     }
 

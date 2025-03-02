@@ -21,28 +21,6 @@
         <!-- Left Sidebar with Personas -->
         <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
              id="sidebar" data-controller="persona" th:data-persona-conversation-id-value="${conversation.id}">
-            <!-- Focus Dropdown -->
-            <!--            <div class="relative mb-4">-->
-            <!--                <button onclick="toggleFocusDropdown()"-->
-            <!--                        class="w-full flex items-center justify-between p-2 bg-gray-100 rounded-lg text-gray-800 hover:bg-gray-200 transition-colors">-->
-            <!--                    <span id="focusLabel">Main Discussion</span>-->
-            <!--                    <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"-->
-            <!--                         viewBox="0 0 24 24" stroke="currentColor">-->
-            <!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>-->
-            <!--                    </svg>-->
-            <!--                </button>-->
-            <!--                <div id="focusDropdown" class="hidden absolute w-full mt-1 bg-white rounded-lg shadow-lg z-10">-->
-            <!--                    <button onclick="changeFocus('Main Discussion')"-->
-            <!--                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Main Discussion-->
-            <!--                    </button>-->
-            <!--                    <button onclick="changeFocus('Brainstorming')"-->
-            <!--                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Brainstorming-->
-            <!--                    </button>-->
-            <!--                    <button onclick="changeFocus('Q&A')"-->
-            <!--                            class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Q&A-->
-            <!--                    </button>-->
-            <!--                </div>-->
-            <!--            </div>-->
             <div class="flex justify-between mb-4">
                 <h2 class="text-lg font-semibold">Personas</h2>
                 <button data-action="click->persona#open" class="text-blue-500 hover:text-blue-700">
@@ -97,11 +75,15 @@
             </div>
 
             <ul role="list" class="divide-y divide-gray-100" id="personaList">
-                <li class="flex gap-x-4 py-5" th:each="persona: ${personas}">
-                    <img class="size-12 flex-none rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+                <li class="flex gap-x-4 py-5 cursor-pointer rounded-lg p-2 hover:bg-gray-100"
+                    th:each="persona: ${personas}">
+                    <img class="size-12 flex-none rounded-full bg-gray-50"
+                         src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="">
                     <div class="min-w-0">
                         <p class="text-sm/6 font-semibold text-gray-900" th:text="${persona.name}">Leslie Alexander</p>
-                        <p class="mt-1 truncate text-xs/5 text-gray-500" th:text="${persona.expertises}">leslie.alexander@example.com</p>
+                        <p class="mt-1 truncate text-xs/5 text-gray-500" th:text="${persona.expertises}">
+                            leslie.alexander@example.com</p>
                     </div>
                 </li>
             </ul>

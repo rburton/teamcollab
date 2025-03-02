@@ -60,22 +60,12 @@ public class ConversationService {
 
     public List<Message> findMessagesByConversation(Long conversationId) {
         log.debug("Fetching messages for conversation {}", conversationId);
-        return messageRepository.findByConversationIdOrderByCreatedAtDesc(conversationId);
+        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
     }
 
     public List<Message> getUserMessages(Long userId) {
         log.debug("Fetching messages for user {}", userId);
-        return messageRepository.findByUserIdOrderByCreatedAtAsc(userId);
-    }
-
-    @PostConstruct
-    public void init() {
-        log.info("ConversationService initialized with:");
-        log.info("chatService: {}", chatService != null);
-        log.info("messageService: {}", messageService != null);
-        log.info("userRepository: {}", userRepository != null);
-        log.info("messageRepository: {}", messageRepository != null);
-        log.info("conversationRepository: {}", conversationRepository != null);
+        return messageRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
 }
