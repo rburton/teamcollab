@@ -1,5 +1,6 @@
 # TeamCollab
-
+- https://www.pulumi.com/aws/
+- 
 ## Frontend Setup
 
 ### Prerequisites
