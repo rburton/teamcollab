@@ -38,11 +38,6 @@ public class Conversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "topic")
-    @NotBlank(message = "Topic is required")
-    @Size(min = 3, max = 255, message = "Topic must be between 3 and 255 characters")
-    private String topic;
-
     @Column(name = "purpose")
     @NotBlank(message = "Purpose is required")
     @Size(min = 10, max = 1000, message = "Purpose must be between 10 and 1000 characters")
@@ -51,6 +46,10 @@ public class Conversation {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
@@ -66,8 +65,7 @@ public class Conversation {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Conversation(String topic, String purpose, User createdBy) {
-        this.topic = topic;
+    public Conversation(String purpose, User createdBy) {
         this.purpose = purpose;
         this.user = createdBy;
         this.createdAt = LocalDateTime.now();

@@ -31,17 +31,25 @@ INSERT INTO roles (name)
 VALUES ('ADMIN'),
        ('USER');
 
+CREATE TABLE projects
+(
+    project_id BIGSERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    topic      VARCHAR(255) NOT NULL,
+    company_id BIGINT,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
+);
+
 CREATE TABLE conversations
 (
     conversation_id BIGSERIAL PRIMARY KEY,
-    topic           VARCHAR(255)  NOT NULL,
     purpose         VARCHAR(1000) NOT NULL,
+    project_id      BIGINT        NOT NULL REFERENCES projects (project_id),
     user_id         BIGINT        NOT NULL REFERENCES users (user_id),
-    created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT topic_length_check CHECK (LENGTH(topic) >= 3),
-    CONSTRAINT purpose_length_check CHECK (LENGTH(purpose) >= 10)
+    created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_conversations_project_by ON projects (project_id);
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
@@ -83,13 +91,13 @@ CREATE TABLE messages
 
 CREATE TABLE metrics
 (
-    metric_id BIGSERIAL PRIMARY KEY,
-    duration BIGINT NOT NULL,
-    input_tokens INT NOT NULL,
-    output_tokens INT NOT NULL,
-    provider VARCHAR(255),
-    model VARCHAR(255),
+    metric_id       BIGSERIAL PRIMARY KEY,
+    duration        BIGINT NOT NULL,
+    input_tokens    INT    NOT NULL,
+    output_tokens   INT    NOT NULL,
+    provider        VARCHAR(255),
+    model           VARCHAR(255),
     additional_info TEXT,
-    message_id BIGINT UNIQUE,
+    message_id      BIGINT UNIQUE,
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE
 );

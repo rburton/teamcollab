@@ -23,14 +23,6 @@
                 <h2 class="text-lg font-semibold mb-4">Create New Conversation</h2>
                 <form th:action="@{/conversations}" method="post" th:object="${conversation}">
                     <div class="mb-4">
-                        <label for="topic" class="block text-sm font-medium text-gray-700">Topic</label>
-                        <input type="text" id="topic" name="topic" th:field="*{topic}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                               th:classappend="${#fields.hasErrors('topic')} ? 'border-red-300'">
-                        <p th:if="${#fields.hasErrors('topic')}" class="mt-2 text-sm text-red-600" th:errors="*{topic}"></p>
-                    </div>
-
-                    <div class="mb-4">
                         <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose</label>
                         <textarea id="purpose" name="purpose" th:field="*{purpose}" rows="3"
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"

@@ -43,7 +43,7 @@ class ConversationServiceTest {
         testUser = new User("testuser", "password", "test@example.com");
         testUser.setId(1L);
 
-        testConversation = new Conversation("Test Topic", "Test Purpose", testUser);
+        testConversation = new Conversation("Test Purpose", testUser);
         testConversation.setId(1L);
         testConversation.setCreatedAt(LocalDateTime.now());
     }
@@ -56,7 +56,6 @@ class ConversationServiceTest {
         Conversation result = conversationService.createConversation(testConversation, testUser.getId());
 
         assertThat(result).isNotNull();
-        assertThat(result.getTopic()).isEqualTo(testConversation.getTopic());
         assertThat(result.getPurpose()).isEqualTo(testConversation.getPurpose());
         assertThat(result.getUser()).isEqualTo(testUser);
         verify(conversationRepository).save(any(Conversation.class));
@@ -82,7 +81,6 @@ class ConversationServiceTest {
         List<Conversation> result = conversationService.getUserConversations(testUser.getId());
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTopic()).isEqualTo(testConversation.getTopic());
         verify(conversationRepository).findByUserIdOrderByCreatedAtDesc(testUser.getId());
     }
 
@@ -104,7 +102,6 @@ class ConversationServiceTest {
         Conversation result = conversationService.findConversationById(testConversation.getId());
 
         assertThat(result).isNotNull();
-        assertThat(result.getTopic()).isEqualTo(testConversation.getTopic());
         verify(conversationRepository).findById(testConversation.getId());
     }
 

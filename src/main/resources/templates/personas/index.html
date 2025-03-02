@@ -62,19 +62,24 @@
                 <div th:if="${#lists.isEmpty(personas)}" class="text-gray-500">
                     No personas yet. Create your first one above!
                 </div>
-                <div th:unless="${#lists.isEmpty(personas)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div th:each="persona : ${personas}" class="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                        <a th:href="@{/personas/{id}(id=${persona.id})}" class="block">
-                            <h3 class="text-lg font-medium text-gray-900" th:text="${persona.name}"></h3>
-                            <div class="mt-2 flex flex-wrap gap-2">
-                                <span th:each="expertise : ${persona.expertiseAreas}"
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                      th:text="${expertise}">
-                                </span>
+
+                <ul th:unless="${#lists.isEmpty(personas)}"
+                    role="list"  class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+                    <li  th:each="persona : ${personas}"
+                         class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow-sm">
+                        <div class="flex w-full items-center justify-between space-x-6 p-6">
+                            <div class="flex-1 truncate">
+                                <div class="flex items-center space-x-3">
+                                    <h3 class="truncate text-sm font-medium text-gray-900" th:text="${persona.name}">Jane Cooper</h3>
+                                    <span class="inline-flex shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">Admin</span>
+                                </div>
+                                <p class="mt-1 truncate text-sm text-gray-500" th:text="${persona.expertises}">Regional Paradigm Technician</p>
                             </div>
-                        </a>
-                    </div>
-                </div>
+                            <img class="size-10 shrink-0 rounded-full bg-gray-300" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" alt="">
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
