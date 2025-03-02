@@ -80,7 +80,7 @@ public class ChatServiceImpl implements ChatService {
                     .model("gpt-3.5-turbo")  // Model name from configuration
                     .build();
 
-            recent.setMetrics(metrics);
+            recent.addMetrics(metrics);
             messageRepository.save(recent);
 
             log.debug("Received response from OpenAI: {}", response);

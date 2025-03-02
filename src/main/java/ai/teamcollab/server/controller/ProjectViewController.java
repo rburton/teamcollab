@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -57,6 +58,24 @@ public class ProjectViewController {
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Failed to create project: " + e.getMessage());
             return "projects/new";
+        }
+    }
+
+    @GetMapping("/{projectId}")
+    public String show(@PathVariable Long projectId, 
+                      @AuthenticationPrincipal User user,
+                      Model model,
+                      RedirectAttributes redirectAttributes) {
+        try {
+            ProjectResponse project = projectService.getProjectById(projectId, user.getCompany().getId());
+            model.addAttribute("project", project);
+            return "projects/show";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Project not found");
+            return "redirect:/projects";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You don't have access to this project");
+            return "redirect:/projects";
         }
     }
 }

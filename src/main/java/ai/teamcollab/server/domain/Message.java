@@ -51,4 +51,9 @@ public class Message {
     @OneToOne(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
     private Metrics metrics;
 
+    public void addMetrics(Metrics metrics) {
+        this.metrics = metrics;
+        metrics.setMessage(this);
+    }
+
 }

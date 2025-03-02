@@ -65,4 +65,16 @@ public class ProjectService {
                 .map(this::buildProjectResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public ProjectResponse getProjectById(Long projectId, Long companyId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        if (!project.getCompany().getId().equals(companyId)) {
+            throw new IllegalStateException("Unauthorized access to project");
+        }
+
+        return buildProjectResponse(project);
+    }
 }
