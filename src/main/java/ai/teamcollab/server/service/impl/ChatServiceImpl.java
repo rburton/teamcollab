@@ -5,12 +5,15 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
+import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.domain.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +28,12 @@ import static java.util.Objects.requireNonNull;
 @Service
 public class ChatServiceImpl implements ChatService {
     private final MessageRepository messageRepository;
-    private final OpenAiChatModel chatModel;
+    private final SystemSettingsService systemSettingsService;
 
     @Autowired
-    public ChatServiceImpl(MessageRepository messageRepository, OpenAiChatModel chatModel) {
+    public ChatServiceImpl(MessageRepository messageRepository, SystemSettingsService systemSettingsService) {
         this.messageRepository = messageRepository;
-        this.chatModel = chatModel;
+        this.systemSettingsService = systemSettingsService;
     }
 
     @Override
@@ -62,6 +65,16 @@ public class ChatServiceImpl implements ChatService {
 
             log.debug("Sending prompt to OpenAI: {}", prompt);
 
+            final var currentSettings = systemSettingsService.getCurrentSettings();
+            final var chatModel = OpenAiChatModel.builder()
+                    .openAiApi(OpenAiApi.builder()
+                            .apiKey(System.getenv("OPENAI_API_KEY"))
+                            .build())
+                    .defaultOptions(OpenAiChatOptions.builder()
+                            .model(currentSettings.getLlmModel())
+                            .temperature(0.7)
+                            .build())
+                    .build();
             final var aiResponse = chatModel.call(prompt);
             final var assistantMessage = aiResponse.getResult().getOutput();
             final var response = assistantMessage.getText();
@@ -77,7 +90,7 @@ public class ChatServiceImpl implements ChatService {
                     .inputTokens(usage.getPromptTokens())
                     .outputTokens(usage.getCompletionTokens())
                     .provider("OpenAI")
-                    .model("gpt-3.5-turbo")  // Model name from configuration
+                    .model(currentSettings.getLlmModel())
                     .build();
 
             recent.addMetrics(metrics);

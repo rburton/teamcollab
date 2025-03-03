@@ -102,3 +102,14 @@ CREATE TABLE metrics
     message_id      BIGINT UNIQUE,
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE
 );
+
+CREATE TABLE system_settings
+(
+    system_setting_id BIGINT PRIMARY KEY,
+    llm_model         VARCHAR(255) NOT NULL,
+    created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default settings
+INSERT INTO system_settings (system_setting_id, llm_model)
+VALUES (1, 'gpt-3.5-turbo');

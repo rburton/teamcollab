@@ -11,13 +11,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
