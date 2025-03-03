@@ -40,6 +40,9 @@ public class Company {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "stripe_customer_id", unique = true)
+    private String stripeCustomerId;
+
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<User> users = new HashSet<>();

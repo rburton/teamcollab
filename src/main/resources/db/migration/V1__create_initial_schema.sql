@@ -119,6 +119,55 @@ CREATE TABLE system_settings
     created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE plans
+(
+    plan_id     BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE plan_details
+(
+    plan_detail_id BIGSERIAL PRIMARY KEY,
+    plan_id        BIGINT         NOT NULL REFERENCES plans (plan_id),
+    effective_date DATE           NOT NULL,
+    monthly_price  DECIMAL(10, 2) NOT NULL,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subscriptions
+(
+    subscription_id        BIGSERIAL PRIMARY KEY,
+    company_id             BIGINT       NOT NULL REFERENCES companies (company_id),
+    plan_id                BIGINT       NOT NULL REFERENCES plans (plan_id),
+    stripe_subscription_id VARCHAR(255) NOT NULL UNIQUE,
+    start_date             DATE         NOT NULL,
+    end_date               DATE,
+    created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE payments
+(
+    payment_id               BIGSERIAL PRIMARY KEY,
+    subscription_id          BIGINT         NOT NULL REFERENCES subscriptions (subscription_id),
+    amount                   DECIMAL(10, 2) NOT NULL,
+    payment_date             DATE           NOT NULL,
+    stripe_payment_intent_id VARCHAR(255)   NOT NULL UNIQUE,
+    stripe_payment_status    VARCHAR(50)    NOT NULL,
+    created_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_plan_details_plan_id ON plan_details (plan_id);
+CREATE INDEX idx_subscriptions_company_id ON subscriptions (company_id);
+CREATE INDEX idx_subscriptions_plan_id ON subscriptions (plan_id);
+CREATE INDEX idx_payments_subscription_id ON payments (subscription_id);
+
 -- Insert default settings
 INSERT INTO system_settings (system_setting_id, llm_model)
 VALUES (1, 'gpt-3.5-turbo');
