@@ -27,6 +27,13 @@ public class CompanyAdminController {
     private final UserService userService;
     private final RoleService roleService;
 
+    @GetMapping("")
+    public String dashboard(@AuthenticationPrincipal User currentUser, Model model) {
+        var stats = userService.getUserStats(currentUser.getCompany().getId());
+        model.addAttribute("stats", stats);
+        return "company/admin/dashboard";
+    }
+
     @GetMapping("/users")
     public String listUsers(@AuthenticationPrincipal User currentUser, Model model) {
         List<User> users = userService.getUsersByCompany(currentUser.getCompany().getId());

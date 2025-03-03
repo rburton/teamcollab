@@ -2,6 +2,7 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.dto.UserStats;
 import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.RoleRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -107,6 +108,14 @@ public class UserService implements UserDetailsService {
 
         user.setEnabled(!user.isEnabled());
         return userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserStats getUserStats(Long companyId) {
+        return UserStats.builder()
+                .activeUsers(userRepository.countByCompanyIdAndEnabledTrue(companyId))
+                .disabledUsers(userRepository.countByCompanyIdAndEnabledFalse(companyId))
+                .build();
     }
 
     @Transactional

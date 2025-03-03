@@ -173,6 +173,25 @@ class UserServiceTest {
         verify(userRepository).existsByUsername(username);
     }
 
+    @Test
+    void getUserStats_ReturnsCorrectStats() {
+        // Arrange
+        Long companyId = 1L;
+        when(userRepository.countByCompanyIdAndEnabledTrue(companyId)).thenReturn(3L);
+        when(userRepository.countByCompanyIdAndEnabledFalse(companyId)).thenReturn(2L);
+
+        // Act
+        var stats = userService.getUserStats(companyId);
+
+        // Assert
+        assertNotNull(stats);
+        assertEquals(3L, stats.activeUsers());
+        assertEquals(2L, stats.disabledUsers());
+        assertEquals(5L, stats.totalUsers());
+        verify(userRepository).countByCompanyIdAndEnabledTrue(companyId);
+        verify(userRepository).countByCompanyIdAndEnabledFalse(companyId);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"existing@example.com", "another@example.com"})
     void existsByEmail_ReturnsExpectedResult(String email) {

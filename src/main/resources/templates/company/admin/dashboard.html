@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="#{admin.dashboard.title}">Admin Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h2 class="text-lg font-medium leading-6 text-gray-900" th:text="#{admin.dashboard.stats.title}">Company Statistics</h2>
+            <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <!-- Total Users -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500" th:text="#{admin.dashboard.stats.total}">Total Users</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900" th:text="${stats.totalUsers()}">0</dd>
+                    </div>
+                </div>
+                <!-- Active Users -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500" th:text="#{admin.dashboard.stats.active}">Active Users</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-green-600" th:text="${stats.activeUsers()}">0</dd>
+                    </div>
+                </div>
+                <!-- Disabled Users -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500" th:text="#{admin.dashboard.stats.disabled}">Disabled Users</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-red-600" th:text="${stats.disabledUsers()}">0</dd>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8">
+                <a href="/company/admin/users" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    <span th:text="#{admin.dashboard.users.manage}">Manage Users</span>
+                    <svg class="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
