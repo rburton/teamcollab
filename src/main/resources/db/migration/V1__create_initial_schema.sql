@@ -28,7 +28,8 @@ CREATE TABLE user_roles
 );
 
 INSERT INTO roles (name)
-VALUES ('ADMIN'),
+VALUES ('SUPER_ADMIN'),
+       ('ADMIN'),
        ('USER');
 
 CREATE TABLE projects
