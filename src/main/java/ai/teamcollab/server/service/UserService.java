@@ -5,6 +5,9 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.RoleRepository;
 import ai.teamcollab.server.repository.UserRepository;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -70,5 +73,64 @@ public class UserService implements UserDetailsService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getUsersByCompany(Long companyId) {
+        return userRepository.findByCompanyId(companyId);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+    }
+
+    @Transactional
+    public User updateUserRoles(Long userId, Set<String> roleNames) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        Set<Role> roles = roleNames.stream()
+                .map(name -> roleRepository.findByName(name)
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(roles);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User toggleUserStatus(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        user.setEnabled(!user.isEnabled());
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User createCompanyUser(User user, Long companyId, Set<String> roleNames) {
+        var company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with id: " + companyId));
+
+        user.setCompany(company);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Set<Role> roles = roleNames.stream()
+                .map(name -> roleRepository.findByName(name)
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(roles);
+
+        if (existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        if (existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        return userRepository.save(user);
     }
 }

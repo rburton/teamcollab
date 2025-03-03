@@ -9,6 +9,8 @@
    - Keep functions concise and focused; less than 25 lines.
    - Make function names clear and descriptive
    - Use Lombok @NonNull annotation to avoid null checks
+   - Use Lombok @Builder annotation for complex object creation
+   - When ever a @Controller requires ADMIN or USER role, use the company id from the authenticated user.
 2. **Form Validation**
    - Spring Boot Validation implementation
    - Real-time form validation with comprehensive error handling
