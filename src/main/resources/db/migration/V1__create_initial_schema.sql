@@ -1,7 +1,10 @@
 CREATE TABLE companies
 (
-    company_id BIGSERIAL PRIMARY KEY,
-    name       VARCHAR(255) NOT NULL
+    company_id         BIGSERIAL PRIMARY KEY,
+    name               VARCHAR(255) NOT NULL,
+    stripe_customer_id VARCHAR(255) UNIQUE, -- Links to Stripe Customer
+    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE roles
@@ -16,8 +19,10 @@ CREATE TABLE users
     username   VARCHAR(50)  NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     email      VARCHAR(255) NOT NULL UNIQUE,
-    enabled    BOOLEAN DEFAULT TRUE,
-    company_id BIGINT REFERENCES companies (company_id)
+    enabled    BOOLEAN   DEFAULT TRUE,
+    company_id BIGINT REFERENCES companies (company_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE user_roles
@@ -38,7 +43,8 @@ CREATE TABLE projects
     name       VARCHAR(100) NOT NULL,
     overview   TEXT         NOT NULL,
     company_id BIGINT,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 
@@ -48,7 +54,8 @@ CREATE TABLE conversations
     purpose         VARCHAR(1000) NOT NULL,
     project_id      BIGINT        NOT NULL REFERENCES projects (project_id),
     user_id         BIGINT        NOT NULL REFERENCES users (user_id),
-    created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_conversations_project_by ON projects (project_id);
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
@@ -60,6 +67,8 @@ CREATE TABLE personas
     name            VARCHAR(100) NOT NULL,
     expertise_areas TEXT         NOT NULL,
     company_id      BIGINT,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 
