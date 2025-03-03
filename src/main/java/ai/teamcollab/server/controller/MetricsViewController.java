@@ -1,25 +1,28 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.Conversation;
-import ai.teamcollab.server.service.MetricsService;
+import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.service.ConversationService;
+import ai.teamcollab.server.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.PathVariable;
+import java.util.Objects;
+
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.HALF_UP;
 
 @Slf4j
 @Controller
@@ -27,28 +30,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class MetricsViewController {
 
-    // GPT-3.5-turbo pricing (per 1K tokens)
-    private static final BigDecimal INPUT_TOKEN_PRICE = new BigDecimal("0.0010");   // $0.0010 per 1K input tokens
-    private static final BigDecimal OUTPUT_TOKEN_PRICE = new BigDecimal("0.0020");  // $0.0020 per 1K output tokens
-    private static final BigDecimal TOKEN_DIVISOR = new BigDecimal("1000");         // Price is per 1K tokens
-
     private final MetricsService metricsService;
     private final MessageSource messageSource;
     private final ConversationService conversationService;
 
-    // Package-private for testing
-    BigDecimal calculateInputTokensCost(int tokens) {
-        return new BigDecimal(tokens)
-                .divide(TOKEN_DIVISOR, 6, RoundingMode.HALF_UP)
-                .multiply(INPUT_TOKEN_PRICE);
-    }
-
-    // Package-private for testing
-    BigDecimal calculateOutputTokensCost(int tokens) {
-        return new BigDecimal(tokens)
-                .divide(TOKEN_DIVISOR, 6, RoundingMode.HALF_UP)
-                .multiply(OUTPUT_TOKEN_PRICE);
-    }
 
     @GetMapping
     public String index(Model model, RedirectAttributes redirectAttributes) {
@@ -62,8 +47,8 @@ public class MetricsViewController {
             return "metrics/index";
         } catch (Exception e) {
             log.error("Error fetching metrics", e);
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                messageSource.getMessage("metrics.error.fetch", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    messageSource.getMessage("metrics.error.fetch", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
             return "redirect:/";
         }
     }
@@ -81,40 +66,59 @@ public class MetricsViewController {
 
             // Aggregate metrics
             var totalDuration = messages.stream()
-                .map(Message::getMetrics)
-                .filter(java.util.Objects::nonNull)
-                .mapToLong(Metrics::getDuration)
-                .sum();
+                    .map(Message::getMetrics)
+                    .filter(Objects::nonNull)
+                    .mapToLong(Metrics::getDuration)
+                    .sum();
             var totalInputTokens = messages.stream()
-                .map(Message::getMetrics)
-                .filter(java.util.Objects::nonNull)
-                .mapToInt(Metrics::getInputTokens)
-                .sum();
+                    .map(Message::getMetrics)
+                    .filter(Objects::nonNull)
+                    .mapToInt(Metrics::getInputTokens)
+                    .sum();
             var totalOutputTokens = messages.stream()
-                .map(Message::getMetrics)
-                .filter(java.util.Objects::nonNull)
-                .mapToInt(Metrics::getOutputTokens)
-                .sum();
+                    .map(Message::getMetrics)
+                    .filter(Objects::nonNull)
+                    .mapToInt(Metrics::getOutputTokens)
+                    .sum();
 
-            // Calculate costs
-            var inputTokensCost = calculateInputTokensCost(totalInputTokens);
-            var outputTokensCost = calculateOutputTokensCost(totalOutputTokens);
+            var inputTokensCost = messages.stream()
+                    .map(Message::getMetrics)
+                    .filter(Objects::nonNull)
+                    .map(message -> calculateInputTokensCost(message.getModel(), message.getInputTokens()))
+                    .reduce(ZERO, BigDecimal::add);
+            var outputTokensCost = messages.stream()
+                    .map(Message::getMetrics)
+                    .filter(Objects::nonNull)
+                    .map(message -> calculateOutputTokensCost(message.getModel(), message.getOutputTokens()))
+                    .reduce(ZERO, BigDecimal::add);
+
             var totalCost = inputTokensCost.add(outputTokensCost);
 
             model.addAttribute("totalDuration", totalDuration);
             model.addAttribute("totalInputTokens", totalInputTokens);
             model.addAttribute("totalOutputTokens", totalOutputTokens);
-            model.addAttribute("inputTokensCost", inputTokensCost.setScale(4, RoundingMode.HALF_UP).toString());
-            model.addAttribute("outputTokensCost", outputTokensCost.setScale(4, RoundingMode.HALF_UP).toString());
-            model.addAttribute("totalCost", totalCost.setScale(4, RoundingMode.HALF_UP).toString());
+            model.addAttribute("inputTokensCost", inputTokensCost.setScale(4, HALF_UP).toString());
+            model.addAttribute("outputTokensCost", outputTokensCost.setScale(4, HALF_UP).toString());
+            model.addAttribute("totalCost", totalCost.setScale(4, HALF_UP).toString());
 
             return "metrics/conversation";
         } catch (Exception e) {
             log.error("Error fetching conversation metrics for id: {}", id, e);
             redirectAttributes.addFlashAttribute("errorMessage",
-                messageSource.getMessage("metrics.error.conversation.fetch", 
-                    new Object[]{id, e.getMessage()}, LocaleContextHolder.getLocale()));
+                    messageSource.getMessage("metrics.error.conversation.fetch",
+                            new Object[]{id, e.getMessage()}, LocaleContextHolder.getLocale()));
             return "redirect:/metrics";
         }
     }
+
+    // Package-private for testing
+    BigDecimal calculateInputTokensCost(String model, int tokens) {
+        return GptModel.fromId(model).calculate(tokens, 0);
+    }
+
+    // Package-private for testing
+    BigDecimal calculateOutputTokensCost(String model, int tokens) {
+        return GptModel.fromId(model).calculate(0, tokens);
+    }
+
 }

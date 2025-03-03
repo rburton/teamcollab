@@ -47,6 +47,7 @@
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.duration}">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.inputTokens}">Cost</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.inputTokens}">Input Tokens</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.outputTokens}">Output Tokens</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{metrics.table.model}">Model</th>
@@ -56,6 +57,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                     <tr th:each="metric : ${metrics}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.duration} + ' ms'"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$<span th:text="${metric.cost}"></span></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.inputTokens}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.outputTokens}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.model}"></td>

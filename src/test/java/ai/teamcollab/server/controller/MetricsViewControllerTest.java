@@ -3,20 +3,18 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.domain.Persona;
+import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MetricsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,11 +22,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import static ai.teamcollab.server.domain.GptModel.GPT_3_5_TURBO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @ExtendWith(MockitoExtension.class)
 class MetricsViewControllerTest {
@@ -116,7 +119,7 @@ class MetricsViewControllerTest {
     @Test
     void calculateInputTokensCost_Success() {
         var controller = new MetricsViewController(metricsService, messageSource, conversationService);
-        var result = controller.calculateInputTokensCost(1000);
+        var result = controller.calculateInputTokensCost(GPT_3_5_TURBO.getId(), 1000);
         var expected = new BigDecimal("0.0010").setScale(4, RoundingMode.HALF_UP);
         org.junit.jupiter.api.Assertions.assertEquals(0, result.compareTo(expected),
                 "Expected " + expected + " but got " + result);
@@ -125,7 +128,7 @@ class MetricsViewControllerTest {
     @Test
     void calculateOutputTokensCost_Success() {
         var controller = new MetricsViewController(metricsService, messageSource, conversationService);
-        var result = controller.calculateOutputTokensCost(1000);
+        var result = controller.calculateOutputTokensCost(GPT_3_5_TURBO.getId(), 1000);
         var expected = new BigDecimal("0.0020").setScale(4, RoundingMode.HALF_UP);
         org.junit.jupiter.api.Assertions.assertEquals(0, result.compareTo(expected),
                 "Expected " + expected + " but got " + result);
