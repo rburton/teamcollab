@@ -20,6 +20,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/register",  "/login", "/css/**", "/js/**", "/dist/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/system/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -31,7 +32,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
                 .permitAll()
             );
-        
+
         return http.build();
     }
 
