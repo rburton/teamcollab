@@ -23,9 +23,9 @@
                 <div>
                     <label th:for="name" class="block text-sm font-medium text-gray-700">Project Name</label>
                     <div class="mt-1">
-                        <input type="text" th:field="*{name}" required
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                               placeholder="Enter project name"
+                        <input type="text" th:field="*{name}" required autocomplete="off"
+                               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                               placeholder="Project Name"
                                th:classappend="${#fields.hasErrors('name')} ? 'border-red-300'">
                         <p th:if="${#fields.hasErrors('name')}" class="mt-2 text-sm text-red-600" th:errors="*{name}"></p>
                     </div>
@@ -36,8 +36,8 @@
                     <label th:for="overview" class="block text-sm font-medium text-gray-700">Project Topic</label>
                     <div class="mt-1">
                         <textarea th:field="*{overview}" rows="3" required
-                                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                  placeholder="Describe the topic of your project"
+                                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                  placeholder="Provide an overview of the project"
                                   th:classappend="${#fields.hasErrors('overview')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('overview')}" class="mt-2 text-sm text-red-600" th:errors="*{overview}"></p>
                     </div>
@@ -45,11 +45,11 @@
 
                 <!-- First Conversation Purpose -->
                 <div>
-                    <label th:for="purpose" class="block text-sm font-medium text-gray-700">First Conversation Purpose</label>
+                    <label th:for="purpose" class="block text-sm font-medium text-gray-700">Conversation Purpose</label>
                     <div class="mt-1">
                         <textarea th:field="*{purpose}" rows="3" required
-                                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                  placeholder="What is the purpose of your first conversation?"
+                                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                  placeholder="What is the purpose of your first team conversation?"
                                   th:classappend="${#fields.hasErrors('purpose')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('purpose')}" class="mt-2 text-sm text-red-600" th:errors="*{purpose}"></p>
                     </div>
