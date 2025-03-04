@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface PersonaRepository extends CrudRepository<Persona, Long> {
     List<Persona> findByCompanyIdOrCompanyIdIsNull(Long companyId);
+
+    List<Persona> findByCompanyIdAndConversationsIdNotOrConversationsIsEmpty(Long companyId, Long conversationId);
 }

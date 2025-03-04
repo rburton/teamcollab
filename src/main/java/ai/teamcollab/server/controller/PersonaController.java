@@ -5,6 +5,7 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.PersonaService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.List;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
+@Slf4j
 @Controller
 @RequestMapping("/personas")
 public class PersonaController {
@@ -42,8 +45,8 @@ public class PersonaController {
         return "personas/index";
     }
 
-    @GetMapping("/all")
     @ResponseBody
+    @GetMapping("/all")
     public List<Persona> getAllPersonas(@AuthenticationPrincipal User user) {
         final var company = user.getCompany();
         return personaService.findByCompany(company.getId());
@@ -137,5 +140,23 @@ public class PersonaController {
         }
 
         return "redirect:/personas/" + id;
+    }
+
+    @GetMapping("/conversations/{conversationId}")
+    public String getPersonasNotInConversation(@PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
+        try {
+            log.debug("Getting personas not in conversation {} for company {}", conversationId, user.getCompany().getId());
+            final var company = user.getCompany();
+            final var personas = personaService.findPersonasNotInConversation(company.getId(), conversationId);
+            model.addAttribute("personas", personas);
+            model.addAttribute("conversationId", conversationId);
+            return "personas/personas";
+        } catch (IllegalArgumentException e) {
+            log.error("Error getting personas not in conversation: {}", e.getMessage());
+            return "personas/personas";
+        } catch (Exception e) {
+            log.error("Unexpected error getting personas not in conversation: {}", e.getMessage());
+            return "personas/personas";
+        }
     }
 }

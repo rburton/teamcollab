@@ -81,4 +81,8 @@ public class PersonaService {
         personaRepository.deleteById(id);
     }
 
+    public List<Persona> findPersonasNotInConversation(Long companyId, Long conversationId) {
+        log.debug("Finding personas not in conversation {} for company {}", conversationId, companyId);
+        return personaRepository.findByCompanyIdAndConversationsIdNotOrConversationsIsEmpty(companyId, conversationId);
+    }
 }

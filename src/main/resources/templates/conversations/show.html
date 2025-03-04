@@ -80,12 +80,9 @@
                 </button>
             </div>
 
-            <!-- Personas Container -->
-            <div data-persona-target="container"></div>
-
             <!-- Personas Modal -->
             <div data-persona-target="modal"
-                 class="fixed inset-0 bg-gray-50 backdrop-opacity-15 hidden items-center justify-center z-50">
+                 class="fixed inset-0 bg-gray-50 hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold">All Personas</h3>
@@ -94,23 +91,9 @@
                         </button>
                     </div>
                     <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <div data-persona-target="list"></div>
-                        <!-- Personas Template -->
-                        <template id="personaTemplate">
-                            <a href="#" data-turbo="true" data-turbo-method="post"
-                               class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <div>
-                                            <h4 class="font-medium"></h4>
-                                            <p class="text-sm text-gray-600"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </template>
+                        <turbo-frame id="personasList" src="/personas/conversations/1">
+                            Loading Personas...
+                        </turbo-frame>
                     </div>
                     <!-- Error Message -->
                     <div id="errorMessage" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
