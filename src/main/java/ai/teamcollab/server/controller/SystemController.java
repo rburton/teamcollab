@@ -1,6 +1,7 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.SystemSettings;
+import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,15 @@ import jakarta.validation.Valid;
 public class SystemController {
 
     private final SystemSettingsService systemSettingsService;
+    private final CompanyService companyService;
+
+    @GetMapping("/companies")
+    public String listCompanies(Model model) {
+        log.debug("Showing companies list page");
+        final var companies = companyService.getAllCompanies();
+        model.addAttribute("companies", companies);
+        return "system/companies";
+    }
 
     @GetMapping
     public String showSettings(Model model) {
@@ -34,7 +44,7 @@ public class SystemController {
     @PostMapping("/update")
     public String updateSettings(@Valid SystemSettings settings, BindingResult result, Model model) {
         log.debug("Updating system settings: {}", settings);
-        
+
         if (result.hasErrors()) {
             return "system/settings";
         }

@@ -67,6 +67,8 @@
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Admin</a>
                         <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">System Settings</a>
+                        <a href="/system/companies" sec:authorize="hasRole('SUPER_ADMIN')"
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Companies</a>
                     </div>
                 </div>
             </div>

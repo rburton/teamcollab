@@ -47,6 +47,9 @@ public class Company {
     @Builder.Default
     private Set<User> users = new HashSet<>();
 
+    @Column(name = "created_at")
+    private java.time.LocalDateTime createdAt;
+
     public void addUser(User user) {
         this.users.add(user);
     }

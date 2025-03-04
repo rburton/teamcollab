@@ -1,7 +1,9 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.config.SecurityConfig;
+import ai.teamcollab.server.config.TestSecurityConfig;
+import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.SystemSettings;
+import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +14,13 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -24,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SystemController.class)
-@Import({SecurityConfig.class, SystemControllerTest.TestConfig.class})
+@Import({TestSecurityConfig.class, SystemControllerTest.TestConfig.class})
 class SystemControllerTest {
 
     @TestConfiguration
@@ -32,7 +38,22 @@ class SystemControllerTest {
         @Bean
         @Primary
         public SystemSettingsService systemSettingsService() {
-            return Mockito.mock(SystemSettingsService.class);
+            return mock(SystemSettingsService.class);
+        }
+
+        @Bean
+        @Primary
+        public CompanyService companyService() {
+            return mock(CompanyService.class);
+        }
+
+        @Bean
+        @Primary
+        public MessageSource messageSource() {
+            var messageSource = new ResourceBundleMessageSource();
+            messageSource.setBasename("messages");
+            messageSource.setDefaultEncoding("UTF-8");
+            return messageSource;
         }
     }
 
@@ -42,15 +63,32 @@ class SystemControllerTest {
     @Autowired
     private SystemSettingsService systemSettingsService;
 
+    @Autowired
+    private CompanyService companyService;
+
     @BeforeEach
     void setUp() {
         Mockito.reset(systemSettingsService);
+        Mockito.reset(companyService);
+
         when(systemSettingsService.getCurrentSettings())
             .thenReturn(SystemSettings.builder()
                 .llmModel("gpt-3.5-turbo")
                 .build());
         when(systemSettingsService.updateSettings(any(SystemSettings.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(companyService.getAllCompanies())
+            .thenReturn(List.of(
+                Company.builder()
+                    .id(1L)
+                    .name("Test Company 1")
+                    .build(),
+                Company.builder()
+                    .id(2L)
+                    .name("Test Company 2")
+                    .build()
+            ));
     }
 
     @Test
@@ -119,5 +157,28 @@ class SystemControllerTest {
 
         // Verify no updates were made
         verify(systemSettingsService).getCurrentSettings();
+    }
+
+    @Test
+    @WithMockUser(roles = "SUPER_ADMIN")
+    void listCompanies_WithSuperAdmin_ShouldSucceed() throws Exception {
+        // When/Then
+        mockMvc.perform(get("/system/companies"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("system/companies"))
+                .andExpect(model().attributeExists("companies"))
+                .andExpect(model().attribute("companies", companyService.getAllCompanies()));
+
+        verify(companyService).getAllCompanies();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void listCompanies_WithoutSuperAdmin_ShouldFail() throws Exception {
+        // When/Then
+        mockMvc.perform(get("/system/companies"))
+                .andExpect(status().isForbidden());
+
+        verify(companyService, never()).getAllCompanies();
     }
 }

@@ -115,7 +115,7 @@ public class MetricsViewController {
     }
 
     @GetMapping("/company/{companyId}/costs")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public String showCompanyCosts(@PathVariable Long companyId, 
                                  @AuthenticationPrincipal User currentUser,
                                  Model model, 
