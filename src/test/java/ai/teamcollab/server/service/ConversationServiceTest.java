@@ -1,9 +1,12 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
+import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
+import ai.teamcollab.server.service.domain.MessageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,6 +36,15 @@ class ConversationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ChatService chatService;
+
+    @Mock
+    private MessageService messageService;
+
+    @Mock
+    private MessageRepository messageRepository;
 
     @InjectMocks
     private ConversationService conversationService;
@@ -112,5 +126,63 @@ class ConversationServiceTest {
         assertThatThrownBy(() -> conversationService.findConversationById(testConversation.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Conversation not found");
+    }
+
+    @Test
+    void sendMessageShouldSucceed() throws ExecutionException, InterruptedException {
+        Message message = new Message();
+        message.setContent("Test message");
+        message.setId(1L);
+
+        when(conversationRepository.findById(testConversation.getId())).thenReturn(Optional.of(testConversation));
+        when(messageService.createMessage(message, testConversation.getId(), testUser))
+                .thenReturn(message);
+        when(chatService.process(testConversation, message))
+                .thenReturn(CompletableFuture.completedFuture(MessageResponse.builder().content("Response").build()));
+
+        CompletableFuture<Void> result = conversationService.sendMessage(testConversation.getId(), message, testUser);
+        result.get(); // Wait for completion
+
+        verify(messageService).createMessage(message, testConversation.getId(), testUser);
+        verify(chatService).process(testConversation, message);
+    }
+
+    @Test
+    void sendMessageShouldHandleProcessingError() {
+        Message message = new Message();
+        message.setContent("Test message");
+        message.setId(1L);
+
+        when(conversationRepository.findById(testConversation.getId())).thenReturn(Optional.of(testConversation));
+        when(messageService.createMessage(message, testConversation.getId(), testUser))
+                .thenReturn(message);
+        when(chatService.process(testConversation, message))
+                .thenReturn(CompletableFuture.failedFuture(new RuntimeException("Processing failed")));
+
+        CompletableFuture<Void> result = conversationService.sendMessage(testConversation.getId(), message, testUser);
+
+        assertThatThrownBy(result::get)
+                .isInstanceOf(ExecutionException.class)
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Processing failed");
+    }
+
+    @Test
+    void sendMessageShouldHandleInvalidConversation() {
+        Message message = new Message();
+        message.setContent("Test message");
+        message.setId(1L);
+
+        when(conversationRepository.findById(testConversation.getId())).thenReturn(Optional.empty());
+
+        CompletableFuture<Void> result = conversationService.sendMessage(testConversation.getId(), message, testUser);
+
+        assertThatThrownBy(result::get)
+                .isInstanceOf(ExecutionException.class)
+                .hasCauseInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Conversation not found");
+
+        verify(messageService, never()).createMessage(any(), any(), any());
+        verify(chatService, never()).process(any(), any());
     }
 }

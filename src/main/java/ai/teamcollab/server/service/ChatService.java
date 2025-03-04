@@ -4,13 +4,15 @@ import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.service.domain.MessageResponse;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface ChatService {
     /**
-     * Process a message in the context of a conversation and generate a response.
+     * Asynchronously process a message in the context of a conversation and generate a response.
      *
      * @param conversation The conversation context
      * @param recent The most recent message to process
-     * @return MessageResponse containing the LLM response and associated metrics
+     * @return CompletableFuture<MessageResponse> containing the LLM response and associated metrics
      */
-    MessageResponse process(Conversation conversation, Message recent);
+    CompletableFuture<MessageResponse> process(Conversation conversation, Message recent);
 }

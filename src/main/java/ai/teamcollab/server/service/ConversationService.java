@@ -9,9 +9,11 @@ import ai.teamcollab.server.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -52,10 +54,26 @@ public class ConversationService {
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
     }
 
-    public void sendMessage(Long conversationId, Message message, User user) {
-        final var conversation = findConversationById(conversationId);
-        final var savedMessage = messageService.createMessage(message, conversationId, user);
-        chatService.process(conversation, savedMessage);
+    @Async
+    public CompletableFuture<Void> sendMessage(Long conversationId, Message message, User user) {
+        log.debug("Asynchronously sending message for conversation: {}, user: {}", conversationId, user.getId());
+        try {
+            final var conversation = findConversationById(conversationId);
+            final var savedMessage = messageService.createMessage(message, conversationId, user);
+            return chatService.process(conversation, savedMessage)
+                    .thenAccept(response -> log.debug("Message processed successfully for conversation: {}", conversationId))
+                    .exceptionally(throwable -> {
+                        log.error("Error processing message for conversation {}: {}", conversationId, throwable.getMessage(), throwable);
+                        // Convert checked exception to unchecked
+                        if (throwable instanceof RuntimeException) {
+                            throw (RuntimeException) throwable;
+                        }
+                        throw new RuntimeException("Failed to process message", throwable);
+                    });
+        } catch (Exception e) {
+            log.error("Error sending message for conversation {}: {}", conversationId, e.getMessage(), e);
+            return CompletableFuture.failedFuture(e);
+        }
     }
 
     public List<Message> findMessagesByConversation(Long conversationId) {
