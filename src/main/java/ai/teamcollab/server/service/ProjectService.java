@@ -1,12 +1,11 @@
 package ai.teamcollab.server.service;
 
-import ai.teamcollab.server.domain.Project;
-import java.util.List;
-import java.util.stream.Collectors;
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.Project;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.ProjectCreateRequest;
 import ai.teamcollab.server.dto.ProjectResponse;
+import ai.teamcollab.server.dto.ProjectResponse.ConversationResponse;
 import ai.teamcollab.server.repository.ProjectRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -52,18 +54,25 @@ public class ProjectService {
                 .name(project.getName())
                 .overview(project.getOverview())
                 .createdAt(project.getCreatedAt())
-                .conversation(ProjectResponse.ConversationResponse.builder()
+                .conversation(ConversationResponse.builder()
                         .id(conversation.getId())
                         .purpose(conversation.getPurpose())
                         .createdAt(conversation.getCreatedAt())
                         .build())
+                .conversations(project.getConversations().stream()
+                        .map(c -> ConversationResponse.builder()
+                                .id(c.getId())
+                                .purpose(c.getPurpose())
+                                .createdAt(c.getCreatedAt())
+                                .build())
+                        .collect(toList()))
                 .build();
     }
 
     public List<ProjectResponse> getProjectsByCompany(Long companyId) {
         return projectRepository.findByCompanyId(companyId).stream()
                 .map(this::buildProjectResponse)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Transactional(readOnly = true)
@@ -76,5 +85,17 @@ public class ProjectService {
         }
 
         return buildProjectResponse(project);
+    }
+
+    @Transactional(readOnly = true)
+    public Project getProjectEntityById(Long projectId, Long companyId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        if (!project.getCompany().getId().equals(companyId)) {
+            throw new IllegalStateException("Unauthorized access to project");
+        }
+
+        return project;
     }
 }

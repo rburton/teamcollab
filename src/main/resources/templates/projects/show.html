@@ -18,34 +18,72 @@
         <div class="bg-white shadow rounded-lg p-6 mb-6">
             <div class="border-b border-gray-200 pb-5">
                 <h3 class="text-2xl font-semibold leading-6 text-gray-900" th:text="${project.name}">Project Name</h3>
-
-                <blockquote class="p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-300 dark:bg-gray-400">
+                <blockquote
+                        class="p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-300 dark:bg-gray-400">
                     <p class="mt-2 text-sm " th:text="${project.overview}">
-                        "Flowbite is just awesome. It contains tons of predesigned components and pages starting from login screen to complex dashboard. Perfect choice for your next SaaS application."
+                        "Flowbite is just awesome. It contains tons of predesigned components and pages starting from
+                        login screen to complex dashboard. Perfect choice for your next SaaS application."
                     </p>
                 </blockquote>
-                <p class="mt-1 text-xs text-gray-400" th:text="'Created: ' + ${#temporals.format(project.createdAt, 'MMM dd, yyyy')}">Created Date</p>
+                <p class="mt-1 text-xs text-gray-400"
+                   th:text="'Created: ' + ${#temporals.format(project.createdAt, 'MMM dd, yyyy')}">Created Date</p>
             </div>
         </div>
 
         <!-- Conversations List -->
         <div class="bg-white shadow rounded-lg p-6">
+            <div class="text-center py-4">
+                <!-- New Conversation Form -->
+                <div class="mt-6 max-w-xl mx-auto">
+                    <form th:action="@{/projects/{id}/conversations(id=${project.id})}"
+                          th:object="${conversationCreateRequest}"
+                          method="post"
+                          class="space-y-4">
+
+                        <div class="rounded-md shadow-sm -space-y-px">
+                            <div>
+                                <label for="purpose" class="sr-only">Conversation Purpose</label>
+                                <textarea id="purpose"
+                                          name="purpose"
+                                          th:field="*{purpose}"
+                                          required
+                                          class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                          placeholder="What would you like to discuss about this project?"
+                                          rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div th:if="${#fields.hasErrors('purpose')}" class="text-red-500 text-sm mt-1">
+                            <span th:errors="*{purpose}"></span>
+                        </div>
+
+                        <div>
+                            <button type="submit"
+                                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Start New Conversation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white shadow rounded-lg p-6">
             <div class="border-b border-gray-200 pb-5">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Active Conversations</h3>
             </div>
-            
             <div class="mt-6">
-                <div th:if="${project.conversation != null}" class="space-y-4">
+                <div th:each="conversation : ${project.conversations}" class="space-y-4">
                     <div class="group relative flex items-start space-x-3 py-4 hover:bg-gray-50 rounded-lg px-4">
                         <div class="min-w-0 flex-1">
                             <div class="text-sm font-medium text-gray-900">
-                                <a th:href="@{/conversations/{id}(id=${project.conversation.id})}" class="hover:underline">
+                                <a th:href="@{/conversations/{id}(id=${conversation.id})}"
+                                   class="hover:underline">
                                     <span class="absolute inset-0" aria-hidden="true"></span>
-                                    <span th:text="${project.conversation.purpose}">Conversation Purpose</span>
+                                    <span th:text="${conversation.purpose}">Conversation Purpose</span>
                                 </a>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1" 
-                               th:text="'Started: ' + ${#temporals.format(project.conversation.createdAt, 'MMM dd, yyyy')}">
+                            <p class="text-xs text-gray-500 mt-1"
+                               th:text="'Started: ' + ${#temporals.format(conversation.createdAt, 'MMM dd, yyyy')}">
                                 Start Date
                             </p>
                         </div>
@@ -59,12 +97,10 @@
                         </div>
                     </div>
                 </div>
-                <div th:if="${project.conversation == null}" class="text-center py-4">
-                    <p class="text-sm text-gray-500">No active conversations</p>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>

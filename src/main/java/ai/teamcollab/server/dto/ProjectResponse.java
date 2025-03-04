@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ public class ProjectResponse {
     private String overview;
     private LocalDateTime createdAt;
     private ConversationResponse conversation;
+    private List<ConversationResponse> conversations;
 
     @Getter
     @Setter
