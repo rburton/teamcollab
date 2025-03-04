@@ -34,6 +34,12 @@ public class SystemController {
     }
 
     @GetMapping
+    public String index() {
+        log.debug("Showing system dashboard page");
+        return "system/index";
+    }
+
+    @GetMapping("/settings")
     public String showSettings(Model model) {
         log.debug("Showing system settings page");
         final var settings = systemSettingsService.getCurrentSettings();
@@ -58,6 +64,6 @@ public class SystemController {
             return "system/settings";
         }
 
-        return "redirect:/system";
+        return "redirect:/system/settings";
     }
 }
