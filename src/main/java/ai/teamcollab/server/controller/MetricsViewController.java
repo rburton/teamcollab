@@ -3,12 +3,15 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,6 +110,40 @@ public class MetricsViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     messageSource.getMessage("metrics.error.conversation.fetch",
                             new Object[]{id, e.getMessage()}, LocaleContextHolder.getLocale()));
+            return "redirect:/metrics";
+        }
+    }
+
+    @GetMapping("/company/{companyId}/costs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showCompanyCosts(@PathVariable Long companyId, 
+                                 @AuthenticationPrincipal User currentUser,
+                                 Model model, 
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            // Verify user has access to the company
+            if (!currentUser.getCompany().getId().equals(companyId)) {
+                log.warn("User {} attempted to access costs for company {}", currentUser.getId(), companyId);
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        messageSource.getMessage("metrics.error.unauthorized",
+                                null, LocaleContextHolder.getLocale()));
+                return "redirect:/metrics";
+            }
+
+            var costs = metricsService.getCompanyCosts(companyId);
+
+            model.addAttribute("dailyCost", costs.get("daily").setScale(4, HALF_UP).toString());
+            model.addAttribute("weeklyCost", costs.get("weekly").setScale(4, HALF_UP).toString());
+            model.addAttribute("monthlyCost", costs.get("monthly").setScale(4, HALF_UP).toString());
+            model.addAttribute("companyId", companyId);
+            model.addAttribute("companyName", currentUser.getCompany().getName());
+
+            return "metrics/company-costs";
+        } catch (Exception e) {
+            log.error("Error fetching company costs for company ID: {}", companyId, e);
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    messageSource.getMessage("metrics.error.company.costs.fetch",
+                            new Object[]{companyId, e.getMessage()}, LocaleContextHolder.getLocale()));
             return "redirect:/metrics";
         }
     }

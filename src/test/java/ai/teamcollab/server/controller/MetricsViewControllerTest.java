@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
@@ -13,14 +14,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 
 import static ai.teamcollab.server.domain.GptModel.GPT_3_5_TURBO;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,16 +63,25 @@ class MetricsViewControllerTest {
     private User user;
     private Set<Persona> personas;
 
+    private Company company;
+
     @BeforeEach
     void setUp() {
         metricsViewController = new MetricsViewController(metricsService, messageSource, conversationService);
-        mockMvc = MockMvcBuilders.standaloneSetup(metricsViewController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(metricsViewController)
+                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
+                .build();
+
+        company = new Company();
+        company.setId(1L);
+        company.setName("Test Company");
 
         user = new User();
         user.setId(1L);
         user.setUsername("testuser");
         user.setEmail("test@example.com");
         user.setPassword("password");
+        user.setCompany(company);
 
         Persona persona = new Persona();
         persona.setId(1L);
@@ -83,6 +101,7 @@ class MetricsViewControllerTest {
         metrics1.setDuration(1000L);
         metrics1.setInputTokens(100);
         metrics1.setOutputTokens(150);
+        metrics1.setModel(GPT_3_5_TURBO.getId());
         message1.addMetrics(metrics1);
 
         Message message2 = new Message();
@@ -91,6 +110,7 @@ class MetricsViewControllerTest {
         metrics2.setDuration(2000L);
         metrics2.setInputTokens(200);
         metrics2.setOutputTokens(250);
+        metrics2.setModel(GPT_3_5_TURBO.getId());
         message2.addMetrics(metrics2);
 
         messages = List.of(message1, message2);
@@ -111,16 +131,15 @@ class MetricsViewControllerTest {
                 .andExpect(model().attribute("totalDuration", 3000L))
                 .andExpect(model().attribute("totalInputTokens", 300))
                 .andExpect(model().attribute("totalOutputTokens", 400))
-                .andExpect(model().attribute("inputTokensCost", "0.0003"))   // 300 tokens * $0.0010 per 1K
+                .andExpect(model().attribute("inputTokensCost", "0.0006"))   // 300 tokens * $0.0020 per 1K
                 .andExpect(model().attribute("outputTokensCost", "0.0008"))  // 400 tokens * $0.0020 per 1K
-                .andExpect(model().attribute("totalCost", "0.0011"));        // 0.0003 + 0.0008
+                .andExpect(model().attribute("totalCost", "0.0014"));        // 0.0006 + 0.0008
     }
 
     @Test
     void calculateInputTokensCost_Success() {
-        var controller = new MetricsViewController(metricsService, messageSource, conversationService);
-        var result = controller.calculateInputTokensCost(GPT_3_5_TURBO.getId(), 1000);
-        var expected = new BigDecimal("0.0010").setScale(4, RoundingMode.HALF_UP);
+        var result = metricsViewController.calculateInputTokensCost(GPT_3_5_TURBO.getId(), 1000);
+        var expected = new BigDecimal("0.0020").setScale(4, RoundingMode.HALF_UP);
         org.junit.jupiter.api.Assertions.assertEquals(0, result.compareTo(expected),
                 "Expected " + expected + " but got " + result);
     }
@@ -142,6 +161,58 @@ class MetricsViewControllerTest {
                 .thenReturn("Error fetching metrics for conversation 1: Conversation not found");
 
         mockMvc.perform(get("/metrics/conversation/1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/metrics"))
+                .andExpect(flash().attributeExists("errorMessage"));
+    }
+
+    @Test
+    void showCompanyCosts_Success() throws Exception {
+        var costs = new HashMap<String, BigDecimal>();
+        costs.put("daily", new BigDecimal("10.5000"));
+        costs.put("weekly", new BigDecimal("50.7500"));
+        costs.put("monthly", new BigDecimal("150.2500"));
+
+        when(metricsService.getCompanyCosts(1L)).thenReturn(costs);
+
+        mockMvc.perform(get("/metrics/company/1/costs")
+                    .principal(new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                .andExpect(status().isOk())
+                .andExpect(view().name("metrics/company-costs"))
+                .andExpect(model().attribute("dailyCost", "10.5000"))
+                .andExpect(model().attribute("weeklyCost", "50.7500"))
+                .andExpect(model().attribute("monthlyCost", "150.2500"))
+                .andExpect(model().attribute("companyId", 1L))
+                .andExpect(model().attribute("companyName", "Test Company"));
+    }
+
+    @Test
+    void showCompanyCosts_Unauthorized() throws Exception {
+        var unauthorizedUser = new User();
+        unauthorizedUser.setId(2L);
+        var unauthorizedCompany = new Company();
+        unauthorizedCompany.setId(2L);
+        unauthorizedUser.setCompany(unauthorizedCompany);
+
+        when(messageSource.getMessage(eq("metrics.error.unauthorized"), isNull(), any()))
+                .thenReturn("You are not authorized to access this company's metrics");
+
+        mockMvc.perform(get("/metrics/company/1/costs")
+                    .principal(new UsernamePasswordAuthenticationToken(unauthorizedUser, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/metrics"))
+                .andExpect(flash().attribute("errorMessage", "You are not authorized to access this company's metrics"));
+    }
+
+    @Test
+    void showCompanyCosts_Error() throws Exception {
+        when(metricsService.getCompanyCosts(1L))
+                .thenThrow(new RuntimeException("Failed to fetch company costs"));
+        when(messageSource.getMessage(eq("metrics.error.company.costs.fetch"), any(), any()))
+                .thenReturn("Error fetching costs for company 1: Failed to fetch company costs");
+
+        mockMvc.perform(get("/metrics/company/1/costs")
+                    .principal(new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/metrics"))
                 .andExpect(flash().attributeExists("errorMessage"));

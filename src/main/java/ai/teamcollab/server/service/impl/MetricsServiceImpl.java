@@ -8,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -72,5 +75,40 @@ public class MetricsServiceImpl implements MetricsService {
         statistics.put("mostUsedModel", mostUsedModel);
 
         return statistics;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, BigDecimal> getCompanyCosts(Long companyId) {
+        log.debug("Calculating company costs for company ID: {}", companyId);
+        
+        Map<String, BigDecimal> costs = new HashMap<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        // Calculate daily costs (last 24 hours)
+        LocalDateTime dayStart = now.minusHours(24);
+        costs.put("daily", getCompanyCostsByDateRange(companyId, dayStart, now));
+
+        // Calculate weekly costs (last 7 days)
+        LocalDateTime weekStart = now.minusDays(7);
+        costs.put("weekly", getCompanyCostsByDateRange(companyId, weekStart, now));
+
+        // Calculate monthly costs (last 30 days)
+        LocalDateTime monthStart = now.minusDays(30);
+        costs.put("monthly", getCompanyCostsByDateRange(companyId, monthStart, now));
+
+        return costs;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal getCompanyCostsByDateRange(Long companyId, LocalDateTime startDate, LocalDateTime endDate) {
+        log.debug("Calculating company costs for company ID: {} between {} and {}", companyId, startDate, endDate);
+        
+        List<Metrics> metrics = metricsRepository.findByCompanyAndDateRange(companyId, startDate, endDate);
+        
+        return metrics.stream()
+                .map(Metrics::getCost)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
