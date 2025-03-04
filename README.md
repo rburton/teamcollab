@@ -61,3 +61,5 @@ Create a pulumi script that does the following:
 Make it so a environment name can be provided so a dev and production enviroment can be setup or future environments.
 
 Do this in Java
+
+https://teamai.com/blog/large-language-models-llms/understanding-different-chatgpt-models/
