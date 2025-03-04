@@ -1,13 +1,17 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.api.domain.AddPersonaRequest;
+import ai.teamcollab.server.api.domain.PersonaResponse;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
+import ai.teamcollab.server.service.PersonaService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,17 +23,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import static ai.teamcollab.server.api.domain.PersonaResponse.fromPersona;
 import static java.util.Objects.isNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.internalServerError;
 
+@Slf4j
 @Controller
 @RequestMapping("/conversations")
 public class ConversationController {
 
     private final ConversationService conversationService;
+    private final PersonaService personaService;
 
     @Autowired
-    public ConversationController(@NonNull ConversationService conversationService) {
+    public ConversationController(@NonNull ConversationService conversationService, @NonNull PersonaService personaService) {
         this.conversationService = conversationService;
+        this.personaService = personaService;
     }
 
     @GetMapping
@@ -111,6 +122,34 @@ public class ConversationController {
         }
 
         return "redirect:/conversations/" + conversationId;
+    }
+
+    @PostMapping("/{conversationId}/persona/{personaId}")
+    public String addPersonaToConversation(
+            @PathVariable Long conversationId,
+            @PathVariable Long personaId,
+            @AuthenticationPrincipal User user,
+            Model model) {
+
+        log.debug("Adding persona {} to conversation {}", personaId, conversationId);
+
+        try {
+            var persona = personaService.findById(personaId)
+                    .orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+
+            personaService.addToConversation(persona.getId(), conversationId);
+
+            var updatedPersona = personaService.findById(personaId)
+                    .orElseThrow(() -> new IllegalArgumentException("Persona not found after update"));
+            model.addAttribute("persona", updatedPersona);
+            return "conversations/persona";
+        } catch (IllegalArgumentException e) {
+            log.error("Bad request while adding persona to conversation", e);
+            return "conversations/persona";
+        } catch (Exception e) {
+            log.error("Error adding persona to conversation", e);
+            return "conversations/persona";
+        }
     }
 
 }

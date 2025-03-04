@@ -37,10 +37,10 @@ export default class extends Controller {
 
         // Update the conversation
         const csrf = this.getCsrfToken();
-        fetch(`/api/conversations/${this.element.dataset.personaConversationIdValue}/persona`, {
+        fetch(`/conversations/${this.element.dataset.personaConversationIdValue}/persona`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/html',
                 [csrf.header]: csrf.token,
             },
             body: JSON.stringify({
@@ -90,10 +90,12 @@ export default class extends Controller {
     createPersonaElement(persona) {
         const template = document.getElementById('personaTemplate')
         const element = template.content.cloneNode(true)
+        const a = element.querySelector('a')
+        a.href = `/conversations/${this.element.dataset.personaConversationIdValue}/personas/${persona.id}`;
+
         const div = element.querySelector('div')
         div.dataset.personaId = persona.id
         div.dataset.personaName = persona.name
-        div.dataset.action = "click->persona#select"
 
         const initial = element.querySelector('.rounded-full')
         initial.textContent = persona.name.charAt(0)
