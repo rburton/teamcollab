@@ -5,6 +5,8 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,24 +44,31 @@ public class AuthController {
                              @Valid @ModelAttribute("company") Company company,
                              BindingResult companyResult,
                              RedirectAttributes redirectAttributes) {
-        
+
         if (userResult.hasErrors() || companyResult.hasErrors()) {
             return "auth/register";
         }
 
         try {
             // Create company first
-            Company savedCompany = companyService.createCompany(company);
-            
+            final var savedCompany = companyService.createCompany(company);
+
             // Then create user with company
             user.setCompany(savedCompany);
-            User savedUser = userService.registerNewUser(user, "USER");
-            
+            final var savedUser = userService.registerNewUser(user, "USER");
+
             // Add user to company
             companyService.addUserToCompany(savedCompany, savedUser);
-            
-            redirectAttributes.addFlashAttribute("successMessage", "Registration successful! Please login.");
-            return "redirect:/login";
+
+            // Automatically authenticate the user
+            final var authentication = new UsernamePasswordAuthenticationToken(
+                savedUser,
+                null,
+                savedUser.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return "redirect:/dashboard";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/register";
