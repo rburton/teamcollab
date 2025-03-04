@@ -14,6 +14,7 @@
                 <p class="mt-2 text-sm text-gray-700">Manage system-wide settings and configurations.</p>
             </div>
         </div>
+
         <div class="mt-8">
             <form th:action="@{/system/update}" method="post" th:object="${settings}" class="space-y-6">
                 <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
@@ -22,18 +23,22 @@
                             <h3 class="text-lg font-medium leading-6 text-gray-900">LLM Settings</h3>
                             <p class="mt-1 text-sm text-gray-500">Configure the Language Model settings.</p>
                         </div>
+
                         <div class="mt-5 md:mt-0 md:col-span-2">
                             <div class="grid grid-cols-6 gap-6">
                                 <div class="col-span-6 sm:col-span-3">
                                     <label for="llmModel" class="block text-sm font-medium text-gray-700">Model</label>
                                     <select id="llmModel" name="llmModel" th:field="*{llmModel}"
                                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                                        <option value="gpt-4">GPT-4</option>
+                                        <option th:each="model : ${T(ai.teamcollab.server.domain.GptModel).values()}"
+                                                th:value="${model.getId()}"
+                                                th:text="${model.getDropdown()}">
+                                        </option>
                                     </select>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 

@@ -55,14 +55,22 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr th:each="metric : ${metrics}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.duration} + ' ms'"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$<span th:text="${metric.cost}"></span></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.inputTokens}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.outputTokens}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.model}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.provider}"></td>
-                    </tr>
+                    <th:block th:each="metric : ${metrics}">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.duration} + ' ms'"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$<span th:text="${metric.cost}"></span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.inputTokens}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.outputTokens}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.model}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.provider}"></td>
+                        </tr>
+                        <tr th:if="${metric.message != null}" class="bg-gray-50">
+                            <td colspan="6" class="px-6 py-2 text-sm text-gray-600">
+                                <span class="font-medium text-gray-500">Message: </span>
+                                <span th:text="${metric.message.content}"></span>
+                            </td>
+                        </tr>
+                    </th:block>
                     <tr th:if="${#lists.isEmpty(metrics)}">
                         <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500" th:text="#{metrics.table.empty}">No metrics available</td>
                     </tr>

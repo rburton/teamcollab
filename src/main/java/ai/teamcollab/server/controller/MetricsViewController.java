@@ -115,12 +115,22 @@ public class MetricsViewController {
     }
 
     @GetMapping("/company/{companyId}/costs")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public String showCompanyCosts(@PathVariable Long companyId, 
                                  @AuthenticationPrincipal User currentUser,
                                  Model model, 
                                  RedirectAttributes redirectAttributes) {
         try {
+            // Verify user and company access
+            if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getCompany()) || 
+                !currentUser.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+                log.warn("Unauthorized access attempt for company {}", companyId);
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        messageSource.getMessage("metrics.error.unauthorized",
+                                null, LocaleContextHolder.getLocale()));
+                return "redirect:/metrics";
+            }
+
             // Verify user has access to the company
             if (!currentUser.getCompany().getId().equals(companyId)) {
                 log.warn("User {} attempted to access costs for company {}", currentUser.getId(), companyId);
@@ -132,9 +142,14 @@ public class MetricsViewController {
 
             var costs = metricsService.getCompanyCosts(companyId);
 
-            model.addAttribute("dailyCost", costs.get("daily").setScale(4, HALF_UP).toString());
-            model.addAttribute("weeklyCost", costs.get("weekly").setScale(4, HALF_UP).toString());
-            model.addAttribute("monthlyCost", costs.get("monthly").setScale(4, HALF_UP).toString());
+            // Handle null values in costs map
+            var dailyCost = costs.getOrDefault("daily", ZERO).setScale(4, HALF_UP);
+            var weeklyCost = costs.getOrDefault("weekly", ZERO).setScale(4, HALF_UP);
+            var monthlyCost = costs.getOrDefault("monthly", ZERO).setScale(4, HALF_UP);
+
+            model.addAttribute("dailyCost", dailyCost.toString());
+            model.addAttribute("weeklyCost", weeklyCost.toString());
+            model.addAttribute("monthlyCost", monthlyCost.toString());
             model.addAttribute("companyId", companyId);
             model.addAttribute("companyName", currentUser.getCompany().getName());
 

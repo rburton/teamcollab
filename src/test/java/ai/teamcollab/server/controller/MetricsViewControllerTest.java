@@ -3,6 +3,7 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
+import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.domain.User;
@@ -17,6 +18,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -82,6 +85,17 @@ class MetricsViewControllerTest {
         user.setEmail("test@example.com");
         user.setPassword("password");
         user.setCompany(company);
+
+        var superAdminRole = Role.builder()
+                .id(1L)
+                .name("SUPER_ADMIN")
+                .build();
+        user.addRole(superAdminRole);
+
+        // Set up security context
+        var authentication = new UsernamePasswordAuthenticationToken(user, null, 
+            List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         Persona persona = new Persona();
         persona.setId(1L);
@@ -176,7 +190,7 @@ class MetricsViewControllerTest {
         when(metricsService.getCompanyCosts(1L)).thenReturn(costs);
 
         mockMvc.perform(get("/metrics/company/1/costs")
-                    .principal(new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                    .principal(new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")))))
                 .andExpect(status().isOk())
                 .andExpect(view().name("metrics/company-costs"))
                 .andExpect(model().attribute("dailyCost", "10.5000"))
@@ -192,13 +206,22 @@ class MetricsViewControllerTest {
         unauthorizedUser.setId(2L);
         var unauthorizedCompany = new Company();
         unauthorizedCompany.setId(2L);
+        unauthorizedCompany.setName("Unauthorized Company");
         unauthorizedUser.setCompany(unauthorizedCompany);
 
         when(messageSource.getMessage(eq("metrics.error.unauthorized"), isNull(), any()))
                 .thenReturn("You are not authorized to access this company's metrics");
 
+        // Test with wrong role
         mockMvc.perform(get("/metrics/company/1/costs")
                     .principal(new UsernamePasswordAuthenticationToken(unauthorizedUser, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/metrics"))
+                .andExpect(flash().attribute("errorMessage", "You are not authorized to access this company's metrics"));
+
+        // Test with correct role but wrong company
+        mockMvc.perform(get("/metrics/company/1/costs")
+                    .principal(new UsernamePasswordAuthenticationToken(unauthorizedUser, null, List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")))))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/metrics"))
                 .andExpect(flash().attribute("errorMessage", "You are not authorized to access this company's metrics"));

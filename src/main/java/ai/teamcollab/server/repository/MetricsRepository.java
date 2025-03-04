@@ -15,6 +15,7 @@ public interface MetricsRepository extends JpaRepository<Metrics, Long> {
      * Finds top 10 metrics ordered by duration in descending order
      * @return List of top 10 metrics
      */
+    @Query("SELECT m FROM Metrics m JOIN FETCH m.message WHERE m IN (SELECT m2 FROM Metrics m2 ORDER BY m2.duration DESC)")
     List<Metrics> findTop10ByOrderByDurationDesc();
 
     /**

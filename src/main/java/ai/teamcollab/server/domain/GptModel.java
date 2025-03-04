@@ -45,7 +45,7 @@ public enum GptModel {
     }
 
     public String getDropdown() {
-        return id + "(in: " + format(this.promptPricePer1M) + " out: " + format(completionPricePer1M) + " total: " + format(promptPricePer1M.add(completionPricePer1M)) + ")";
+        return id + " " + format(promptPricePer1M.add(completionPricePer1M)) + " (in: " + format(this.promptPricePer1M) + " out: " + format(completionPricePer1M) +  ")";
     }
 
     public String format(BigDecimal amount) {
