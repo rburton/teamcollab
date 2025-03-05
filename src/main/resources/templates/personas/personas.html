@@ -1,6 +1,6 @@
 <turbo-frame id="personasList">
-    <th:inline th:each="persona : ${personas}" th:id="'persona_' + ${persona.id}">
-        <a data-turbo="true" data-turbo-method="post"
+    <th:inline th:each="persona : ${personas}">
+        <a data-turbo="true" data-turbo-method="post" th:id="'persona_' + ${persona.id}"
            th:href="@{/personas/{personaId}/conversations/{id}(id=${conversationId},personaId=${persona.id})}"
            class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between">
             <div class="flex items-center gap-3">

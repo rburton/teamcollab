@@ -102,7 +102,7 @@ public class PersonaController {
     }
 
 
-    @PostMapping(value = "/{id}/conversations/{conversationId}", produces = "text/vnd.turbo-stream.html")
+    @PostMapping(value = "/{id}/conversations/{conversationId}")
     public String addToConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
         try {
             final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
@@ -117,7 +117,7 @@ public class PersonaController {
         } catch (IllegalArgumentException e) {
         }
 
-        return "/personas/added";
+        return "/personas/added.xhtml";
     }
 
     @DeleteMapping("/{id}/conversations/{conversationId}")
