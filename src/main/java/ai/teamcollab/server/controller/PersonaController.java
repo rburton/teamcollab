@@ -2,7 +2,6 @@ package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.domain.User;
-import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.PersonaService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +27,9 @@ import java.util.List;
 public class PersonaController {
 
     private final PersonaService personaService;
-    private final CompanyService companyService;
 
-    public PersonaController(PersonaService personaService, CompanyService companyService) {
+    public PersonaController(PersonaService personaService) {
         this.personaService = personaService;
-        this.companyService = companyService;
     }
 
     @GetMapping
@@ -104,10 +101,12 @@ public class PersonaController {
         return "redirect:/personas/" + id;
     }
 
-    @PostMapping("/{id}/conversations/{conversationId}")
-    public String addToConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
+
+    @PostMapping(value = "/{id}/conversations/{conversationId}", produces = "text/vnd.turbo-stream.html")
+    public String addToConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
         try {
-            Persona persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            model.addAttribute("personaId", id);
 
             final var company = user.getCompany();
             if (company.doesntOwns(persona)) {
@@ -115,12 +114,10 @@ public class PersonaController {
             }
 
             personaService.addToConversation(id, conversationId);
-            redirectAttributes.addFlashAttribute("successMessage", "Added to conversation successfully!");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
-        return "redirect:/personas/" + id;
+        return "/personas/added";
     }
 
     @DeleteMapping("/{id}/conversations/{conversationId}")

@@ -1,17 +1,18 @@
 <turbo-frame id="personasList">
-    <a href="#" data-turbo="true" data-turbo-method="post"
-       class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between"
-       th:href="@{/personas/conversations/{id}(id=${conversationId})}"
-       th:each="persona : ${personas}">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
-            </div>
-            <div class="flex justify-between">
-                <div>
-                    <h4 class="font-medium" th:text="${persona.name}"></h4>
-                    <p class="text-sm text-gray-600" th:text="${persona.expertises}"></p>
+    <th:inline th:each="persona : ${personas}" th:id="'persona_' + ${persona.id}">
+        <a data-turbo="true" data-turbo-method="post"
+           th:href="@{/personas/{personaId}/conversations/{id}(id=${conversationId},personaId=${persona.id})}"
+           class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <h4 class="font-medium" th:text="${persona.name}"></h4>
+                        <p class="text-sm text-gray-600" th:text="${persona.expertises}"></p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </a>
+        </a>
+    </th:inline>
 </turbo-frame>

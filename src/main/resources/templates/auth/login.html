@@ -28,7 +28,6 @@
 
 
             <form class="space-y-4" action="/login" method="POST">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input required type="text" name="username" placeholder="Username" id="username"
