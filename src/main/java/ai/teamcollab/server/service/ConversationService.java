@@ -6,7 +6,6 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -54,16 +53,19 @@ public class ConversationService {
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
     }
 
-    @Async
-    public CompletableFuture<Void> sendMessage(Long conversationId, Message message, User user) {
+    public Message addToConversation(Long conversationId, Message message, User user) {
         log.debug("Asynchronously sending message for conversation: {}, user: {}", conversationId, user.getId());
+        return messageService.createMessage(message, conversationId, user);
+    }
+
+    @Async
+    public CompletableFuture<Void> sendMessage(Message message) {
         try {
-            final var conversation = findConversationById(conversationId);
-            final var savedMessage = messageService.createMessage(message, conversationId, user);
-            return chatService.process(conversation, savedMessage)
-                    .thenAccept(response -> log.debug("Message processed successfully for conversation: {}", conversationId))
+            final var conversation = message.getConversation();
+            return chatService.process(conversation, message)
+                    .thenAccept(response -> log.debug("Message processed successfully for conversation: {}", message.getId()))
                     .exceptionally(throwable -> {
-                        log.error("Error processing message for conversation {}: {}", conversationId, throwable.getMessage(), throwable);
+                        log.error("Error processing message for conversation {}: {}", conversation.getId(), throwable.getMessage(), throwable);
                         // Convert checked exception to unchecked
                         if (throwable instanceof RuntimeException) {
                             throw (RuntimeException) throwable;
@@ -71,7 +73,7 @@ public class ConversationService {
                         throw new RuntimeException("Failed to process message", throwable);
                     });
         } catch (Exception e) {
-            log.error("Error sending message for conversation {}: {}", conversationId, e.getMessage(), e);
+            log.error("Error sending message for conversation {}: {}", message, e.getMessage(), e);
             return CompletableFuture.failedFuture(e);
         }
     }

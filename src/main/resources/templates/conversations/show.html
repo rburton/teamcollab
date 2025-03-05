@@ -121,14 +121,14 @@
             <!-- Chat Messages -->
             <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4 h-[calc(100vh-16rem)]">
                 <div th:each="message : ${messages}" class="flex items-start"
-                     th:classappend="${message.user != null} ? ' justify-end'">
+                     th:classappend="${message.username} ? ' justify-end'">
 
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2"
-                         th:text="${#strings.substring(message?.user.username, 0, 1)}">
+                         th:text="${#strings.substring(message.username, 0, 1)}">
                     </div>
                     <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
                         <p class="text-sm font-semibold text-blue-800"
-                           th:text="${message.user?.username + (message.persona != null ? ' - ' + message.persona?.name : '')}">
+                           th:text="${message.username + (message.personaName != null ? ' - ' + message.personnName : '')}">
                         </p>
                         <p class="text-gray-800" th:text="${message.content}"></p>
                         <p class="text-xs text-gray-500 mt-1"
@@ -144,13 +144,11 @@
                     <p th:text="${errorMessage}"></p>
                 </div>
                 <form th:action="@{/conversations/{conversationId}/messages(conversationId=${conversation.id})}"
-                      th:object="${newMessage}" method="post" class="flex gap-2 items-center">
+                      data-turbo="true" th:object="${newMessage}" method="post" class="flex gap-2 items-center">
                     <div class="flex-1">
-                        <input type="text"
-                               autocomplete="off"
-                               th:field="*{content}"
-                               placeholder="Type your message..."
+                        <input type="text" autocomplete="off" placeholder="Type your message..."
                                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               th:field="*{content}"
                                th:classappend="${#fields.hasErrors('content')} ? 'border-red-500'">
                         <div th:if="${#fields.hasErrors('content')}" class="mt-1 text-sm text-red-600"
                              th:errors="*{content}"></div>

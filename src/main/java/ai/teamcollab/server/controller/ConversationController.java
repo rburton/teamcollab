@@ -1,17 +1,15 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.api.domain.AddPersonaRequest;
-import ai.teamcollab.server.api.domain.PersonaResponse;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.PersonaService;
+import ai.teamcollab.server.service.domain.MessageRow;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +18,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import static ai.teamcollab.server.api.domain.PersonaResponse.fromPersona;
 import static java.util.Objects.isNull;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.ResponseEntity.badRequest;
-import static org.springframework.http.ResponseEntity.internalServerError;
 
 @Slf4j
 @Controller
@@ -83,7 +78,7 @@ public class ConversationController {
         }
 
         model.addAttribute("conversation", conversation);
-        model.addAttribute("messages", conversationService.findMessagesByConversation(id));
+        model.addAttribute("messages", conversationService.findMessagesByConversation(id).stream().map(MessageRow::from).toList());
         model.addAttribute("newMessage", new Message());
         model.addAttribute("personas", conversation.getPersonas());
         return "conversations/show";
@@ -94,7 +89,9 @@ public class ConversationController {
                               @Valid @ModelAttribute("newMessage") Message message,
                               BindingResult bindingResult,
                               @AuthenticationPrincipal User user,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              Model mode,
+                              @RequestHeader("Accept") String accept) {
 
         if (isNull(user)) {
             throw new IllegalArgumentException("User not authenticated");
@@ -114,14 +111,20 @@ public class ConversationController {
         }
 
         try {
-            conversationService.sendMessage(conversationId, message, user);
+            final var savedMessage = conversationService.addToConversation(conversationId, message, user);
+//            conversationService.sendMessage(savedMessage);
             redirectAttributes.addFlashAttribute("successMessage", "Message posted successfully!");
+            mode.addAttribute("message", MessageRow.from(message));
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            redirectAttributes.addFlashAttribute("newMessage", message);
+            redirectAttributes.addFlashAttribute("newMessage", MessageRow.from(message));
         }
 
+        if (accept.contains("turbo")) {
+            return "/conversations/message.xhtml";
+        }
         return "redirect:/conversations/" + conversationId;
+
     }
 
     @PostMapping("/{conversationId}/persona/{personaId}")
