@@ -12,4 +12,5 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
     List<Message> findByConversationIdOrderByCreatedAtAsc(Long conversationId);
     List<Message> findByUserIdOrderByCreatedAtDesc(Long userId);
     List<Message> findByUserIdOrderByCreatedAtAsc(Long userId);
+    List<Message> findTop10ByConversationIdOrderByCreatedAtAsc(Long conversationId);
 }

@@ -80,7 +80,7 @@ public class ConversationService {
 
     public List<Message> findMessagesByConversation(Long conversationId) {
         log.debug("Fetching messages for conversation {}", conversationId);
-        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+        return messageRepository.findTop10ByConversationIdOrderByCreatedAtAsc(conversationId);
     }
 
     public List<Message> getUserMessages(Long userId) {
