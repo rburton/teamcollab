@@ -72,7 +72,7 @@ public class PersonaController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, @AuthenticationPrincipal User user, Model model) {
-        Persona persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+        final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
         final var company = user.getCompany();
         if (company.doesntOwns(persona)) {
             throw new IllegalArgumentException("Access denied");
@@ -84,7 +84,7 @@ public class PersonaController {
     @PostMapping("/{id}/expertise")
     public String addExpertise(@PathVariable Long id, @RequestParam String expertise, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
         try {
-            Persona persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
 
             final var company = user.getCompany();
             if (company.doesntOwns(persona)) {

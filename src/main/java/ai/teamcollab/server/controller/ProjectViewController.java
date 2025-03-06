@@ -35,7 +35,7 @@ public class ProjectViewController {
 
     @GetMapping
     public String index(@AuthenticationPrincipal User user, Model model) {
-        List<ProjectResponse> projects = projectService.getProjectsByCompany(user.getCompany().getId());
+        final var projects = projectService.getProjectsByCompany(user.getCompany().getId());
         model.addAttribute("projects", projects);
         return "projects/index";
     }
@@ -59,7 +59,7 @@ public class ProjectViewController {
         }
 
         try {
-            ProjectResponse response = projectService.createProject(request);
+            final var response = projectService.createProject(request);
             redirectAttributes.addFlashAttribute("successMessage", "Project created successfully");
             return "redirect:/conversations/" + response.getConversation().getId();
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class ProjectViewController {
         if (bindingResult.hasErrors()) {
             log.debug("[DEBUG_LOG] Validation errors found: {}", bindingResult.getAllErrors());
             try {
-                ProjectResponse project = projectService.getProjectById(projectId, user.getCompany().getId());
+                final var project = projectService.getProjectById(projectId, user.getCompany().getId());
                 model.addAttribute("project", project);
                 model.addAttribute("conversationCreateRequest", request);
                 return "projects/show";

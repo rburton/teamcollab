@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static java.math.BigDecimal.ZERO;
@@ -41,8 +38,8 @@ public class MetricsViewController {
     @GetMapping
     public String index(Model model, RedirectAttributes redirectAttributes) {
         try {
-            List<Metrics> topMetrics = metricsService.getTopMetrics();
-            Map<String, Object> statistics = metricsService.getMetricsStatistics();
+            final var topMetrics = metricsService.getTopMetrics();
+            final var statistics = metricsService.getMetricsStatistics();
 
             model.addAttribute("metrics", topMetrics);
             model.addAttribute("statistics", statistics);
@@ -115,15 +112,15 @@ public class MetricsViewController {
     }
 
     @GetMapping("/company/{companyId}/costs")
-    public String showCompanyCosts(@PathVariable Long companyId, 
-                                 @AuthenticationPrincipal User currentUser,
-                                 Model model, 
-                                 RedirectAttributes redirectAttributes) {
+    public String showCompanyCosts(@PathVariable Long companyId,
+                                   @AuthenticationPrincipal User currentUser,
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         try {
             // Verify user and company access
-            if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getCompany()) || 
-                !currentUser.getAuthorities().stream()
-                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getCompany()) ||
+                    !currentUser.getAuthorities().stream()
+                            .anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
                 log.warn("Unauthorized access attempt for company {}", companyId);
                 redirectAttributes.addFlashAttribute("errorMessage",
                         messageSource.getMessage("metrics.error.unauthorized",

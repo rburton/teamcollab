@@ -1,10 +1,8 @@
 package ai.teamcollab.server.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -16,9 +14,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.util.Objects.nonNull;
 
 @Entity
@@ -33,7 +34,7 @@ public class Company {
 
     @Id
     @Column(name = "company_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @NotBlank
@@ -43,12 +44,12 @@ public class Company {
     @Column(name = "stripe_customer_id", unique = true)
     private String stripeCustomerId;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", cascade = ALL, orphanRemoval = true)
     @Builder.Default
     private Set<User> users = new HashSet<>();
 
     @Column(name = "created_at")
-    private java.time.LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     public void addUser(User user) {
         this.users.add(user);

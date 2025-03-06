@@ -50,24 +50,19 @@ public class AuthController {
         }
 
         try {
-            // Create company first
             final var savedCompany = companyService.createCompany(company);
 
-            // Then create user with company
             user.setCompany(savedCompany);
             final var savedUser = userService.registerNewUser(user, "USER");
 
-            // Add user to company
             companyService.addUserToCompany(savedCompany, savedUser);
 
-            // Automatically authenticate the user
             final var authentication = new UsernamePasswordAuthenticationToken(
                 savedUser,
                 null,
                 savedUser.getAuthorities()
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             return "redirect:/dashboard";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

@@ -1,21 +1,24 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.CreateUserDTO;
 import ai.teamcollab.server.service.RoleService;
 import ai.teamcollab.server.service.UserService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -36,7 +39,7 @@ public class CompanyAdminController {
 
     @GetMapping("/users")
     public String listUsers(@AuthenticationPrincipal User currentUser, Model model) {
-        List<User> users = userService.getUsersByCompany(currentUser.getCompany().getId());
+        final var users = userService.getUsersByCompany(currentUser.getCompany().getId());
         model.addAttribute("users", users);
         model.addAttribute("allRoles", roleService.getAllRoles());
         return "company/admin/users/index";
@@ -64,7 +67,7 @@ public class CompanyAdminController {
         }
 
         try {
-            User user = User.builder()
+            final var user = User.builder()
                     .username(createUserDTO.getUsername())
                     .email(createUserDTO.getEmail())
                     .password(createUserDTO.getPassword())
@@ -88,8 +91,7 @@ public class CompanyAdminController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Verify user belongs to current user's company
-            User targetUser = userService.getUserById(userId);
+            final var targetUser = userService.getUserById(userId);
             if (!targetUser.getCompany().getId().equals(currentUser.getCompany().getId())) {
                 throw new IllegalArgumentException("User not found in your company");
             }
@@ -111,15 +113,15 @@ public class CompanyAdminController {
 
         try {
             // Verify user belongs to current user's company
-            User targetUser = userService.getUserById(userId);
+            final var targetUser = userService.getUserById(userId);
             if (!targetUser.getCompany().getId().equals(currentUser.getCompany().getId())) {
                 throw new IllegalArgumentException("User not found in your company");
             }
 
-            User user = userService.toggleUserStatus(userId);
-            String status = user.isEnabled() ? "enabled" : "disabled";
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "User account has been " + status);
+            final var user = userService.toggleUserStatus(userId);
+            final var status = user.isEnabled() ? "enabled" : "disabled";
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "User account has been " + status);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

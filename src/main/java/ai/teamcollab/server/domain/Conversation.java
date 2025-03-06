@@ -1,10 +1,8 @@
 package ai.teamcollab.server.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -24,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
 @Table(name = "conversations")
 @Getter
@@ -35,7 +36,7 @@ public class Conversation {
 
     @Id
     @Column(name = "conversation_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(name = "purpose")
@@ -51,7 +52,7 @@ public class Conversation {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
 
     @ManyToMany

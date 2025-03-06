@@ -3,7 +3,6 @@ package ai.teamcollab.server.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -17,6 +16,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.math.RoundingMode.HALF_UP;
 
 @Getter
@@ -31,7 +31,7 @@ public class Metrics {
 
     @Id
     @Column(name = "metric_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(name = "duration")
