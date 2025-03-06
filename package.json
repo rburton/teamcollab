@@ -5,7 +5,9 @@
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/stimulus-webpack-helpers": "^1.0.1",
     "@hotwired/turbo": "^8.0.13",
-    "@tailwindcss/postcss": "^4.0.9"
+    "@tailwindcss/postcss": "^4.0.9",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3"
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",

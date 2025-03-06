@@ -45,6 +45,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js'],
-    modules: ['node_modules']
+    modules: ['node_modules'],
+    fallback: {
+      net: false, // Tell Webpack to ignore 'net'
+      tls: false, // Sometimes required too
+    },
   }
 };

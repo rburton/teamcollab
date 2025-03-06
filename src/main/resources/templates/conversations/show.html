@@ -7,7 +7,8 @@
     <title>View Conversation</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" data-controller="conversation">
+
     <nav class="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
         <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 px-4 sm:px-6 lg:px-8">
             <li class="flex">
@@ -119,23 +120,9 @@
         <!-- Right Chat Area -->
         <div class="flex-1 flex flex-col">
             <!-- Chat Messages -->
-            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4 h-[calc(100vh-16rem)]">
-                <div th:each="message : ${messages}" class="flex items-start"
-                     th:classappend="${message.username} ? ' justify-end'">
+            <div id="chatMessages" data-conversation-target="chat"
+                 class="flex-1 p-4 overflow-y-auto space-y-4 h-[calc(100vh-16rem)]">
 
-                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2"
-                         th:text="${#strings.substring(message.username, 0, 1)}">
-                    </div>
-                    <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
-                        <p class="text-sm font-semibold text-blue-800"
-                           th:text="${message.username + (message.personaName != null ? ' - ' + message.personnName : '')}">
-                        </p>
-                        <p class="text-gray-800" th:text="${message.content}"></p>
-                        <p class="text-xs text-gray-500 mt-1"
-                           th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
-                        </p>
-                    </div>
-                </div>
             </div>
 
             <!-- Message Input -->
@@ -143,17 +130,13 @@
                 <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
                     <p th:text="${errorMessage}"></p>
                 </div>
-                <form th:action="@{/conversations/{conversationId}/messages(conversationId=${conversation.id})}"
-                      data-turbo="true" th:object="${newMessage}" method="post" class="flex gap-2 items-center">
+                <form data-turbo="true" method="post" class="flex gap-2 items-center">
                     <div class="flex-1">
                         <input type="text" autocomplete="off" placeholder="Type your message..."
-                               class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               th:field="*{content}"
-                               th:classappend="${#fields.hasErrors('content')} ? 'border-red-500'">
-                        <div th:if="${#fields.hasErrors('content')}" class="mt-1 text-sm text-red-600"
-                             th:errors="*{content}"></div>
+                               data-conversation-target="input"
+                               class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button type="submit"
+                    <button type="button" data-conversation-target="button"
                             class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                         <i class="fas fa-paper-plane"></i>
                         Send
@@ -163,97 +146,6 @@
         </div>
     </div>
 
-    <script>
-        let currentPersona = 'All';
-        let currentPersonaName = 'All Personas';
-        let currentUser = 'User1'; // Default user
-        let currentFocus = 'Main Discussion'; // Default focus
-
-        function selectPersona(persona, personaName) {
-            currentPersona = persona;
-            currentPersonaName = personaName;
-            document.getElementById('chatHeader').textContent = `Chat with ${personaName}`;
-        }
-
-        function editPersona(persona, personaName) {
-            const newName = prompt(`Edit persona name for ${persona}:`, personaName);
-            if (newName) {
-                alert(`Would update ${persona} to "${newName}" - refresh to see original names`);
-            }
-        }
-
-        function exportPersonaThoughts(persona, personaName) {
-            const thoughts = getPersonaThoughts(persona);
-            alert(`${personaName}'s thoughts would be exported to Google Docs:\n\n${thoughts}`);
-        }
-
-        function exportAllThoughts() {
-            const personas = ['Marketing', 'Product', 'Technical', 'Legal'];
-            let allThoughts = '';
-            personas.forEach(p => {
-                allThoughts += getPersonaThoughts(p) + '\n\n';
-            });
-            alert(`All personas' thoughts would be exported to Google Docs:\n\n${allThoughts}`);
-        }
-
-        function getPersonaThoughts(persona) {
-            const chatMessages = document.getElementById('chatMessages').innerHTML;
-            return `Thoughts from ${persona} (${currentFocus}):\n- Sample thought 1\n- Sample thought 2\n(Extracted from chat: ${chatMessages.length} characters)`;
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const icon = document.getElementById('sidebarToggleIcon');
-            sidebar.classList.toggle('w-1/4');
-            sidebar.classList.toggle('w-16');
-            document.getElementById('personaList').classList.toggle('hidden');
-            icon.innerHTML = sidebar.classList.contains('w-16')
-                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />`
-                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`;
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const chatMessages = document.getElementById('chatMessages');
-                const timestamp = new Date().toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                });
-                const attachmentMessage = `
-                    <div class="flex items-start justify-end">
-                        <div class="bg-green-100 p-3 rounded-lg max-w-[70%]">
-                            <p class="text-sm font-semibold text-green-800">${currentUser}</p>
-                            <p class="text-gray-800">Attached: ${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
-                            <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
-                        </div>
-                    </div>
-                `;
-                chatMessages.innerHTML += attachmentMessage;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                event.target.value = '';
-                alert(`File "${file.name}" would be uploaded. Size: ${(file.size / 1024).toFixed(2)} KB`);
-            }
-        }
-
-        function toggleFocusDropdown() {
-            const dropdown = document.getElementById('focusDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        function changeFocus(focus) {
-            currentFocus = focus;
-            document.getElementById('focusLabel').textContent = focus;
-            toggleFocusDropdown();
-            alert(`Focus changed to ${focus}`);
-            // In a real app, this could trigger context-specific behavior for personas
-        }
-
-    </script>
 </div>
 </body>
 </html>

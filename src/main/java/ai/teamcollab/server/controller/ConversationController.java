@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +32,13 @@ public class ConversationController {
 
     private final ConversationService conversationService;
     private final PersonaService personaService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ConversationController(@NonNull ConversationService conversationService, @NonNull PersonaService personaService) {
+    public ConversationController(@NonNull ConversationService conversationService, @NonNull PersonaService personaService, SimpMessagingTemplate messagingTemplate) {
         this.conversationService = conversationService;
         this.personaService = personaService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -78,8 +81,6 @@ public class ConversationController {
         }
 
         model.addAttribute("conversation", conversation);
-        model.addAttribute("messages", conversationService.findMessagesByConversation(id).stream().map(MessageRow::from).toList());
-        model.addAttribute("newMessage", new Message());
         model.addAttribute("personas", conversation.getPersonas());
         return "conversations/show";
     }
@@ -112,7 +113,9 @@ public class ConversationController {
 
         try {
             final var savedMessage = conversationService.addToConversation(conversationId, message, user);
-//            conversationService.sendMessage(savedMessage);
+            this.messagingTemplate.convertAndSend("/topic/public", "{}");
+
+            //            conversationService.sendMessage(savedMessage);
             redirectAttributes.addFlashAttribute("successMessage", "Message posted successfully!");
             mode.addAttribute("message", MessageRow.from(message));
         } catch (IllegalArgumentException e) {
