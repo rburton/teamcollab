@@ -21,7 +21,7 @@ export default class extends Controller {
         });
 
         this.stompClient.connect({}, (frame) => {
-            this.stompClient.subscribe('/user/messages', (messages) => {
+            this.stompClient.subscribe('/user/queue/messages', (messages) => {
                 const listOfMessages = JSON.parse(messages.body);
                 for (let i = 0; i < listOfMessages.length; i++) {
                     const message = listOfMessages[i];
@@ -29,7 +29,7 @@ export default class extends Controller {
                     this.chatTarget.appendChild(element);
                 }
             });
-            this.stompClient.subscribe('/user/personas', (personas) => {
+            this.stompClient.subscribe('/user/queue/personas', (personas) => {
                 console.log('persons ', personas);
             });
             const payload = JSON.stringify({

@@ -10,10 +10,13 @@ import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -85,7 +88,16 @@ public class ConversationService {
 
             return chatService.process(conversation, message, chatContext)
                     .thenAccept(response -> {
-                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, MessageRow.from(message));
+                        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+                        headerAccessor.setSessionId(sessionId);
+                        headerAccessor.setLeaveMutable(true);
+                        final var responseMessage = Message.builder()
+                                .content(response.getContent())
+                                .user(message.getUser())
+                                .persona(message.getPersona())
+                                .createdAt(LocalDateTime.now())
+                                .build();
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, MessageRow.from(responseMessage), headerAccessor.getMessageHeaders());
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {

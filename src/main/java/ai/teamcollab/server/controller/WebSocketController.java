@@ -5,6 +5,7 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.domain.MessageRow;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -35,8 +36,8 @@ import java.util.List;
 @Controller
 public class WebSocketController {
 
-    public static final String DIRECT_MESSAGE_TOPIC = "/user/messages";
-    public static final String PERSONA_EVENT_TOPIC = "/user/persona";
+    public static final String DIRECT_MESSAGE_TOPIC = "/queue/messages";
+    public static final String ERROR_EVENT_TOPIC = "/queue/errors";
 
     private final ConversationService conversationService;
 
@@ -54,7 +55,7 @@ public class WebSocketController {
                 .content(message.getContent())
                 .build();
         final var savedMessage = conversationService.addToConversation(message.getConversationId(), newMessage, user);
-        conversationService.sendMessage(savedMessage.getId(), headerAccessor.getSessionId());
+        conversationService.sendMessage(savedMessage.getId(), user.getUsername());
         return List.of(MessageRow.builder()
                 .content(savedMessage.getContent())
                 .username(principal.getName())
@@ -71,5 +72,10 @@ public class WebSocketController {
                 .toList();
     }
 
+    @MessageExceptionHandler
+    @SendToUser(ERROR_EVENT_TOPIC)
+    public String handleException(Throwable exception) {
+        return exception.getMessage();
+    }
 
 }
