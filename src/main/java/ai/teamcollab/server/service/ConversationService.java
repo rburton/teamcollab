@@ -6,6 +6,7 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
+import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE_TOPIC;
+import static java.util.Collections.reverse;
 
 @Slf4j
 @Service
@@ -62,15 +66,26 @@ public class ConversationService {
         return messageService.createMessage(message, conversationId, user);
     }
 
+    private ChatContext buildChatContext(Conversation conversation, String sessionId) {
+        final var lastMessages = findMessagesByConversation(conversation.getId());
+
+        return ChatContext.builder()
+                .purpose(conversation.getPurpose())
+                .projectOverview(conversation.getProject().getOverview())
+                .lastMessages(lastMessages)
+                .build();
+    }
+
     @Async
-    public CompletableFuture<Void> sendMessage(Long messageId) {
+    public CompletableFuture<Void> sendMessage(Long messageId, String sessionId) {
         try {
             final var message = messageRepository.findById(messageId).orElseThrow();
-
             final var conversation = message.getConversation();
-            return chatService.process(conversation, message)
-                    .thenAccept(response ->{
-                        messagingTemplate.convertAndSend( "/topic/messages", MessageRow.from(message));
+            final var chatContext = buildChatContext(conversation, sessionId);
+
+            return chatService.process(conversation, message, chatContext)
+                    .thenAccept(response -> {
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, MessageRow.from(message));
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {
@@ -89,7 +104,9 @@ public class ConversationService {
 
     public List<Message> findMessagesByConversation(Long conversationId) {
         log.debug("Fetching messages for conversation {}", conversationId);
-        return messageRepository.findTop10ByConversationIdOrderByCreatedAtAsc(conversationId);
+        final var messages = messageRepository.findTop10ByConversationIdOrderByCreatedAtDesc(conversationId);
+        reverse(messages);
+        return messages;
     }
 
     public List<Message> getUserMessages(Long userId) {

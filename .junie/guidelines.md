@@ -42,6 +42,7 @@
 - Using Java-style loops instead of functional operations
 - Do not use != or == null, instead use Objects.isNull or Objects.nonNull
 - Using wild card imports
+- method chaining
 
 ### Best Practices
 

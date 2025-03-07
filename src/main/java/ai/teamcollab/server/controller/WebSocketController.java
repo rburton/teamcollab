@@ -8,7 +8,8 @@ import ai.teamcollab.server.service.domain.MessageRow;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
@@ -34,6 +35,9 @@ import java.util.List;
 @Controller
 public class WebSocketController {
 
+    public static final String DIRECT_MESSAGE_TOPIC = "/user/messages";
+    public static final String PERSONA_EVENT_TOPIC = "/user/persona";
+
     private final ConversationService conversationService;
 
     public WebSocketController(ConversationService conversationService) {
@@ -41,14 +45,16 @@ public class WebSocketController {
     }
 
     @MessageMapping("/chat.send")
-    @SendTo("/topic/messages")
-    public List<MessageRow> sendMessage(@Payload WsMessage message, UsernamePasswordAuthenticationToken principal) {
+    @SendToUser(DIRECT_MESSAGE_TOPIC)
+    public List<MessageRow> sendMessage(@Payload WsMessage message,
+                                        UsernamePasswordAuthenticationToken principal,
+                                        SimpMessageHeaderAccessor headerAccessor) {
         final var user = (User) principal.getPrincipal();
         final var newMessage = Message.builder()
                 .content(message.getContent())
                 .build();
         final var savedMessage = conversationService.addToConversation(message.getConversationId(), newMessage, user);
-        conversationService.sendMessage(savedMessage.getId());
+        conversationService.sendMessage(savedMessage.getId(), headerAccessor.getSessionId());
         return List.of(MessageRow.builder()
                 .content(savedMessage.getContent())
                 .username(principal.getName())
@@ -57,12 +63,13 @@ public class WebSocketController {
     }
 
     @MessageMapping("/chat.join")
-    @SendTo("/topic/messages")
-    public List<MessageRow> joinChat(@Payload WsMessage message, UsernamePasswordAuthenticationToken principal) {
+    @SendToUser(DIRECT_MESSAGE_TOPIC)
+    public List<MessageRow> joinChat(@Payload WsMessage message, SimpMessageHeaderAccessor headerAccessor) {
         return conversationService.findMessagesByConversation(message.getConversationId())
                 .stream()
                 .map(MessageRow::from)
                 .toList();
     }
+
 
 }

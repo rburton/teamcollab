@@ -21,13 +21,16 @@ export default class extends Controller {
         });
 
         this.stompClient.connect({}, (frame) => {
-            this.stompClient.subscribe('/topic/messages', (messages) => {
+            this.stompClient.subscribe('/user/messages', (messages) => {
                 const listOfMessages = JSON.parse(messages.body);
                 for (let i = 0; i < listOfMessages.length; i++) {
                     const message = listOfMessages[i];
                     const element = this.createMessage(message);
                     this.chatTarget.appendChild(element);
                 }
+            });
+            this.stompClient.subscribe('/user/personas', (personas) => {
+                console.log('persons ', personas);
             });
             const payload = JSON.stringify({
                 'conversation_id': this.element.dataset.conversationChatIdValue,
