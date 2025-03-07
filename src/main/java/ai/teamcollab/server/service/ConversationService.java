@@ -6,8 +6,10 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
+import ai.teamcollab.server.service.domain.MessageRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +25,16 @@ public class ConversationService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ConversationService(ChatService chatService, MessageService messageService, UserRepository userRepository, MessageRepository messageRepository, ConversationRepository conversationRepository) {
+    public ConversationService(ChatService chatService, MessageService messageService, UserRepository userRepository, MessageRepository messageRepository, ConversationRepository conversationRepository, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
         this.messageService = messageService;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Conversation createConversation(Conversation conversation, Long userId) {
@@ -59,11 +63,16 @@ public class ConversationService {
     }
 
     @Async
-    public CompletableFuture<Void> sendMessage(Message message) {
+    public CompletableFuture<Void> sendMessage(Long messageId) {
         try {
+            final var message = messageRepository.findById(messageId).orElseThrow();
+
             final var conversation = message.getConversation();
             return chatService.process(conversation, message)
-                    .thenAccept(response -> log.debug("Message processed successfully for conversation: {}", message.getId()))
+                    .thenAccept(response ->{
+                        messagingTemplate.convertAndSend( "/topic/messages", MessageRow.from(message));
+                        log.debug("Message processed successfully for conversation: {}", message.getId());
+                    })
                     .exceptionally(throwable -> {
                         log.error("Error processing message for conversation {}: {}", conversation.getId(), throwable.getMessage(), throwable);
                         // Convert checked exception to unchecked
@@ -73,7 +82,7 @@ public class ConversationService {
                         throw new RuntimeException("Failed to process message", throwable);
                     });
         } catch (Exception e) {
-            log.error("Error sending message for conversation {}: {}", message, e.getMessage(), e);
+            log.error("Error sending message for conversation {}: {}", messageId, e.getMessage(), e);
             return CompletableFuture.failedFuture(e);
         }
     }

@@ -38,7 +38,6 @@ public class ChatServiceImpl implements ChatService {
         this.systemSettingsService = systemSettingsService;
     }
 
-    @Async
     @Override
     public CompletableFuture<MessageResponse> process(Conversation conversation, Message recent) {
         requireNonNull(conversation, "Conversation cannot be null");
