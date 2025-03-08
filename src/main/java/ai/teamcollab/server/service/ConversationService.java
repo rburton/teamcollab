@@ -2,6 +2,7 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
+import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
@@ -10,8 +11,6 @@ import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -88,16 +87,14 @@ public class ConversationService {
 
             return chatService.process(conversation, message, chatContext)
                     .thenAccept(response -> {
-                        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-                        headerAccessor.setSessionId(sessionId);
-                        headerAccessor.setLeaveMutable(true);
                         final var responseMessage = Message.builder()
                                 .content(response.getContent())
-                                .user(message.getUser())
-                                .persona(message.getPersona())
+                                .persona(Persona.builder()
+                                        .name("System")
+                                        .build())
                                 .createdAt(LocalDateTime.now())
                                 .build();
-                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, MessageRow.from(responseMessage), headerAccessor.getMessageHeaders());
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, List.of(MessageRow.from(responseMessage)));
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {
