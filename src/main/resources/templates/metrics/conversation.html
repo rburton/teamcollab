@@ -18,6 +18,11 @@
                 <span th:text="#{metrics.conversation.created}">Created:</span>
                 <span th:text="${#temporals.format(conversation.createdAt, 'dd MMM yyyy HH:mm')}" class="font-medium"></span>
             </p>
+            <p class="text-gray-600 mb-2">
+                <a th:href="@{'/conversations/' + ${conversation.id}}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    <span>Back to Conversation</span>
+                </a>
+            </p>
         </div>
 
         <!-- Participants -->
