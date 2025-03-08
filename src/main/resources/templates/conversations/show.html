@@ -60,8 +60,11 @@
 
     <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md flex justify-between items-center gap-6 rounded-lg">
         <div class="flex justify-start gap-6 col">
+            <span class="text-amber-500 flex items-center" data-conversation-target="status">
+                <i class="fas fa-circle text-sm animate-pulse"></i>
+                <span class="ml-2" data-conversation-target="statusLabel">Connected</span>
+            </span>
             <h2 class="text-lg text-white font-semibold" th:text="${conversation.purpose}">Chat with All Personas</h2>
-            <small class="text-white" th:text="${conversation.purpose}"></small>
         </div>
         <div class="flex items-center" sec:authorize="hasRole('SUPER_ADMIN')">
             <a th:href="@{/metrics/conversation/{id}(id=${conversation.id})}" class="text-white hover:text-gray-100">

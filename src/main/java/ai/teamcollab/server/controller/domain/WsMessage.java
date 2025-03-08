@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller.domain;
 
+import ai.teamcollab.server.ws.domain.MessageType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

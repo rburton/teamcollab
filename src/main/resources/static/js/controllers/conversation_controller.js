@@ -3,7 +3,7 @@ import Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 
 export default class extends Controller {
-    static targets = ["chat", "input", "button"]
+    static targets = ["chat", "input", "button", "status", "statusLabel"]
 
     connect() {
         const socket = new SockJS('http://localhost:8080/ws'); // Adjust endpoint as needed
@@ -21,6 +21,7 @@ export default class extends Controller {
         });
 
         this.stompClient.connect({}, (frame) => {
+            this.online();
             this.stompClient.subscribe(`/user/queue/messages`, (messages) => {
                 console.log('messages.body ', messages.body);
                 const listOfMessages = JSON.parse(messages.body);
@@ -40,9 +41,26 @@ export default class extends Controller {
             });
             this.stompClient.send('/app/chat.join', {}, payload);
         }, (error) => {
+            this.offline();
             console.error('Connection error: ' + error);
         });
 
+        this.stompClient.onclose = () => {
+            this.offline();
+        }
+
+    }
+
+    offline() {
+        this.statusTarget.classList.remove('text-green-500');
+        this.statusTarget.classList.add('text-amber-500');
+        this.statusLabelTarget.innerHTML = 'Disconnected'
+    }
+
+    online() {
+        this.statusTarget.classList.remove('text-amber-500');
+        this.statusTarget.classList.add('text-green-500');
+        this.statusLabelTarget.innerHTML = 'Connected'
     }
 
     disconnect() {
