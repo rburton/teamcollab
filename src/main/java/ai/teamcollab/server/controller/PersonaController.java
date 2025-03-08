@@ -114,7 +114,9 @@ public class PersonaController {
             }
 
             personaService.addToConversation(id, conversationId);
+            model.addAttribute("persona", persona);
         } catch (IllegalArgumentException e) {
+            log.error("Failed to add to conversation", e);
         }
 
         return "/personas/added.xhtml";

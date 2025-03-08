@@ -20,7 +20,7 @@ import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 @Entity
 @Table(name = "companies")
@@ -59,7 +59,7 @@ public class Company {
     }
 
     public boolean owns(Persona persona) {
-        return nonNull(persona.getCompany()) && persona.getCompany().equals(this);
+        return isNull(persona.getCompany()) || persona.getCompany().equals(this);
     }
 
     public boolean doesntOwns(Persona persona) {
