@@ -10,6 +10,6 @@
                 <p class="text-sm text-gray-500" th:text="${persona.expertises}">Software Engineer</p>
             </div>
         </div>
-        <th:block th:replace="conversations/fragements/persona_status :: persona_status"/>
+        <th:block th:replace="conversations/fragements/persona_status :: persona_status(status='Waiting')"/>
     </div>
 </li>

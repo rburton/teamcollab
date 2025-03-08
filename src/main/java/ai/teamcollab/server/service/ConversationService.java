@@ -2,15 +2,12 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.Persona;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
-import ai.teamcollab.server.templates.TemplatePath;
-import ai.teamcollab.server.templates.TemplateVariableName;
 import ai.teamcollab.server.templates.ThymeleafTemplateRender;
 import ai.teamcollab.server.ws.domain.WsMessageResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +23,10 @@ import java.util.concurrent.CompletableFuture;
 
 import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE_TOPIC;
 import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplatePath.PERSONA_STATUSES_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+import static ai.teamcollab.server.templates.TemplateVariableName.PERSONAS;
+import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 import static java.util.Collections.reverse;
 import static java.util.Objects.nonNull;
 
@@ -114,7 +114,10 @@ public class ConversationService {
 
                         final var row = MessageRow.from(responseMessage);
                         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
-                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(html));
+                        final var personas = conversation.getPersonas();
+                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(PERSONA_STATUSES_TEMPLATE, Map.of(PERSONAS, personas, STATUS, "Waiting"));
+
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(List.of(html, htmlStatus)));
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {

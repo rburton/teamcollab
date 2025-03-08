@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -55,7 +56,7 @@ public class Conversation {
     @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = EAGER)
     @JoinTable(
             name = "conversation_persona",
             joinColumns = @JoinColumn(name = "conversation_id"),

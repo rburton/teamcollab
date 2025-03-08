@@ -23,9 +23,7 @@ export default class extends Controller {
         this.stompClient.connect({}, (frame) => {
             this.online();
             this.stompClient.subscribe(`/user/queue/messages`, (messages) => {
-                console.log('messages.body ', messages.body);
                 const response = JSON.parse(messages.body);
-                console.log('WsMessageResponse ', response.messageType);
                 if (this.isMessage(response)) {
                     const messages = response.payload;
                     for (let i = 0; i < messages.length; i++) {

@@ -4,7 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum TemplateVariableName {
-    MESSAGE("message");
+    MESSAGE("message"),
+    PERSONAS("personas"),
+    STATUS("status"),
+    ;
 
     private final String key;
 

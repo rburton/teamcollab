@@ -15,10 +15,14 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplatePath.PERSONA_STATUSES_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+import static ai.teamcollab.server.templates.TemplateVariableName.PERSONAS;
+import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 
 
 /**
@@ -61,7 +65,9 @@ public class WebSocketController {
         final var newMessage = Message.builder()
                 .content(message.getContent())
                 .build();
-        final var savedMessage = conversationService.addToConversation(message.getConversationId(), newMessage, user);
+        final var conversation = conversationService.findConversationById(message.getConversationId());
+
+        final var savedMessage = conversationService.addToConversation(conversation.getId(), newMessage, user);
         conversationService.sendMessage(savedMessage.getId(), user.getUsername());
         final var row = MessageRow.builder()
                 .content(savedMessage.getContent())
@@ -70,7 +76,9 @@ public class WebSocketController {
                 .build();
 
         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
-        return WsMessageResponse.turbo(html);
+        final var personas = conversation.getPersonas();
+        final var htmlStatus = thymeleafTemplateRender.renderToHtml(PERSONA_STATUSES_TEMPLATE, Map.of(PERSONAS, personas, STATUS, "Thinking"));
+        return WsMessageResponse.turbo(List.of(html, htmlStatus));
     }
 
     @MessageMapping("/chat.join")

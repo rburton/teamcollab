@@ -8,12 +8,15 @@ import java.util.Map;
 import java.util.Set;
 
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+import static ai.teamcollab.server.templates.TemplateVariableName.PERSONAS;
+import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Getter
 public enum TemplatePath {
-    CONVERSATION_MESSAGE_TEMPLATE("conversations/message.xhtml", MESSAGE);
+    CONVERSATION_MESSAGE_TEMPLATE("conversations/streams/message.xhtml", MESSAGE),
+    PERSONA_STATUSES_TEMPLATE("conversations/streams/statuses.xhtml", PERSONAS, STATUS);
 
     private final String path;
     private final Set<String> variables;
