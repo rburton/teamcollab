@@ -47,9 +47,15 @@
                             </td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <a th:href="@{/metrics/company/{id}/costs(id=${company.id})}"
-                                   class="text-indigo-600 hover:text-indigo-900">
+                                   class="text-indigo-600 hover:text-indigo-900 mr-4">
                                     <i class="fa fa-chart-bar mr-2" aria-hidden="true"></i>
                                     View Metrics
+                                    <span class="sr-only">, <span th:text="${company.name}">Company name</span></span>
+                                </a>
+                                <a th:href="@{/system/admin/companies/{id}/settings(id=${company.id})}"
+                                   class="text-indigo-600 hover:text-indigo-900">
+                                    <i class="fa fa-cog mr-2" aria-hidden="true"></i>
+                                    Settings
                                     <span class="sr-only">, <span th:text="${company.name}">Company name</span></span>
                                 </a>
                             </td>

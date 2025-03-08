@@ -51,6 +51,9 @@ public class Company {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "llm_model")
+    private String llmModel;
+
     public void addUser(User user) {
         this.users.add(user);
     }

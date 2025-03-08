@@ -1,12 +1,13 @@
 package ai.teamcollab.server.service.impl;
 
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
-import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.SystemSettingsService;
+import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -17,7 +18,6 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -47,7 +47,7 @@ public class ChatServiceImpl implements ChatService {
         requireNonNull(chatContext, "ChatContext cannot be null");
 
         log.debug("Asynchronously processing message for conversation: {}, message: {}", conversation.getId(), recent.getId());
-        log.debug("Using chat context - Purpose: {}, Project Overview: {}, History Size: {}", 
+        log.debug("Using chat context - Purpose: {}, Project Overview: {}, History Size: {}",
                 chatContext.getPurpose(), chatContext.getProjectOverview(), chatContext.getLastMessages().size());
 
         final var start = now();
@@ -58,9 +58,9 @@ public class ChatServiceImpl implements ChatService {
 
                 // Add system message with context
                 messages.add(new SystemMessage(String.format(
-                    "Conversation Purpose: %s\nProject Overview: %s",
-                    chatContext.getPurpose(),
-                    chatContext.getProjectOverview()
+                        "Conversation Purpose: %s\nProject Overview: %s",
+                        chatContext.getPurpose(),
+                        chatContext.getProjectOverview()
                 )));
 
                 // Add conversation history
@@ -83,13 +83,26 @@ public class ChatServiceImpl implements ChatService {
                 log.debug("Sending prompt to OpenAI: {}", prompt);
 
                 final var currentSettings = systemSettingsService.getCurrentSettings();
+
+                // Get company-level LLM model if available, otherwise use system setting
+                var llmModel = currentSettings.getLlmModel();
+                if (nonNull(conversation.getUser()) &&
+                        nonNull(conversation.getUser().getCompany()) &&
+                        nonNull(conversation.getUser().getCompany().getLlmModel())) {
+                    llmModel = conversation.getUser().getCompany().getLlmModel();
+                    log.debug("Using company-specific LLM model: {}", llmModel);
+                } else {
+                    log.debug("Using system default LLM model: {}", llmModel);
+                }
+
+                final var model = GptModel.fromId(llmModel);
                 final var chatModel = OpenAiChatModel.builder()
                         .openAiApi(OpenAiApi.builder()
                                 .apiKey(System.getenv("OPENAI_API_KEY"))
                                 .build())
                         .defaultOptions(OpenAiChatOptions.builder()
-                                .model(currentSettings.getLlmModel())
-                                .temperature(0.7)
+                                .model(model.getId())
+                                .temperature(model.getTemperature())
                                 .build())
                         .build();
                 final var aiResponse = chatModel.call(prompt);
@@ -107,7 +120,7 @@ public class ChatServiceImpl implements ChatService {
                         .inputTokens(usage.getPromptTokens())
                         .outputTokens(usage.getCompletionTokens())
                         .provider("OpenAI")
-                        .model(currentSettings.getLlmModel())
+                        .model(llmModel)
                         .build();
 
                 recent.addMetrics(metrics);

@@ -1,0 +1,2 @@
+ALTER TABLE companies
+ADD COLUMN llm_model VARCHAR(255);

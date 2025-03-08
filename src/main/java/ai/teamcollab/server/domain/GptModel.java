@@ -11,18 +11,18 @@ import static java.util.Locale.US;
 @Getter
 public enum GptModel {
 
-    CHATGPT_4o_LATEST("chatgpt-4o-latest", 5.00, 15.00),
-    CHATGPT_4o("gpt-4o", 2.50, 10.00),
-    CHATGPT_4o_MINI("gpt-4o-mini", 0.15, 0.60),
-    O1("o1", 15.00, 60.00),
-    O1_MINI("o1-mini", 1.10, 4.40),
-    O3_MINI("o3-mini", 1.10, 4.40),
-    GPT_3_5_TURBO("gpt-3.5-turbo", 1.50, 2.00),
-    GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", 3.00, 4.00),
-    GPT_3_5_TURBO_INSTRUCT("gpt-3.5-turbo-instruct", 1.50, 2.00),
-    GPT_4("gpt-4", 30.00, 60.00),
-    GPT_4_TURBO("gpt-4-turbo", 30.00, 60.00),
-    GPT_4_32K("gpt-4-32k", 60.00, 120.00);
+    CHATGPT_4o_LATEST("chatgpt-4o-latest", 0.7, 5.00, 15.00),
+    CHATGPT_4o("gpt-4o", 0.7, 2.50, 10.00),
+    CHATGPT_4o_MINI("gpt-4o-mini", 0.7, 0.15, 0.60),
+    O1("o1", 0.7, 15.00, 60.00),
+    O1_MINI("o1-mini", 0.7, 1.10, 4.40),
+    O3_MINI("o3-mini", null, 1.10, 4.40),
+    GPT_3_5_TURBO("gpt-3.5-turbo", 0.7, 1.50, 2.00),
+    GPT_3_5_TURBO_16K("gpt-3.5-turbo-16k", 0.7, 3.00, 4.00),
+    GPT_3_5_TURBO_INSTRUCT("gpt-3.5-turbo-instruct", 0.7, 1.50, 2.00),
+    GPT_4("gpt-4", 0.7, 30.00, 60.00),
+    GPT_4_TURBO("gpt-4-turbo", 0.7, 30.00, 60.00),
+    GPT_4_32K("gpt-4-32k", 0.7, 60.00, 120.00);
 
     private final BigDecimal MILLION = new BigDecimal("1000000");         // Price is per 1K tokens
     private final BigDecimal TOKEN_DIVISOR = new BigDecimal("1000");         // Price is per 1K tokens
@@ -32,9 +32,11 @@ public enum GptModel {
     private final BigDecimal completionPricePer1M;
     private final BigDecimal promptPricePer1K;
     private final BigDecimal completionPricePer1K;
+    private final Double temperature;
 
-    GptModel(String id, double promptPrice, double completionPrice) {
+    GptModel(String id, Double temperature, double promptPrice, double completionPrice) {
         this.id = id;
+        this.temperature = temperature;
         this.promptPricePer1M = BigDecimal.valueOf(promptPrice);
         this.completionPricePer1M = BigDecimal.valueOf(completionPrice);
         this.promptPricePer1K = promptPricePer1M.divide(MILLION, 6, RoundingMode.HALF_UP)
@@ -45,7 +47,7 @@ public enum GptModel {
     }
 
     public String getDropdown() {
-        return id + " " + format(promptPricePer1M.add(completionPricePer1M)) + " (in: " + format(this.promptPricePer1M) + " out: " + format(completionPricePer1M) +  ")";
+        return id + " " + format(promptPricePer1M.add(completionPricePer1M)) + " (in: " + format(this.promptPricePer1M) + " out: " + format(completionPricePer1M) + ")";
     }
 
     public String format(BigDecimal amount) {

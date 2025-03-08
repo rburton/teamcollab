@@ -67,7 +67,6 @@
                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                             <!-- Role Management Form -->
                             <form th:action="@{/company/admin/users/{id}/roles(id=${user.id})}" method="post" class="inline-block">
-                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                 <select name="roles" multiple class="hidden">
                                     <option th:each="role : ${allRoles}" 
                                             th:value="${role.name}" 
@@ -80,7 +79,6 @@
 
                             <!-- Toggle Status Form -->
                             <form th:action="@{/company/admin/users/{id}/toggle(id=${user.id})}" method="post" class="inline-block">
-                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                 <button type="submit" class="text-indigo-600 hover:text-indigo-900" th:if="${user.enabled}">
                                     Disable
                                 </button>

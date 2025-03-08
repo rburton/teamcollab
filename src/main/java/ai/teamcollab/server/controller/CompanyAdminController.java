@@ -128,4 +128,5 @@ public class CompanyAdminController {
 
         return "redirect:/company/admin/users";
     }
+
 }

@@ -35,4 +35,11 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
+    @Transactional
+    public Company updateCompanyLlmModel(Long companyId, String llmModel) {
+        Company company = getCompanyById(companyId);
+        company.setLlmModel(llmModel);
+        return companyRepository.save(company);
+    }
+
 }

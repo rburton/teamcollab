@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Company Settings</title>
+</head>
+<body>
+<div layout:fragment="content" class="py-10">
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 class="text-base font-semibold leading-6 text-gray-900">Company Settings</h1>
+                <p class="mt-2 text-sm text-gray-700">Manage company-specific settings and configurations.</p>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div th:if="${successMessage}" class="rounded-md bg-green-50 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800" th:text="${successMessage}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${errorMessage}" class="rounded-md bg-red-50 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800" th:text="${errorMessage}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+                <div class="md:grid md:grid-cols-3 md:gap-6">
+                    <div class="md:col-span-1">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">LLM Settings</h3>
+                        <p class="mt-1 text-sm text-gray-500">Configure the Language Model settings for your company.</p>
+                        <p class="mt-1 text-sm text-gray-500">If not specified, the system default will be used.</p>
+                        <p class="mt-3 text-sm text-gray-700">
+                            <span class="font-medium">System Default:</span>
+                            <span th:text="${systemSettings.llmModel}"></span>
+                        </p>
+                    </div>
+
+                    <div class="mt-5 md:mt-0 md:col-span-2">
+                        <form th:action="@{/company/admin/settings/llm-model}" method="post" class="space-y-6">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="llmModel" class="block text-sm font-medium text-gray-700">Model</label>
+                                    <select id="llmModel" name="llmModel"
+                                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        <option value="">Use System Default</option>
+                                        <option th:each="model : ${T(ai.teamcollab.server.domain.GptModel).values()}"
+                                                th:value="${model.getId()}"
+                                                th:text="${model.getDropdown()}"
+                                                th:selected="${company.llmModel != null && company.llmModel == model.getId()}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

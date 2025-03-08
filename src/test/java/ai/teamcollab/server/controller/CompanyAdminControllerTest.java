@@ -58,7 +58,9 @@ class CompanyAdminControllerTest {
         }
 
         @Bean
-        public CompanyAdminController companyAdminController(UserService userService, RoleService roleService) {
+        public CompanyAdminController companyAdminController(
+                UserService userService, 
+                RoleService roleService) {
             return new CompanyAdminController(userService, roleService);
         }
     }
@@ -121,4 +123,5 @@ class CompanyAdminControllerTest {
                 .sessionAttr("_csrf", csrfToken))
                 .andExpect(status().isForbidden());
     }
+
 }
