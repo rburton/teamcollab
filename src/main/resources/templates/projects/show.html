@@ -12,8 +12,11 @@
             <li class="flex">
                 <div class="flex items-center">
                     <a href="/dashboard" class="text-gray-400 hover:text-gray-500">
-                        <svg class="size-5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                            <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" />
+                        <svg class="size-5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+                             data-slot="icon">
+                            <path fill-rule="evenodd"
+                                  d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z"
+                                  clip-rule="evenodd"/>
                         </svg>
                         <span class="sr-only">Home</span>
                     </a>
@@ -21,18 +24,21 @@
             </li>
             <li class="flex">
                 <div class="flex items-center">
-                    <svg class="h-full w-6 shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor" aria-hidden="true">
-                        <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                    <svg class="h-full w-6 shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
                     <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">Projects</a>
                 </div>
             </li>
             <li class="flex">
                 <div class="flex items-center">
-                    <svg class="h-full w-6 shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor" aria-hidden="true">
-                        <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                    <svg class="h-full w-6 shrink-0 text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="#" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" aria-current="page" th:text="${project.name}">Project Nero</a>
+                    <a href="#" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" aria-current="page"
+                       th:text="${project.name}">Project Nero</a>
                 </div>
             </li>
         </ol>
@@ -55,77 +61,93 @@
     </div>
 
 
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Conversations List -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="text-center py-4">
-                <!-- New Conversation Form -->
-                <div class="mt-6 max-w-xl mx-auto">
-                    <form th:action="@{/projects/{id}/conversations(id=${project.id})}"
-                          th:object="${conversationCreateRequest}"
-                          method="post"
-                          class="space-y-4">
-
-                        <div class="rounded-md shadow-sm -space-y-px">
-                            <div>
-                                <label for="purpose" class="sr-only">Conversation Purpose</label>
-                                <textarea id="purpose"
-                                          name="purpose"
-                                          th:field="*{purpose}"
-                                          required
-                                          class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                          placeholder="What would you like to discuss about this project?"
-                                          rows="3"></textarea>
-                            </div>
-                        </div>
-
-                        <div th:if="${#fields.hasErrors('purpose')}" class="text-red-500 text-sm mt-1">
-                            <span th:errors="*{purpose}"></span>
-                        </div>
-
-                        <div>
-                            <button type="submit"
-                                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Start New Conversation
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <!-- Conversations List -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="border-b border-gray-200 pb-5">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Conversations</h3>
         </div>
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="border-b border-gray-200 pb-5">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Active Conversations</h3>
-            </div>
-            <div class="mt-6">
-                <div th:each="conversation : ${project.conversations}" class="space-y-4">
-                    <div class="group relative flex items-start space-x-3 py-4 hover:bg-gray-50 rounded-lg px-4">
-                        <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-gray-900">
-                                <a th:href="@{/conversations/{id}(id=${conversation.id})}"
-                                   class="hover:underline">
-                                    <span class="absolute inset-0" aria-hidden="true"></span>
+        <div class="mt-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                            Conversation Name
+                        </th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At
+                        </th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="conversation : ${project.conversations}" class="hover:bg-gray-50">
+                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
+                            <div class="text-sm font-bold text-blue-800">
+                                <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="hover:underline">
                                     <span th:text="${conversation.purpose}">Conversation Purpose</span>
                                 </a>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1"
-                               th:text="'Started: ' + ${#temporals.format(conversation.createdAt, 'MMM dd, yyyy')}">
-                                Start Date
-                            </p>
-                        </div>
-                        <div class="shrink-0 self-center">
-                            <svg class="size-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
-                                 fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                      d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
+                            <div class="text-sm text-gray-500"
+                                 th:text="${#temporals.format(conversation.createdAt, 'MMM dd, yyyy')}">Date
+                            </div>
+                        </td>
+                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
+                            <a th:href="@{/conversations/{id}(id=${conversation.id})}"
+                               class="text-indigo-600 hover:text-indigo-900">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(project.conversations)}">
+                        <td colspan="3" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                            No conversations found
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+    <div class="bg-white shadow rounded-lg p-6 py-2">
+        <div class="text-center py-4">
+            <!-- New Conversation Form -->
+            <div class="mt-6 max-w-xl mx-auto">
+                <form th:action="@{/projects/{id}/conversations(id=${project.id})}"
+                      th:object="${conversationCreateRequest}"
+                      method="post"
+                      class="space-y-4">
+
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label for="purpose" class="sr-only">Conversation Purpose</label>
+                            <textarea id="purpose"
+                                      name="purpose"
+                                      th:field="*{purpose}"
+                                      required
+                                      class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                      placeholder="What would you like to discuss about this project?"
+                                      rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div th:if="${#fields.hasErrors('purpose')}" class="text-red-500 text-sm mt-1">
+                        <span th:errors="*{purpose}"></span>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Start New Conversation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 </body>
