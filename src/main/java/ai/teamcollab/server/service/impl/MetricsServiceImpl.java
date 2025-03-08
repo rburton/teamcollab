@@ -5,6 +5,8 @@ import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.MetricsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +33,19 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<Metrics> getMetricsPaginated(Pageable pageable) {
+        log.debug("Fetching paginated metrics with pageable: {}", pageable);
+        return metricsRepository.findAllOrderByMessageCreatedAtDesc(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Map<String, Object> getMetricsStatistics() {
         log.debug("Calculating metrics statistics");
-        
+
         List<Metrics> allMetrics = metricsRepository.findAll();
         Map<String, Object> statistics = new HashMap<>();
-        
+
         if (allMetrics.isEmpty()) {
             return statistics;
         }
@@ -51,7 +60,7 @@ public class MetricsServiceImpl implements MetricsService {
         int totalInputTokens = allMetrics.stream()
                 .mapToInt(Metrics::getInputTokens)
                 .sum();
-        
+
         int totalOutputTokens = allMetrics.stream()
                 .mapToInt(Metrics::getOutputTokens)
                 .sum();
@@ -81,7 +90,7 @@ public class MetricsServiceImpl implements MetricsService {
     @Transactional(readOnly = true)
     public Map<String, BigDecimal> getCompanyCosts(Long companyId) {
         log.debug("Calculating company costs for company ID: {}", companyId);
-        
+
         Map<String, BigDecimal> costs = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
 
@@ -104,9 +113,9 @@ public class MetricsServiceImpl implements MetricsService {
     @Transactional(readOnly = true)
     public BigDecimal getCompanyCostsByDateRange(Long companyId, LocalDateTime startDate, LocalDateTime endDate) {
         log.debug("Calculating company costs for company ID: {} between {} and {}", companyId, startDate, endDate);
-        
+
         List<Metrics> metrics = metricsRepository.findByCompanyAndDateRange(companyId, startDate, endDate);
-        
+
         return metrics.stream()
                 .map(Metrics::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

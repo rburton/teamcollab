@@ -1,6 +1,8 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Metrics;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +13,13 @@ public interface MetricsService {
      * @return List of top 10 metrics
      */
     List<Metrics> getTopMetrics();
+
+    /**
+     * Retrieves metrics ordered by message creation date with pagination.
+     * @param pageable pagination information
+     * @return Page of metrics
+     */
+    Page<Metrics> getMetricsPaginated(Pageable pageable);
 
     /**
      * Retrieves metrics statistics including:

@@ -37,10 +37,10 @@
             </div>
         </div>
 
-        <!-- Top 10 Metrics Table -->
+        <!-- Recent Metrics Table with Pagination -->
         <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-200">
-                <h2 class="text-xl font-semibold" th:text="#{metrics.table.title}">Top 10 Metrics by Duration</h2>
+                <h2 class="text-xl font-semibold">Recent Metrics</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -55,8 +55,8 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <th:block th:each="metric : ${metrics}">
-                        <tr>
+                    <th:block th:each="metric, iterStat : ${metrics}">
+                        <tr th:class="${iterStat.odd} ? 'bg-gray-50' : 'bg-white'">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.duration} + ' ms'"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$<span th:text="${metric.cost}"></span></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.inputTokens}"></td>
@@ -64,7 +64,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.model}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.provider}"></td>
                         </tr>
-                        <tr th:if="${metric.message != null}" class="bg-gray-50">
+                        <tr th:if="${metric.message != null}" th:class="${iterStat.odd} ? 'bg-blue-50' : 'bg-gray-50'">
                             <td colspan="6" class="px-6 py-2 text-sm text-gray-600">
                                 <span class="font-medium text-gray-500">Message: </span>
                                 <span th:text="${metric.message.content}"></span>
@@ -76,6 +76,59 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Pagination Controls -->
+                <div class="px-6 py-4 bg-white border-t border-gray-200" th:if="${totalPages > 0}">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Showing 
+                            <span class="font-medium" th:text="${metrics.size() == 0 ? 0 : currentPage * pageSize + 1}"></span>
+                            to 
+                            <span class="font-medium" th:text="${metrics.size() == 0 ? 0 : currentPage * pageSize + metrics.size()}"></span>
+                            of 
+                            <span class="font-medium" th:text="${totalItems}"></span>
+                            results
+                        </div>
+                        <div class="flex space-x-2">
+                            <!-- Previous Page Button -->
+                            <a th:if="${currentPage > 0}" 
+                               th:href="@{/metrics(page=${currentPage - 1}, size=${pageSize})}"
+                               class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Previous
+                            </a>
+                            <span th:unless="${currentPage > 0}" 
+                                  class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                                Previous
+                            </span>
+
+                            <!-- Page Numbers -->
+                            <div class="hidden md:flex">
+                                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <a th:if="${i != currentPage}" 
+                                       th:href="@{/metrics(page=${i}, size=${pageSize})}"
+                                       class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">
+                                        [[${i + 1}]]
+                                    </a>
+                                    <span th:if="${i == currentPage}" 
+                                          class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-indigo-600 rounded-md">
+                                        [[${i + 1}]]
+                                    </span>
+                                </th:block>
+                            </div>
+
+                            <!-- Next Page Button -->
+                            <a th:if="${currentPage < totalPages - 1}" 
+                               th:href="@{/metrics(page=${currentPage + 1}, size=${pageSize})}"
+                               class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Next
+                            </a>
+                            <span th:unless="${currentPage < totalPages - 1}" 
+                                  class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                                Next
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
