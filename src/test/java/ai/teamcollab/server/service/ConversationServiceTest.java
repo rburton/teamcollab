@@ -90,11 +90,59 @@ class ConversationServiceTest {
                 .thenReturn(List.of(message));
         when(chatService.process(any(), any(), any()))
                 .thenReturn(CompletableFuture.completedFuture(messageResponse));
+        when(messageService.createMessage(any(), any(), any())).thenReturn(message);
+        when(thymeleafTemplateRender.renderToHtml(any(), any())).thenReturn("<html></html>");
 
         // Act
-//        conversationService.sendMessage(1L);
+        conversationService.sendMessage(1L, "test-session-id");
 
         // Assert
         verify(chatService).process(any(), any(), any(ChatContext.class));
+        verify(messageService).createMessage(any(), any(), any());
+    }
+
+    @Test
+    void sendMessage_shouldAddMetricsToSavedMessage_whenResponseContainsMetrics() {
+        // Arrange
+        final var project = new Project();
+        project.setOverview("Test Project Overview");
+
+        final var conversation = new Conversation();
+        conversation.setId(1L);
+        conversation.setPurpose("Test Purpose");
+        conversation.setProject(project);
+
+        final var message = new Message();
+        message.setId(1L);
+        message.setConversation(conversation);
+        message.setContent("Test Message");
+        message.setCreatedAt(LocalDateTime.now());
+
+        final var savedMessage = new Message();
+        savedMessage.setId(2L);
+
+        final var metrics = new ai.teamcollab.server.domain.Metrics();
+        metrics.setId(1L);
+
+        final var messageResponse = MessageResponse.builder()
+                .content("Test Response")
+                .metrics(metrics)
+                .build();
+
+        when(messageRepository.findById(1L)).thenReturn(Optional.of(message));
+        when(messageRepository.findTop10ByConversationIdOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of(message));
+        when(chatService.process(any(), any(), any()))
+                .thenReturn(CompletableFuture.completedFuture(messageResponse));
+        when(messageService.createMessage(any(), any(), any())).thenReturn(savedMessage);
+        when(thymeleafTemplateRender.renderToHtml(any(), any())).thenReturn("<html></html>");
+
+        // Act
+        conversationService.sendMessage(1L, "test-session-id");
+
+        // Assert
+        verify(chatService).process(any(), any(), any(ChatContext.class));
+        verify(messageService).createMessage(any(), any(), any());
+        verify(messageRepository).save(savedMessage);
     }
 }

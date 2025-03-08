@@ -1,15 +1,18 @@
 package ai.teamcollab.server.service.impl;
 
+import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.service.ChatService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.time.Instant.now;
@@ -84,16 +88,12 @@ public class ChatServiceImpl implements ChatService {
 
                 final var currentSettings = systemSettingsService.getCurrentSettings();
 
-                // Get company-level LLM model if available, otherwise use system setting
-                var llmModel = currentSettings.getLlmModel();
-                if (nonNull(conversation.getUser()) &&
-                        nonNull(conversation.getUser().getCompany()) &&
-                        nonNull(conversation.getUser().getCompany().getLlmModel())) {
-                    llmModel = conversation.getUser().getCompany().getLlmModel();
-                    log.debug("Using company-specific LLM model: {}", llmModel);
-                } else {
-                    log.debug("Using system default LLM model: {}", llmModel);
-                }
+                final var llmModel = Optional.ofNullable(conversation)
+                        .map(Conversation::getUser)
+                        .map(User::getCompany)
+                        .map(Company::getLlmModel)
+                        .filter(Strings::isNotBlank)
+                        .orElse(currentSettings.getLlmModel());
 
                 final var model = GptModel.fromId(llmModel);
                 final var chatModel = OpenAiChatModel.builder()

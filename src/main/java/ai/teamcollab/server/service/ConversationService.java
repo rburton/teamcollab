@@ -28,6 +28,7 @@ import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE
 import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static java.util.Collections.reverse;
+import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
@@ -100,11 +101,17 @@ public class ConversationService {
                     .thenAccept(response -> {
                         final var responseMessage = Message.builder()
                                 .content(response.getContent())
-                                .persona(Persona.builder()
-                                        .name("System")
-                                        .build())
+                                .persona(message.getPersona())
                                 .createdAt(LocalDateTime.now())
                                 .build();
+
+                        // Save the response message to the conversation
+                        final var savedMessage = messageService.createMessage(responseMessage, conversation.getId(), message.getUser());
+                        if (nonNull(response.getMetrics())) {
+                            savedMessage.addMetrics(response.getMetrics());
+                            messageRepository.save(savedMessage);
+                        }
+
                         final var row = MessageRow.from(responseMessage);
                         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
                         messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(html));
