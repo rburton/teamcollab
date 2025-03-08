@@ -24,11 +24,23 @@ export default class extends Controller {
             this.online();
             this.stompClient.subscribe(`/user/queue/messages`, (messages) => {
                 console.log('messages.body ', messages.body);
-                const listOfMessages = JSON.parse(messages.body);
-                for (let i = 0; i < listOfMessages.length; i++) {
-                    const message = listOfMessages[i];
-                    const element = this.createMessage(message);
-                    this.chatTarget.appendChild(element);
+                const response = JSON.parse(messages.body);
+                console.log('WsMessageResponse ', response.messageType);
+                if (this.isMessage(response)) {
+                    const messages = response.payload;
+                    for (let i = 0; i < messages.length; i++) {
+                        const message = messages[i];
+                        const element = this.createMessage(message);
+                        this.chatTarget.appendChild(element);
+                    }
+                } else if (this.isTurbo(response)) {
+                    if (Array.isArray(response.payload)) {
+                        for (let i = 0; i < response.payload.length; i++) {
+                            Turbo.renderStreamMessage(response.payload[i]);
+                        }
+                    } else {
+                        Turbo.renderStreamMessage(response.payload);
+                    }
                 }
             });
 
@@ -49,6 +61,14 @@ export default class extends Controller {
             this.offline();
         }
 
+    }
+
+    isMessage(response) {
+        return response.messageType === 'MESSAGE';
+    }
+
+    isTurbo(response) {
+        return response.messageType === 'TURBO';
     }
 
     offline() {

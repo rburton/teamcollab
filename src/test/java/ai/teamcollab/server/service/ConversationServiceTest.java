@@ -8,6 +8,7 @@ import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
+import ai.teamcollab.server.templates.ThymeleafTemplateRender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,17 +46,21 @@ class ConversationServiceTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    private ThymeleafTemplateRender thymeleafTemplateRender;
+
     private ConversationService conversationService;
 
     @BeforeEach
     void setUp() {
         conversationService = new ConversationService(
-            chatService,
-            messageService,
-            userRepository,
-            messageRepository,
-            conversationRepository,
-            messagingTemplate
+                chatService,
+                messageService,
+                userRepository,
+                messageRepository,
+                conversationRepository,
+                messagingTemplate,
+                thymeleafTemplateRender
         );
     }
 
@@ -77,14 +82,14 @@ class ConversationServiceTest {
         message.setCreatedAt(LocalDateTime.now());
 
         final var messageResponse = MessageResponse.builder()
-            .content("Test Response")
-            .build();
+                .content("Test Response")
+                .build();
 
         when(messageRepository.findById(1L)).thenReturn(Optional.of(message));
         when(messageRepository.findTop10ByConversationIdOrderByCreatedAtDesc(1L))
-            .thenReturn(List.of(message));
+                .thenReturn(List.of(message));
         when(chatService.process(any(), any(), any()))
-            .thenReturn(CompletableFuture.completedFuture(messageResponse));
+                .thenReturn(CompletableFuture.completedFuture(messageResponse));
 
         // Act
 //        conversationService.sendMessage(1L);

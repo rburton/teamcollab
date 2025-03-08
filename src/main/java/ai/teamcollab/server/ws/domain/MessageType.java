@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum MessageType {
+    TURBO("A payload for Turbo streams"),
     CLOSED("When the conversation is closed by the server"),
     MESSAGE("When one or more messages are sent"),
     MESSAGE_PROCESSING("When a message is being processed by AI"),

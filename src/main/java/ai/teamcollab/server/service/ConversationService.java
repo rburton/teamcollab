@@ -9,6 +9,10 @@ import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
+import ai.teamcollab.server.templates.TemplatePath;
+import ai.teamcollab.server.templates.TemplateVariableName;
+import ai.teamcollab.server.templates.ThymeleafTemplateRender;
+import ai.teamcollab.server.ws.domain.WsMessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,9 +21,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE_TOPIC;
+import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static java.util.Collections.reverse;
 
 @Slf4j
@@ -32,15 +39,19 @@ public class ConversationService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ThymeleafTemplateRender thymeleafTemplateRender;
 
     @Autowired
-    public ConversationService(ChatService chatService, MessageService messageService, UserRepository userRepository, MessageRepository messageRepository, ConversationRepository conversationRepository, SimpMessagingTemplate messagingTemplate) {
+    public ConversationService(ChatService chatService, MessageService messageService, UserRepository userRepository,
+                               MessageRepository messageRepository, ConversationRepository conversationRepository,
+                               SimpMessagingTemplate messagingTemplate, ThymeleafTemplateRender thymeleafTemplateRender) {
         this.chatService = chatService;
         this.messageService = messageService;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
         this.messagingTemplate = messagingTemplate;
+        this.thymeleafTemplateRender = thymeleafTemplateRender;
     }
 
     public Conversation createConversation(Conversation conversation, Long userId) {
@@ -94,7 +105,9 @@ public class ConversationService {
                                         .build())
                                 .createdAt(LocalDateTime.now())
                                 .build();
-                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, List.of(MessageRow.from(responseMessage)));
+                        final var row = MessageRow.from(responseMessage);
+                        final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(html));
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {

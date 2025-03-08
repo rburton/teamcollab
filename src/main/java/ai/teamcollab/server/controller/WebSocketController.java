@@ -5,16 +5,21 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.domain.MessageRow;
+import ai.teamcollab.server.templates.ThymeleafTemplateRender;
+import ai.teamcollab.server.ws.domain.WsMessageResponse;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
+import java.util.Map;
+
+import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+
 
 /**
  * <div class="flex items-start" th:classappend="${message.username} ? ' justify-end'">
@@ -39,37 +44,47 @@ public class WebSocketController {
     public static final String DIRECT_MESSAGE_TOPIC = "/queue/messages";
     public static final String ERROR_EVENT_TOPIC = "/queue/errors";
 
+    private final ThymeleafTemplateRender thymeleafTemplateRender;
     private final ConversationService conversationService;
 
-    public WebSocketController(ConversationService conversationService) {
+    public WebSocketController(ThymeleafTemplateRender thymeleafTemplateRender, ConversationService conversationService) {
+        this.thymeleafTemplateRender = thymeleafTemplateRender;
         this.conversationService = conversationService;
     }
 
     @MessageMapping("/chat.send")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
-    public List<MessageRow> sendMessage(@Payload WsMessage message,
-                                        UsernamePasswordAuthenticationToken principal,
-                                        SimpMessageHeaderAccessor headerAccessor) {
+    public WsMessageResponse sendMessage(@Payload WsMessage message,
+                                         UsernamePasswordAuthenticationToken principal,
+                                         SimpMessageHeaderAccessor headerAccessor) {
         final var user = (User) principal.getPrincipal();
         final var newMessage = Message.builder()
                 .content(message.getContent())
                 .build();
         final var savedMessage = conversationService.addToConversation(message.getConversationId(), newMessage, user);
         conversationService.sendMessage(savedMessage.getId(), user.getUsername());
-        return List.of(MessageRow.builder()
+        final var row = MessageRow.builder()
                 .content(savedMessage.getContent())
                 .username(principal.getName())
                 .createdAt(savedMessage.getCreatedAt())
-                .build());
+                .build();
+
+        final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
+        return WsMessageResponse.turbo(html);
     }
 
     @MessageMapping("/chat.join")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
-    public List<MessageRow> joinChat(@Payload WsMessage message, SimpMessageHeaderAccessor headerAccessor) {
-        return conversationService.findMessagesByConversation(message.getConversationId())
+    public WsMessageResponse joinChat(@Payload WsMessage message, SimpMessageHeaderAccessor headerAccessor) {
+        final var messages = conversationService.findMessagesByConversation(message.getConversationId())
                 .stream()
                 .map(MessageRow::from)
                 .toList();
+        final var elements = messages.stream()
+                .map(row -> thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row)))
+                .toList();
+
+        return WsMessageResponse.turbo(elements);
     }
 
     @MessageExceptionHandler
