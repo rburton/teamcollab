@@ -36,8 +36,8 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                         <tr th:each="company : ${companies}">
-                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"
-                                th:text="${company.name}">Company Name
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-blue-900 sm:pl-0">
+                                <a th:href="@{/system/admin/companies/{id}/settings(id=${company.id})}" class="text-blue-900 hover:text-indigo-600" th:text="${company.name}">Company Name</a>
                             </td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                 th:text="${#temporals.format(company.createdAt, 'yyyy-MM-dd')}">2024-01-01
