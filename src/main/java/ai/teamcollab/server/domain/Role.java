@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Getter
@@ -21,7 +23,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Role {
+public class Role implements Serializable {
 
     @Id
     @Column(name = "role_id")

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ import static java.util.Objects.isNull;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
-public class Company {
+public class Company implements Serializable {
 
     @Id
     @Column(name = "company_id")
