@@ -75,7 +75,7 @@ public class ConversationController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal User user, @NonNull Model model) {
-        final var conversation = conversationService.findConversationById(id);
+        final var conversation = conversationService.findConversationByIdWithPersonas(id);
         if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");
         }

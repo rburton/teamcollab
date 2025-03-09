@@ -70,8 +70,27 @@ public class ConversationService {
         return conversationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    /**
+     * Finds a conversation by ID.
+     *
+     * @param id the ID of the conversation to find
+     * @return the conversation
+     * @throws IllegalArgumentException if no conversation is found with the given ID
+     */
     public Conversation findConversationById(Long id) {
         return conversationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
+    }
+
+    /**
+     * Finds a conversation by ID with its personas eagerly fetched.
+     *
+     * @param id the ID of the conversation to find
+     * @return the conversation with eagerly fetched personas
+     * @throws IllegalArgumentException if no conversation is found with the given ID
+     */
+    public Conversation findConversationByIdWithPersonas(Long id) {
+        return conversationRepository.findByIdWithPersonas(id)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
     }
 
