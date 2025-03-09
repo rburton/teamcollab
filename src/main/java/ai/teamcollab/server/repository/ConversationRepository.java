@@ -14,11 +14,11 @@ public interface ConversationRepository extends CrudRepository<Conversation, Lon
     List<Conversation> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     /**
-     * Finds a conversation by ID and eagerly fetches its personas.
+     * Finds a conversation by ID and eagerly fetches its assistants.
      * 
      * @param id the ID of the conversation to find
-     * @return the conversation with eagerly fetched personas, or empty if not found
+     * @return the conversation with eagerly fetched assistants, or empty if not found
      */
-    @Query("SELECT c FROM Conversation c LEFT JOIN FETCH c.personas WHERE c.id = :id")
-    Optional<Conversation> findByIdWithPersonas(@Param("id") Long id);
+    @Query("SELECT c FROM Conversation c LEFT JOIN FETCH c.assistants WHERE c.id = :id")
+    Optional<Conversation> findByIdWithAssistant(@Param("id") Long id);
 }

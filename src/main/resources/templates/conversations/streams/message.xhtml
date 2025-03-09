@@ -6,7 +6,7 @@
             </div>
             <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
                 <p class="text-sm font-semibold text-blue-800"
-                   th:text="${message.username + (message.personaName != null ? ' - ' + message.personaName : '')}">
+                   th:text="${message.username + (message.assistantName != null ? ' - ' + message.assistantName : '')}">
                 </p>
                 <p class="text-gray-800" 
                    th:attr="data-controller='message', data-message-content-value=${message.content}, data-message-target='message'"></p>

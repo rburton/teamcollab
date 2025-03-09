@@ -42,8 +42,8 @@ export default class extends Controller {
                 }
             });
 
-            this.stompClient.subscribe(`/user/queue/personas`, (personas) => {
-                console.log('persons ', personas);
+            this.stompClient.subscribe(`/user/queue/assistants`, (assistants) => {
+                console.log('assistant ', assistants);
             });
             const payload = JSON.stringify({
                 'conversation_id': this.element.dataset.conversationChatIdValue,
@@ -103,8 +103,8 @@ export default class extends Controller {
         userBadge.className = `w-8 h-8 bg-${color}-500 rounded-full flex items-center justify-center text-white mr-2`;
         if (message.username) {
             userBadge.textContent = message.username.charAt(0);
-        } else if (message.personaName) {
-            userBadge.textContent = message.personaName.charAt(0);
+        } else if (message.assistantName) {
+            userBadge.textContent = message.assistantName.charAt(0);
         }
         container.appendChild(userBadge);
 
@@ -117,7 +117,7 @@ export default class extends Controller {
         if (message.username) {
             nameElement.innerHTML = message.username;
         } else {
-            nameElement.innerHTML = message.personaName;
+            nameElement.innerHTML = message.assistantName;
         }
         messageBox.appendChild(nameElement);
 

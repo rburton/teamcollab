@@ -58,8 +58,8 @@
                            aria-current="page">Dashboard</a>
                         <a href="/projects"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">All Projects</a>
-                        <a href="/personas"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Personas</a>
+                        <a href="/assistants"
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
                         <a href="/company/admin" sec:authorize="hasRole('ADMIN')"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Admin</a>
                         <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
@@ -130,8 +130,8 @@
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
             <a href="/projects/new"
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">New Project</a>
-            <a href="/personas"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Personas</a>
+            <a href="/assistants"
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
             <a href="/metrics"
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Metrics</a>
             <a href="/admin" sec:authorize="hasRole('ADMIN')"

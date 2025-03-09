@@ -1,9 +1,9 @@
 package ai.teamcollab.server.api;
 
-import ai.teamcollab.server.api.domain.PersonaResponse;
+import ai.teamcollab.server.api.domain.AssistantResponse;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
-import ai.teamcollab.server.service.PersonaService;
+import ai.teamcollab.server.service.AssistantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,21 +15,21 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/personas", produces = MediaType.APPLICATION_JSON_VALUE)
-public class PersonaRestController {
+@RequestMapping(value = "/api/assistants", produces = MediaType.APPLICATION_JSON_VALUE)
+public class AssistantRestController {
 
-    private final PersonaService personaService;
+    private final AssistantService assistantService;
 
-    public PersonaRestController(PersonaService personaService, CompanyService companyService) {
-        this.personaService = personaService;
+    public AssistantRestController(AssistantService assistantService, CompanyService companyService) {
+        this.assistantService = assistantService;
     }
 
     @GetMapping("/all")
-    public List<PersonaResponse> getAllPersonas(@AuthenticationPrincipal User user) {
+    public List<AssistantResponse> getAllAssistants(@AuthenticationPrincipal User user) {
         final var company = user.getCompany();
-        return personaService.findByCompany(company.getId())
+        return assistantService.findByCompany(company.getId())
                 .stream()
-                .map(PersonaResponse::fromPersona)
+                .map(AssistantResponse::fromAssistant)
                 .toList();
     }
 

@@ -45,25 +45,25 @@ CREATE TABLE conversations
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
-CREATE TABLE personas
+CREATE TABLE assistants
 (
-    persona_id      BIGSERIAL PRIMARY KEY,
+    assistant_id    BIGSERIAL PRIMARY KEY,
     name            VARCHAR(100) NOT NULL,
     expertise_areas TEXT         NOT NULL,
     company_id      BIGINT,
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 
-CREATE TABLE conversation_persona
+CREATE TABLE conversation_assistant
 (
     conversation_id BIGINT NOT NULL,
-    persona_id      BIGINT NOT NULL,
-    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas (persona_id) ON DELETE CASCADE,
+    assistant_id    BIGINT NOT NULL,
+    CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
-    CONSTRAINT uk_persona_conversation UNIQUE (persona_id, conversation_id)
+    CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)
 );
 
-INSERT INTO personas (name, expertise_areas)
+INSERT INTO assistants (name, expertise_areas)
 VALUES ('Mary', 'Marketing'),
        ('Jack', 'Product Management'),
        ('Frank', 'Legal');
@@ -72,11 +72,11 @@ CREATE TABLE messages
 (
     message_id      BIGSERIAL PRIMARY KEY,
     conversation_id BIGINT    NOT NULL,
-    persona_id      BIGINT,
+    assistant_id    BIGINT,
     user_id         BIGINT,
     content         TEXT      NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas (persona_id) ON DELETE CASCADE,
+    CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );

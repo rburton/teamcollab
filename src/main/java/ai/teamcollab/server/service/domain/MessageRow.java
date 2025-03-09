@@ -1,7 +1,7 @@
 package ai.teamcollab.server.service.domain;
 
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.Persona;
+import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @Builder
 public class MessageRow {
     private String username;
-    private String personaName;
+    private String assistantName;
     private String content;
     private LocalDateTime createdAt;
 
@@ -21,14 +21,14 @@ public class MessageRow {
         final var username = Optional.ofNullable(message.getUser())
                 .map(User::getUsername)
                 .orElse(null);
-        final var personaName = Optional.ofNullable(message.getPersona())
-                .map(Persona::getName)
+        final var assistantName = Optional.ofNullable(message.getAssistant())
+                .map(Assistant::getName)
                 .orElse(null);
 
         return MessageRow.builder()
                 .content(message.getContent())
                 .username(username)
-                .personaName(personaName)
+                .assistantName(assistantName)
                 .createdAt(message.getCreatedAt())
                 .build();
     }

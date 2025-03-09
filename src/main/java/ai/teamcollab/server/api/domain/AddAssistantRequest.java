@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AddPersonaRequest {
-    @NotNull(message = "Persona ID is required")
-    private Long personaId;
+public class AddAssistantRequest {
+    @NotNull(message = "Assistant ID is required")
+    private Long assistantId;
 }

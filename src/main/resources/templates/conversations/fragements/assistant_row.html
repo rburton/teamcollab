@@ -1,15 +1,15 @@
 <li class="flex gap-x-4 py-0 cursor-pointer rounded-xs p-0 hover:bg-gray-100"
-    th:fragment="persona_row" th:id="'persona_' + ${persona.id}">
+    th:fragment="assistant_row" th:id="'assistant_' + ${assistant.id}">
     <div class="bg-white p-2 rounded-md shadow-sm w-full max-w-sm border-zinc-200 border-1">
         <div class="flex items-center space-x-4">
             <img class="w-16 h-16 rounded-full border-2 border-gray-300"
                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                  alt="User Avatar">
             <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-800" th:text="${persona.name}">John Doe</h3>
-                <p class="text-sm text-gray-500" th:text="${persona.expertise}">Software Engineer</p>
+                <h3 class="text-lg font-bold text-gray-800" th:text="${assistant.name}">John Doe</h3>
+                <p class="text-sm text-gray-500" th:text="${assistant.expertise}">Software Engineer</p>
             </div>
         </div>
-        <th:block th:replace="conversations/fragements/persona_status :: persona_status(status='Waiting')"/>
+        <th:block th:replace="conversations/fragements/assistant_status :: assistant_status(status='Waiting')"/>
     </div>
 </li>

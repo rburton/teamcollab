@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>View Persona</title>
+    <title>View Assistant</title>
 </head>
 <body>
     <div layout:fragment="content">
@@ -20,20 +20,20 @@
 
             <!-- Back Button -->
             <div class="mb-4">
-                <a href="/personas" class="text-blue-500 hover:text-blue-700 flex items-center">
+                <a href="/assistants" class="text-blue-500 hover:text-blue-700 flex items-center">
                     <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    Back to Personas
+                    Back to Assistants
                 </a>
             </div>
 
-            <!-- Persona Details -->
+            <!-- Assistant Details -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h1 class="text-2xl font-bold text-gray-900" th:text="${persona.name}"></h1>
-                    <p th:if="${persona.companyId}" class="text-sm text-gray-500">
-                        Company ID: <span th:text="${persona.companyId}"></span>
+                    <h1 class="text-2xl font-bold text-gray-900" th:text="${assistant.name}"></h1>
+                    <p th:if="${assistant.companyId}" class="text-sm text-gray-500">
+                        Company ID: <span th:text="${assistant.companyId}"></span>
                     </p>
                 </div>
 
@@ -41,14 +41,14 @@
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold mb-4">Areas of Expertise</h2>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span th:each="expertise : ${persona.expertiseAreas}"
+                        <span th:each="expertise : ${assistant.expertiseAreas}"
                               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                             <span th:text="${expertise}"></span>
                         </span>
                     </div>
                     
                     <!-- Add Expertise Form -->
-                    <form th:action="@{/personas/{id}/expertise(id=${persona.id})}" method="post" class="flex gap-2">
+                    <form th:action="@{/assistants/{id}/expertise(id=${assistant.id})}" method="post" class="flex gap-2">
                         <input type="text" name="expertise" placeholder="New expertise area"
                                class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
@@ -60,13 +60,13 @@
                 <!-- Associated Conversations -->
                 <div class="px-6 py-4">
                     <h2 class="text-lg font-semibold mb-4">Conversations</h2>
-                    <div th:if="${#sets.isEmpty(persona.conversations)}" class="text-gray-500">
+                    <div th:if="${#sets.isEmpty(assistant.conversations)}" class="text-gray-500">
                         No conversations associated yet.
                     </div>
-                    <div th:unless="${#sets.isEmpty(persona.conversations)}" class="space-y-2">
-                        <div th:each="conv : ${persona.conversations}" class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div th:unless="${#sets.isEmpty(assistant.conversations)}" class="space-y-2">
+                        <div th:each="conv : ${assistant.conversations}" class="flex items-center justify-between p-2 bg-gray-50 rounded">
                             <span th:text="${conv.conversationId}"></span>
-                            <form th:action="@{/personas/{id}/conversations/{convId}(id=${persona.id},convId=${conv.conversationId})}"
+                            <form th:action="@{/assistants/{id}/conversations/{convId}(id=${assistant.id},convId=${conv.conversationId})}"
                                   method="post"
                                   th:data-method="delete"
                                   class="inline">

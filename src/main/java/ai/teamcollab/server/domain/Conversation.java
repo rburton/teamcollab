@@ -34,7 +34,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"messages", "personas"})
+@ToString(exclude = {"messages", "assistants"})
 public class Conversation {
 
     @Id
@@ -44,7 +44,7 @@ public class Conversation {
 
     @Column(name = "purpose")
     @NotBlank(message = "Purpose is required")
-    @Size(min = 10, max = 1000, message = "Purpose must be between 10 and 1000 characters")
+    @Size(min = 1, max = 1000, message = "Purpose must be between 1 and 1000 characters")
     private String purpose;
 
     @ManyToOne
@@ -60,12 +60,12 @@ public class Conversation {
 
     @ManyToMany(fetch = EAGER)
     @JoinTable(
-            name = "conversation_persona",
+            name = "conversation_assistant",
             joinColumns = @JoinColumn(name = "conversation_id"),
-            inverseJoinColumns = @JoinColumn(name = "persona_id")
+            inverseJoinColumns = @JoinColumn(name = "assistant_id")
     )
     @Fetch(FetchMode.JOIN)
-    private Set<Persona> personas = new HashSet<>();
+    private Set<Assistant> assistants = new HashSet<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -76,8 +76,8 @@ public class Conversation {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void addPersona(Persona persona) {
-        personas.add(persona);
-        persona.getConversations().add(this);
+    public void addAssistant(Assistant assistant) {
+        assistants.add(assistant);
+        assistant.getConversations().add(this);
     }
 }

@@ -64,7 +64,7 @@
                 <i class="fas fa-circle text-sm animate-pulse"></i>
                 <span class="ml-2" data-conversation-target="statusLabel">Connected</span>
             </span>
-            <h2 class="text-lg text-white font-semibold" th:text="${conversation.purpose}">Chat with All Personas</h2>
+            <h2 class="text-lg text-white font-semibold" th:text="${conversation.purpose}">Chat with All Assistants</h2>
         </div>
         <div class="flex items-center" sec:authorize="hasRole('SUPER_ADMIN')">
             <a th:href="@{/metrics/conversation/{id}(id=${conversation.id})}" class="text-white hover:text-gray-100">
@@ -74,29 +74,29 @@
     </div>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- Left Sidebar with Personas -->
+        <!-- Left Sidebar with assistants -->
         <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
-             id="sidebar" data-controller="persona" th:data-persona-conversation-id-value="${conversation.id}">
+             id="sidebar" data-controller="assistant" th:data-assistant-conversation-id-value="${conversation.id}">
             <div class="flex justify-between mb-4">
-                <h2 class="text-lg font-semibold">Personas</h2>
-                <button data-action="click->persona#open" class="text-blue-500 hover:text-blue-700">
+                <h2 class="text-lg font-semibold">Assistants</h2>
+                <button data-action="click->assistant#open" class="text-blue-500 hover:text-blue-700">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
 
-            <!-- Personas Modal -->
-            <div data-persona-target="modal"
+            <!-- Assistants Modal -->
+            <div data-assistant-target="modal"
                  class="fixed inset-0 backdrop-blur-xs hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-semibold">All Personas</h3>
-                        <button data-action="click->persona#close" class="text-gray-500 hover:text-gray-700">
+                        <h3 class="text-xl font-semibold">All Assistant</h3>
+                        <button data-action="click->assistant#close" class="text-gray-500 hover:text-gray-700">
                             <i class="fas fa-times fa-lg"></i>
                         </button>
                     </div>
                     <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <turbo-frame id="personasList" src="/personas/conversations/1" th:attr="target='/personas/conversations/' + ${conversation.id}">
-                            Loading Personas...
+                        <turbo-frame id="assistantPanelList" src="/assistants/conversations/1" th:attr="target='/assistants/conversations/' + ${conversation.id}">
+                            Loading Assistants...
                         </turbo-frame>
                     </div>
                     <!-- Error Message -->
@@ -104,10 +104,10 @@
                 </div>
             </div>
 
-            <ul role="list" class="divide-y divide-gray-100 space-y-2" id="personaList">
-                <th:block th:each="persona: ${personas}">
-                    <th:block th:replace="conversations/fragements/persona_row :: persona_row"
-                              th:id="'persona_' + ${persona.id}">
+            <ul role="list" class="divide-y divide-gray-100 space-y-2" id="assistantList">
+                <th:block th:each="assistant: ${assistants}">
+                    <th:block th:replace="conversations/fragements/assistant_row :: assistant_row"
+                              th:id="'assistant_' + ${assistant.id}">
                     </th:block>
                 </th:block>
             </ul>

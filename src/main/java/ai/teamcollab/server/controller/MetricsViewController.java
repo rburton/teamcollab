@@ -10,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,7 +73,7 @@ public class MetricsViewController {
             model.addAttribute("conversation", conversation);
             model.addAttribute("messageCount", messages.size());
             model.addAttribute("user", conversation.getUser());
-            model.addAttribute("personas", conversation.getPersonas());
+            model.addAttribute("assistants", conversation.getAssistants());
 
             // Aggregate metrics
             var totalDuration = messages.stream()

@@ -24,17 +24,17 @@ import java.util.Set;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "personas")
+@Table(name = "assistants")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Persona {
+public class Assistant {
 
     @Id
-    @Column(name = "persona_id")
+    @Column(name = "assistant_id")
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
@@ -49,7 +49,7 @@ public class Persona {
     private String expertise;
 
     @Column(name = "expertise_prompt")
-    @NotBlank(message = "Please describe the role to guide the behavior of the Persona")
+    @NotBlank(message = "Please describe the role to guide the behavior of the assistant")
     @Size(min = 1, message = "The expertise prompt is too short")
     private String expertisePrompt;
 
@@ -58,16 +58,16 @@ public class Persona {
     private Company company;
 
     @Lazy
-    @ManyToMany(mappedBy = "personas")
+    @ManyToMany(mappedBy = "assistants")
     private Set<Conversation> conversations = new HashSet<>();
 
-    public Persona(String name, String expertise) {
+    public Assistant(String name, String expertise) {
         this.name = name;
         this.expertise = expertise;
     }
 
     public void addToConversation(Conversation conversation) {
-        conversation.addPersona(this);
+        conversation.addAssistant(this);
     }
 
     public void removeFromConversation(Conversation conversation) {

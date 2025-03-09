@@ -1,9 +1,9 @@
 package ai.teamcollab.server.api;
 
-import ai.teamcollab.server.api.domain.AddPersonaRequest;
-import ai.teamcollab.server.api.domain.PersonaResponse;
+import ai.teamcollab.server.api.domain.AddAssistantRequest;
+import ai.teamcollab.server.api.domain.AssistantResponse;
 import ai.teamcollab.server.domain.User;
-import ai.teamcollab.server.service.PersonaService;
+import ai.teamcollab.server.service.AssistantService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static ai.teamcollab.server.api.domain.PersonaResponse.fromPersona;
+import static ai.teamcollab.server.api.domain.AssistantResponse.fromAssistant;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -27,37 +27,37 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 @RequestMapping(value = "/api/conversations", produces = APPLICATION_JSON_VALUE)
 public class ConversationRestController {
 
-    private final PersonaService personaService;
+    private final AssistantService assistantService;
 
-    public ConversationRestController(PersonaService personaService) {
-        this.personaService = personaService;
+    public ConversationRestController(AssistantService assistantService) {
+        this.assistantService = assistantService;
     }
 
-    @PostMapping("/{conversationId}/persona")
-    public ResponseEntity<PersonaResponse> addPersonaToConversation(
+    @PostMapping("/{conversationId}/assistant")
+    public ResponseEntity<AssistantResponse> addAssistantToConversation(
             @PathVariable Long conversationId,
-            @Valid @RequestBody AddPersonaRequest request,
+            @Valid @RequestBody AddAssistantRequest request,
             @AuthenticationPrincipal User user) {
 
-        log.debug("Adding persona {} to conversation {}", request.getPersonaId(), conversationId);
+        log.debug("Adding assistant {} to conversation {}", request.getAssistantId(), conversationId);
 
         try {
-            var persona = personaService.findById(request.getPersonaId())
-                    .orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            var assistant = assistantService.findById(request.getAssistantId())
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
 
-            personaService.addToConversation(persona.getId(), conversationId);
+            assistantService.addToConversation(assistant.getId(), conversationId);
 
-            var updatedPersona = personaService.findById(request.getPersonaId())
-                    .orElseThrow(() -> new IllegalArgumentException("Persona not found after update"));
+            var updatedAssistant = assistantService.findById(request.getAssistantId())
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found after update"));
 
             return ResponseEntity.ok()
                     .contentType(APPLICATION_JSON)
-                    .body(fromPersona(updatedPersona));
+                    .body(fromAssistant(updatedAssistant));
         } catch (IllegalArgumentException e) {
-            log.error("Bad request while adding persona to conversation", e);
+            log.error("Bad request while adding assistant to conversation", e);
             return badRequest().build();
         } catch (Exception e) {
-            log.error("Error adding persona to conversation", e);
+            log.error("Error adding assistant to conversation", e);
             return internalServerError().build();
         }
     }

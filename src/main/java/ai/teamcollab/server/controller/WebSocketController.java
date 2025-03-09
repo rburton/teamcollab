@@ -19,29 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
-import static ai.teamcollab.server.templates.TemplatePath.PERSONA_STATUSES_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplatePath.ASSISTANT_STATUSES_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
-import static ai.teamcollab.server.templates.TemplateVariableName.PERSONAS;
+import static ai.teamcollab.server.templates.TemplateVariableName.ASSISTANTS;
 import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 
-
-/**
- * <div class="flex items-start" th:classappend="${message.username} ? ' justify-end'">
- * <p>
- * <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2"
- * th:text="${#strings.substring(message.username, 0, 1)}">
- * </div>
- * <div class="bg-blue-100 p-3 rounded-lg max-w-[70%]">
- * <p class="text-sm font-semibold text-blue-800"
- * th:text="${message.username + (message.personaName != null ? ' - ' + message.personnName : '')}">
- * </p>
- * <p class="text-gray-800" th:text="${message.content}"></p>
- * <p class="text-xs text-gray-500 mt-1"
- * th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
- * </p>
- * </div>
- * </div>
- */
 @Controller
 public class WebSocketController {
 
@@ -76,8 +58,8 @@ public class WebSocketController {
                 .build();
 
         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
-        final var personas = conversation.getPersonas();
-        final var htmlStatus = thymeleafTemplateRender.renderToHtml(PERSONA_STATUSES_TEMPLATE, Map.of(PERSONAS, personas, STATUS, "Thinking"));
+        final var assistants = conversation.getAssistants();
+        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Thinking"));
         return WsMessageResponse.turbo(List.of(html, htmlStatus));
     }
 

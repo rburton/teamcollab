@@ -23,9 +23,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE_TOPIC;
 import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
-import static ai.teamcollab.server.templates.TemplatePath.PERSONA_STATUSES_TEMPLATE;
+import static ai.teamcollab.server.templates.TemplatePath.ASSISTANT_STATUSES_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
-import static ai.teamcollab.server.templates.TemplateVariableName.PERSONAS;
+import static ai.teamcollab.server.templates.TemplateVariableName.ASSISTANTS;
 import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 import static java.util.Collections.reverse;
 import static java.util.Objects.nonNull;
@@ -83,14 +83,14 @@ public class ConversationService {
     }
 
     /**
-     * Finds a conversation by ID with its personas eagerly fetched.
+     * Finds a conversation by ID with its assistants eagerly fetched.
      *
      * @param id the ID of the conversation to find
-     * @return the conversation with eagerly fetched personas
+     * @return the conversation with eagerly fetched assistants
      * @throws IllegalArgumentException if no conversation is found with the given ID
      */
-    public Conversation findConversationByIdWithPersonas(Long id) {
-        return conversationRepository.findByIdWithPersonas(id)
+    public Conversation findConversationByIdWithAssistant(Long id) {
+        return conversationRepository.findByIdWithAssistant(id)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
     }
 
@@ -120,7 +120,7 @@ public class ConversationService {
                     .thenAccept(response -> {
                         final var responseMessage = Message.builder()
                                 .content(response.getContent())
-                                .persona(message.getPersona())
+                                .assistant(message.getAssistant())
                                 .createdAt(LocalDateTime.now())
                                 .build();
 
@@ -133,8 +133,8 @@ public class ConversationService {
 
                         final var row = MessageRow.from(responseMessage);
                         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
-                        final var personas = conversation.getPersonas();
-                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(PERSONA_STATUSES_TEMPLATE, Map.of(PERSONAS, personas, STATUS, "Waiting"));
+                        final var assistants = conversation.getAssistants();
+                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Waiting"));
 
                         messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(List.of(html, htmlStatus)));
                         log.debug("Message processed successfully for conversation: {}", message.getId());

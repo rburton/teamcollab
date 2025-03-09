@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.time.Instant.now;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -72,10 +71,10 @@ public class ChatServiceImpl implements ChatService {
                     if (historyMessage.equals(recent)) {
                         continue; // Skip the current message
                     }
-                    if (nonNull(historyMessage.getUser())) {
-                        messages.add(new UserMessage(historyMessage.getContent()));
-                    } else {
+                    if (historyMessage.isAssistant()) {
                         messages.add(new AssistantMessage(historyMessage.getContent()));
+                    } else {
+                        messages.add(new UserMessage(historyMessage.getContent()));
                     }
                 }
 

@@ -1,8 +1,8 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.Persona;
+import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.User;
-import ai.teamcollab.server.service.PersonaService;
+import ai.teamcollab.server.service.AssistantService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,139 +23,141 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/personas")
-public class PersonaController {
+@RequestMapping("/assistants")
+public class AssistantController {
 
-    private final PersonaService personaService;
+    private final AssistantService assistantService;
 
-    public PersonaController(PersonaService personaService) {
-        this.personaService = personaService;
+    public AssistantController(AssistantService assistantService) {
+        this.assistantService = assistantService;
     }
 
     @GetMapping
     public String index(@AuthenticationPrincipal User user, Model model) {
         final var company = user.getCompany();
-        model.addAttribute("personas", personaService.findByCompany(company.getId()));
-        if (!model.containsAttribute("persona")) {
-            model.addAttribute("persona", new Persona());
+        model.addAttribute("assistants", assistantService.findByCompany(company.getId()));
+        if (!model.containsAttribute("assistant")) {
+            model.addAttribute("assistant", new Assistant());
         }
-        return "personas/index";
+        return "assistants/index";
     }
 
     @ResponseBody
     @GetMapping("/all")
-    public List<Persona> getAllPersonas(@AuthenticationPrincipal User user) {
+    public List<Assistant> getAllAssistants(@AuthenticationPrincipal User user) {
         final var company = user.getCompany();
-        return personaService.findByCompany(company.getId());
+        return assistantService.findByCompany(company.getId());
     }
 
     @PostMapping
-    public String create(@Valid @ModelAttribute("persona") Persona persona, BindingResult bindingResult, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
+    public String create(@Valid @ModelAttribute("assistant") Assistant assistant, BindingResult bindingResult, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.persona", bindingResult);
-            redirectAttributes.addFlashAttribute("persona", persona);
-            return "redirect:/personas";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.assistant", bindingResult);
+            redirectAttributes.addFlashAttribute("assistant", assistant);
+            return "redirect:/assistants";
         }
 
         try {
             final var company = user.getCompany();
-            personaService.createPersona(persona.getName(), persona.getExpertise(), persona.getExpertisePrompt(), company);
-            redirectAttributes.addFlashAttribute("successMessage", "Persona created successfully!");
+            assistantService.createAssistant(assistant.getName(), assistant.getExpertise(), assistant.getExpertisePrompt(), company);
+            redirectAttributes.addFlashAttribute("successMessage", "Assistant created successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            redirectAttributes.addFlashAttribute("persona", persona);
+            redirectAttributes.addFlashAttribute("assistant", assistant);
         }
 
-        return "redirect:/personas";
+        return "redirect:/assistants";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, @AuthenticationPrincipal User user, Model model) {
-        final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+        final var assistant = assistantService.findById(id).orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
         final var company = user.getCompany();
-        if (company.doesntOwns(persona)) {
+        if (company.doesntOwns(assistant)) {
             throw new IllegalArgumentException("Access denied");
         }
-        model.addAttribute("persona", persona);
-        return "personas/show";
+        model.addAttribute("assistant", assistant);
+        return "assistants/show";
     }
 
     @PostMapping("/{id}/expertise")
     public String addExpertise(@PathVariable Long id, @RequestParam String expertise, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
         try {
-            final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            final var assistant = assistantService.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
 
             final var company = user.getCompany();
-            if (company.doesntOwns(persona)) {
+            if (company.doesntOwns(assistant)) {
                 throw new IllegalArgumentException("Access denied");
             }
 
-            persona.setExpertise(expertise);
-            personaService.updatePersona(persona.getId(), persona.getName(), persona.getExpertise());
+            assistant.setExpertise(expertise);
+            assistantService.updateAssistant(assistant.getId(), assistant.getName(), assistant.getExpertise());
             redirectAttributes.addFlashAttribute("successMessage", "Expertise added successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
-        return "redirect:/personas/" + id;
+        return "redirect:/assistants/" + id;
     }
 
 
     @PostMapping(value = "/{id}/conversations/{conversationId}")
     public String addToConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
         try {
-            final var persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
-            model.addAttribute("personaId", id);
+            final var assistant = assistantService.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
+            model.addAttribute("assistantId", id);
 
             final var company = user.getCompany();
-            if (company.doesntOwns(persona)) {
+            if (company.doesntOwns(assistant)) {
                 throw new IllegalArgumentException("Access denied");
             }
 
-            personaService.addToConversation(id, conversationId);
-            model.addAttribute("persona", persona);
+            assistantService.addToConversation(id, conversationId);
+            model.addAttribute("assistant", assistant);
         } catch (IllegalArgumentException e) {
             log.error("Failed to add to conversation", e);
         }
 
-        return "/personas/added.xhtml";
+        return "/assistants/added.xhtml";
     }
 
     @DeleteMapping("/{id}/conversations/{conversationId}")
     public String removeFromConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
         try {
-            Persona persona = personaService.findById(id).orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            Assistant assistant = assistantService.findById(id).orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
 
             final var company = user.getCompany();
-            if (company.doesntOwns(persona)) {
+            if (company.doesntOwns(assistant)) {
                 throw new IllegalArgumentException("Access denied");
             }
 
-            personaService.removeFromConversation(id, conversationId);
+            assistantService.removeFromConversation(id, conversationId);
             redirectAttributes.addFlashAttribute("successMessage", "Removed from conversation successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
-        return "redirect:/personas/" + id;
+        return "redirect:/assistants/" + id;
     }
 
     @GetMapping("/conversations/{conversationId}")
-    public String getPersonasNotInConversation(@PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
+    public String getAssistantNotInConversation(@PathVariable Long conversationId, @AuthenticationPrincipal User user, Model model) {
         try {
-            log.debug("Getting personas not in conversation {} for company {}", conversationId, user.getCompany().getId());
+            log.debug("Getting assistants not in conversation {} for company {}", conversationId, user.getCompany().getId());
             final var company = user.getCompany();
-            final var personas = personaService.findPersonasNotInConversation(company.getId(), conversationId);
-            model.addAttribute("personas", personas);
+            final var assistants = assistantService.findAssistantsNotInConversation(company.getId(), conversationId);
+            model.addAttribute("assistants", assistants);
             model.addAttribute("conversationId", conversationId);
-            return "personas/personas";
+            return "assistants/assistants";
         } catch (IllegalArgumentException e) {
-            log.error("Error getting personas not in conversation: {}", e.getMessage());
-            return "personas/personas";
+            log.error("Error getting assistants not in conversation: {}", e.getMessage());
+            return "assistants/assistants";
         } catch (Exception e) {
-            log.error("Unexpected error getting personas not in conversation: {}", e.getMessage());
-            return "personas/personas";
+            log.error("Unexpected error getting assistants not in conversation: {}", e.getMessage());
+            return "assistants/assistants";
         }
     }
 }

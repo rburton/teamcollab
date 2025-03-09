@@ -1,0 +1,11 @@
+<turbo-stream action="remove" th:attr="target='assistant_'+ ${assistantId} + '_row'">
+    <template>
+    </template>
+</turbo-stream>
+
+<turbo-stream action="append" target='assistantList'>
+<template>
+    <th:block th:replace="conversations/fragements/assistant_row :: assistant_row" th:id="'assistant_' + ${assistant.id}">
+    </th:block>
+</template>
+</turbo-stream>

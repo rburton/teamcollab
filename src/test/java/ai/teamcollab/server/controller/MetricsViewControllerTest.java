@@ -1,11 +1,11 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.Metrics;
-import ai.teamcollab.server.domain.Persona;
+import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MetricsService;
@@ -18,8 +18,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,12 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-
 import static ai.teamcollab.server.domain.GptModel.GPT_3_5_TURBO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
@@ -64,7 +61,7 @@ class MetricsViewControllerTest {
     private Conversation conversation;
     private List<Message> messages;
     private User user;
-    private Set<Persona> personas;
+    private Set<Assistant> assistants;
 
     private Company company;
 
@@ -97,16 +94,16 @@ class MetricsViewControllerTest {
             List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Persona persona = new Persona();
-        persona.setId(1L);
-        persona.setName("Test Persona");
-        personas = Set.of(persona);
+        Assistant assistant = new Assistant();
+        assistant.setId(1L);
+        assistant.setName("Test Persona");
+        assistants = Set.of(assistant);
 
         conversation = new Conversation();
         conversation.setId(1L);
         conversation.setPurpose("Test Purpose");
         conversation.setUser(user);
-        conversation.setPersonas(personas);
+        conversation.setAssistants(assistants);
         conversation.setCreatedAt(LocalDateTime.now());
 
         Message message1 = new Message();
@@ -141,7 +138,7 @@ class MetricsViewControllerTest {
                 .andExpect(model().attribute("conversation", conversation))
                 .andExpect(model().attribute("messageCount", 2))
                 .andExpect(model().attribute("user", user))
-                .andExpect(model().attribute("personas", personas))
+                .andExpect(model().attribute("assistant", assistants))
                 .andExpect(model().attribute("totalDuration", 3000L))
                 .andExpect(model().attribute("totalInputTokens", 300))
                 .andExpect(model().attribute("totalOutputTokens", 400))

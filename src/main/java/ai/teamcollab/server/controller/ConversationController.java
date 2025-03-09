@@ -3,8 +3,8 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.service.AssistantService;
 import ai.teamcollab.server.service.ConversationService;
-import ai.teamcollab.server.service.PersonaService;
 import ai.teamcollab.server.service.domain.MessageRow;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -31,13 +31,13 @@ import static java.util.Objects.isNull;
 public class ConversationController {
 
     private final ConversationService conversationService;
-    private final PersonaService personaService;
+    private final AssistantService assistantService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ConversationController(@NonNull ConversationService conversationService, @NonNull PersonaService personaService, SimpMessagingTemplate messagingTemplate) {
+    public ConversationController(@NonNull ConversationService conversationService, @NonNull AssistantService assistantService, SimpMessagingTemplate messagingTemplate) {
         this.conversationService = conversationService;
-        this.personaService = personaService;
+        this.assistantService = assistantService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -75,13 +75,13 @@ public class ConversationController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal User user, @NonNull Model model) {
-        final var conversation = conversationService.findConversationByIdWithPersonas(id);
+        final var conversation = conversationService.findConversationByIdWithAssistant(id);
         if (!user.equals(conversation.getUser())) {
             throw new IllegalArgumentException("Access denied");
         }
 
         model.addAttribute("conversation", conversation);
-        model.addAttribute("personas", conversation.getPersonas());
+        model.addAttribute("assistants", conversation.getAssistants());
         return "conversations/show";
     }
 
@@ -130,31 +130,31 @@ public class ConversationController {
 
     }
 
-    @PostMapping("/{conversationId}/persona/{personaId}")
-    public String addPersonaToConversation(
+    @PostMapping("/{conversationId}/assistant/{assistantId}")
+    public String addAssistantToConversation(
             @PathVariable Long conversationId,
-            @PathVariable Long personaId,
+            @PathVariable Long assistantId,
             @AuthenticationPrincipal User user,
             Model model) {
 
-        log.debug("Adding persona {} to conversation {}", personaId, conversationId);
+        log.debug("Adding assistant {} to conversation {}", assistantId, conversationId);
 
         try {
-            var persona = personaService.findById(personaId)
-                    .orElseThrow(() -> new IllegalArgumentException("Persona not found"));
+            var assistant = assistantService.findById(assistantId)
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
 
-            personaService.addToConversation(persona.getId(), conversationId);
+            assistantService.addToConversation(assistant.getId(), conversationId);
 
-            var updatedPersona = personaService.findById(personaId)
-                    .orElseThrow(() -> new IllegalArgumentException("Persona not found after update"));
-            model.addAttribute("persona", updatedPersona);
-            return "conversations/persona";
+            var updatedAssistant = assistantService.findById(assistantId)
+                    .orElseThrow(() -> new IllegalArgumentException("Assistant not found after update"));
+            model.addAttribute("assistant", updatedAssistant);
+            return "conversations/assistant";
         } catch (IllegalArgumentException e) {
-            log.error("Bad request while adding persona to conversation", e);
-            return "conversations/persona";
+            log.error("Bad request while adding assistant to conversation", e);
+            return "conversations/assistant";
         } catch (Exception e) {
-            log.error("Error adding persona to conversation", e);
-            return "conversations/persona";
+            log.error("Error adding assistant to conversation", e);
+            return "conversations/assistant";
         }
     }
 

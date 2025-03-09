@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Personas</title>
+    <title>Assistants</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -20,14 +20,14 @@
             <span class="block sm:inline" th:text="${errorMessage}"></span>
         </div>
         <div class="bg-white shadow rounded-lg p-6 mb-6">
-            <form th:action="@{/personas}" method="post" th:object="${persona}">
+            <form th:action="@{/assistants}" method="post" th:object="${assistant}">
                 <div class="space-y-12">
                     <div class="border-b border-gray-900/10 pb-12">
                         <h2 class="text-base/7 font-semibold text-gray-900">
-                            Create new Persona
+                            Create new Assistant
                         </h2>
                         <p class="mt-1 text-sm/6 text-gray-600">
-                            Create a new Persona to represent a type of user or an area of expertise.
+                            Create a new Assistant to represent a type of user or an area of expertise.
                         </p>
                         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div class="sm:col-span-4">
@@ -36,7 +36,7 @@
                                     <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                         <input type="text" id="name" name="name" th:field="*{name}" autocomplete="off"
                                                class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-                                               placeholder="Mandy"
+                                               placeholder="Ricky"
                                                th:classappend="${#fields.hasErrors('name')} ? 'border-red-300'">
                                     </div>
                                     <p th:if="${#fields.hasErrors('name')}" class="mt-2 text-sm text-red-600"
@@ -82,17 +82,17 @@
             </form>
         </div>
 
-        <!-- Personas List -->
+        <!-- Assistants List -->
         <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-semibold mb-4">Personas</h2>
-            <div th:if="${#lists.isEmpty(personas)}" class="text-gray-500">
-                No personas yet. Create your first one above!
+            <h2 class="text-lg font-semibold mb-4">Assistants</h2>
+            <div th:if="${#lists.isEmpty(assistants)}" class="text-gray-500">
+                No assistants yet. Create your first one above!
             </div>
-            <ul th:unless="${#lists.isEmpty(personas)}" role="list"
+            <ul th:unless="${#lists.isEmpty(assistants)}" role="list"
                 class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
 
-                <th:block th:each="persona : ${personas}">
-                    <th:block th:replace="personas/fragements/persona_card :: persona_card"/>
+                <th:block th:each="assistant : ${assistants}">
+                    <th:block th:replace="assistants/fragements/assistant_card :: assistant_card"/>
                 </th:block>
             </ul>
         </div>

@@ -84,16 +84,16 @@
                     <h3 class="font-medium mb-2" th:text="#{metrics.conversation.user}">User</h3>
                     <p th:text="${user.username}" class="text-gray-700"></p>
                 </div>
-                <!-- Personas -->
+                <!-- Assistants -->
                 <div class="bg-gray-50 p-4 rounded">
 
-                    <div th:if="${#lists.isEmpty(personas)}" class="text-gray-500">
-                        No personas yet. Create your first one above!
+                    <div th:if="${#lists.isEmpty(assistants)}" class="text-gray-500">
+                        No assistants yet. Create your first one above!
                     </div>
 
-                    <ul th:unless="${#lists.isEmpty(personas)}"
+                    <ul th:unless="${#lists.isEmpty(assistants)}"
                         role="list" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <li th:each="persona : ${personas}">
+                        <li th:each="assistant : ${assistants}">
                             <button type="button"
                                     class="group flex w-full items-center justify-between space-x-3 rounded-full border border-gray-300 p-2 text-left shadow-xs hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden">
                                 <span class="flex min-w-0 flex-1 items-center space-x-3">
@@ -104,8 +104,8 @@
                                     </span>
                                     <span class="block min-w-0 flex-1">
                                       <span class="block truncate text-sm font-medium text-gray-900"
-                                            th:text="${persona.name}">Lindsay Walton</span>
-                                      <span class="block truncate text-sm font-medium text-gray-500" th:text="${persona.expertise}">Front-end Developer</span>
+                                            th:text="${assistant.name}">Lindsay Walton</span>
+                                      <span class="block truncate text-sm font-medium text-gray-500" th:text="${assistant.expertise}">Front-end Developer</span>
                                     </span>
                                   </span>
                                 <span class="inline-flex size-10 shrink-0 items-center justify-center">

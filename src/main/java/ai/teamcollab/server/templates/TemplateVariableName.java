@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum TemplateVariableName {
     MESSAGE("message"),
-    PERSONAS("personas"),
+    ASSISTANTS("assistants"),
     STATUS("status"),
     ;
 

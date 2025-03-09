@@ -58,11 +58,11 @@ public class Company {
         this.users.add(user);
     }
 
-    public boolean owns(Persona persona) {
-        return isNull(persona.getCompany()) || persona.getCompany().equals(this);
+    public boolean owns(Assistant assistant) {
+        return isNull(assistant.getCompany()) || assistant.getCompany().equals(this);
     }
 
-    public boolean doesntOwns(Persona persona) {
-        return !owns(persona);
+    public boolean doesntOwns(Assistant assistant) {
+        return !owns(assistant);
     }
 }

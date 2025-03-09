@@ -61,9 +61,9 @@ CREATE INDEX idx_conversations_project_by ON projects (project_id);
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
-CREATE TABLE personas
+CREATE TABLE assistants
 (
-    persona_id       BIGSERIAL PRIMARY KEY,
+    assistant_id       BIGSERIAL PRIMARY KEY,
     name             VARCHAR(100) NOT NULL,
     expertise_areas  TEXT         NOT NULL,
     expertise_prompt TEXT         NOT NULL,
@@ -73,16 +73,16 @@ CREATE TABLE personas
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 
-CREATE TABLE conversation_persona
+CREATE TABLE conversation_assistant
 (
     conversation_id BIGINT NOT NULL,
-    persona_id      BIGINT NOT NULL,
-    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas (persona_id) ON DELETE CASCADE,
+    assistant_id      BIGINT NOT NULL,
+    CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
-    CONSTRAINT uk_persona_conversation UNIQUE (persona_id, conversation_id)
+    CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)
 );
 
-INSERT INTO personas (name, expertise_areas, expertise_prompt)
+INSERT INTO assistants (name, expertise_areas, expertise_prompt)
 VALUES ('Dash', 'Marketing', 'Marketing expert with deep knowledge of branding, customer acquisition strategies, and digital campaign optimization. Specializing in leveraging data insights to craft effective marketing plans that drive business growth and engagement.'),
        ('Eli', 'Product Management', 'Excels at defining product vision, strategy, and roadmaps, ensuring alignment with customer needs and business objectives. They possess strong skills in market research, stakeholder collaboration, and prioritizing features to drive product development and growth.'),
        ('Leo', 'Growth Hacker', 'Specializes in using creative, data-driven strategies to rapidly scale user acquisition and engagement. Leveraging digital marketing, A/B testing, and automation to optimize growth channels while minimizing costs and maximizing results.'),
@@ -98,11 +98,11 @@ CREATE TABLE messages
 (
     message_id      BIGSERIAL PRIMARY KEY,
     conversation_id BIGINT    NOT NULL,
-    persona_id      BIGINT,
+    assistant_id      BIGINT,
     user_id         BIGINT,
     content         TEXT      NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_persona FOREIGN KEY (persona_id) REFERENCES personas (persona_id) ON DELETE CASCADE,
+    CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );

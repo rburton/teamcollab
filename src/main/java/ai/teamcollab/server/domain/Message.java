@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static java.util.Objects.isNull;
 
 @Getter
 @Setter
@@ -43,8 +44,8 @@ public class Message {
     private Conversation conversation;
 
     @ManyToOne
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @JoinColumn(name = "assistant_id")
+    private Assistant assistant;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -59,6 +60,10 @@ public class Message {
     public void addMetrics(Metrics metrics) {
         this.metrics = metrics;
         metrics.setMessage(this);
+    }
+
+    public boolean isAssistant() {
+        return isNull(this.user);
     }
 
 }
