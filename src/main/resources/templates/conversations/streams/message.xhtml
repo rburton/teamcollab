@@ -8,7 +8,8 @@
                 <p class="text-sm font-semibold text-blue-800"
                    th:text="${message.username + (message.personaName != null ? ' - ' + message.personaName : '')}">
                 </p>
-                <p class="text-gray-800" th:text="${message.content}"></p>
+                <p class="text-gray-800" 
+                   th:attr="data-controller='message', data-message-content-value=${message.content}, data-message-target='message'"></p>
                 <p class="text-xs text-gray-500 mt-1"
                    th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
                 </p>
