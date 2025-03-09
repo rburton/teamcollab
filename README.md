@@ -39,9 +39,9 @@ The build process will:
 
 ### Example Controller Usage
 ```html
-<div data-controller="persona">
-  <button data-action="click->persona#open">Open Modal</button>
-  <div data-persona-target="modal">
+<div data-controller="assistant">
+  <button data-action="click->assistant#open">Open Modal</button>
+  <div data-assistant-target="modal">
     <!-- Modal content -->
   </div>
 </div>

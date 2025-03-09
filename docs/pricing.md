@@ -13,18 +13,18 @@
 > The ChatGPT model is gpt-3.5-turbo.
 
 # Grok
-To create three pricing plans for Team Collab, a platform that enables group conversations with AI personas powered by the gpt-3.5-turbo model, we need to consider the system's functionality and usage patterns. Team Collab allows users to send messages in a chat setting, where up to 10 AI personas—each an expert in a specific area—respond based on specific triggers: being named, answering relevant questions, or replying to group-wide prompts. Every 10 messages, the conversation is summarized per persona to manage the LLM's context window, and responses are delivered in JSON format, including notes and action items. A typical conversation involves 1,000 user-sent sentences, with each sentence being of average length for researching ideas. Below, I’ll outline the pricing plans based on this structure, focusing on usage limits that align with the system’s costs and user needs.
+To create three pricing plans for Team Collab, a platform that enables group conversations with AI personas powered by the gpt-3.5-turbo model, we need to consider the system's functionality and usage patterns. Team Collab allows users to send messages in a chat setting, where up to 10 AI personas—each an expert in a specific area—respond based on specific triggers: being named, answering relevant questions, or replying to group-wide prompts. Every 10 messages, the conversation is summarized per assistant to manage the LLM's context window, and responses are delivered in JSON format, including notes and action items. A typical conversation involves 1,000 user-sent sentences, with each sentence being of average length for researching ideas. Below, I’ll outline the pricing plans based on this structure, focusing on usage limits that align with the system’s costs and user needs.
 
 ### Cost Estimation
 The primary cost driver is the token usage of gpt-3.5-turbo, which processes both input and output tokens. Let’s break this down:
 
-- **User Messages**: An average sentence for researching ideas is about 15-20 words. Assuming 90 characters per sentence (including spaces), and using the rule of thumb that 1 token ≈ 4 characters, each sentence is approximately 25 tokens. For each message, the LLM receives the user’s sentence (25 tokens) plus a summarized conversation from each of the 10 personas. Assuming each persona’s summary is concise, around 100 tokens, that’s 10 × 100 = 1,000 tokens. Total input per message: 1,025 tokens.
+- **User Messages**: An average sentence for researching ideas is about 15-20 words. Assuming 90 characters per sentence (including spaces), and using the rule of thumb that 1 token ≈ 4 characters, each sentence is approximately 25 tokens. For each message, the LLM receives the user’s sentence (25 tokens) plus a summarized conversation from each of the 10 personas. Assuming each assistant’s summary is concise, around 100 tokens, that’s 10 × 100 = 1,000 tokens. Total input per message: 1,025 tokens.
 - **LLM Output**: On average, 2-3 personas respond per message, each with a 50-token response (e.g., 2-3 sentences). For 3 responders, that’s 150 tokens, plus 50 tokens for JSON structure, notes, and action items, totaling 200 output tokens per message.
 - **Cost per Message**: Using hypothetical rates of $0.001 per 1,000 input tokens and $0.002 per 1,000 output tokens:
     - Input: 1,025 × $0.001 / 1,000 = $0.001025
     - Output: 200 × $0.002 / 1,000 = $0.0004
     - Total: $0.001425 per message
-- **Summarization Costs**: Every 10 messages, each persona’s summary is updated. Input includes the current summary (100 tokens) and the last 10 messages (10 × 25 = 250 tokens), totaling 350 tokens per persona. Output is a new 100-token summary. For 10 personas: 3,500 input tokens and 1,000 output tokens per summarization event. Cost: (3,500 × $0.001 / 1,000) + (1,000 × $0.002 / 1,000) = $0.0055. With 1,000 messages, there are 100 summarizations, costing 100 × $0.0055 = $0.55.
+- **Summarization Costs**: Every 10 messages, each assistant’s summary is updated. Input includes the current summary (100 tokens) and the last 10 messages (10 × 25 = 250 tokens), totaling 350 tokens per assistant. Output is a new 100-token summary. For 10 personas: 3,500 input tokens and 1,000 output tokens per summarization event. Cost: (3,500 × $0.001 / 1,000) + (1,000 × $0.002 / 1,000) = $0.0055. With 1,000 messages, there are 100 summarizations, costing 100 × $0.0055 = $0.55.
 - **Total Conversation Cost**: For 1,000 messages: (1,000 × $0.001425) + $0.55 = $1.425 + $0.55 = $1.975, rounded to $2 per conversation.
 
 A typical conversation (1,000 messages) costs approximately $2, providing a baseline for pricing.
@@ -98,8 +98,8 @@ As of this writing, the approximate pay-as-you-go rates for gpt-3.5-turbo are:
 
 2. **Persona Responses**
     - Up to 10 personas, but not all respond every time.
-    - Let’s assume **on average 2 personas respond per user message** (some user messages may be directed at one persona, others might tag multiple, etc.).
-    - Each persona response might be around **60 tokens** (again, an average that can vary depending on complexity).
+    - Let’s assume **on average 2 personas respond per user message** (some user messages may be directed at one assistant, others might tag multiple, etc.).
+    - Each assistant response might be around **60 tokens** (again, an average that can vary depending on complexity).
     - **Total output tokens** across 1,000 user messages:  
       \[
       1{,}000 \ (\text{user messages}) \times 2 \ (\text{responses per message}) \times 60 \ (\text{tokens per response})  
@@ -113,7 +113,7 @@ As of this writing, the approximate pay-as-you-go rates for gpt-3.5-turbo are:
     - **Total tokens for summaries**: \(100 \times 50 = 5{,}000\) tokens.
     - Technically, the summary prompt input also counts toward input tokens. However, the total input overhead is typically smaller than the output, so we’ll include it in the rough estimate below.
 
-Putting it all together, the output tokens from persona responses plus summaries is approximately **125,000** (120k for responses + 5k for summaries).
+Putting it all together, the output tokens from assistant responses plus summaries is approximately **125,000** (120k for responses + 5k for summaries).
 
 ---
 
@@ -126,7 +126,7 @@ Putting it all together, the output tokens from persona responses plus summaries
       \]
 
 2. **Output Tokens**
-    - ~**125,000 tokens** (120k persona responses + 5k summaries) at \$0.0020 per 1,000 tokens  
+    - ~**125,000 tokens** (120k assistant responses + 5k summaries) at \$0.0020 per 1,000 tokens  
       \[
       125{,}000 \div 1{,}000 \times 0.0020 = \$0.25
       \]
@@ -140,10 +140,10 @@ Putting it all together, the output tokens from persona responses plus summaries
 
 ## 4. Factors That Can Increase/Decrease Costs
 
-- **Longer Messages**: If each user message or persona response is longer than the assumed average (e.g., 50+ tokens per sentence instead of 20), token usage (and cost) will increase.
+- **Longer Messages**: If each user message or assistant response is longer than the assumed average (e.g., 50+ tokens per sentence instead of 20), token usage (and cost) will increase.
 - **More Personas Responding**: If multiple personas frequently respond to a single user prompt, you’ll see higher total output tokens.
 - **Summaries Frequency**: If you summarize more often (e.g., every 5 messages instead of every 10), that raises cost.
-- **System or Context Prompts**: Each conversation includes “hidden” system prompts and persona profiles that also consume tokens. Depending on how often you refresh or re-inject persona prompts, you add a small overhead.
+- **System or Context Prompts**: Each conversation includes “hidden” system prompts and assistant profiles that also consume tokens. Depending on how often you refresh or re-inject assistant prompts, you add a small overhead.
 
 ---
 

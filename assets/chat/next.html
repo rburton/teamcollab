@@ -75,9 +75,9 @@
 <script>
     let currentPersona = 'All';
 
-    function selectPersona(persona) {
-        currentPersona = persona;
-        document.getElementById('chatHeader').textContent = `Chat with ${persona} ${persona === 'All' ? 'Personas' : ''}`;
+    function selectPersona(assistant) {
+        currentPersona = assistant;
+        document.getElementById('chatHeader').textContent = `Chat with ${assistant} ${assistant === 'All' ? 'Personas' : ''}`;
         // Here you could add logic to filter messages or change chat context
     }
 
@@ -100,7 +100,7 @@
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Simulate persona response (replace with actual backend logic)
+            // Simulate assistant response (replace with actual backend logic)
             setTimeout(() => {
                 const response = `
                         <div class="flex items-start">

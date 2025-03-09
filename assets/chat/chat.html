@@ -217,21 +217,21 @@
     let currentUser = 'User1'; // Default user
     let currentFocus = 'Main Discussion'; // Default focus
 
-    function selectPersona(persona, personaName) {
-        currentPersona = persona;
+    function selectPersona(assistant, personaName) {
+        currentPersona = assistant;
         currentPersonaName = personaName;
         document.getElementById('chatHeader').textContent = `Chat with ${personaName}`;
     }
 
-    function editPersona(persona, personaName) {
-        const newName = prompt(`Edit persona name for ${persona}:`, personaName);
+    function editPersona(assistant, personaName) {
+        const newName = prompt(`Edit assistant name for ${assistant}:`, personaName);
         if (newName) {
-            alert(`Would update ${persona} to "${newName}" - refresh to see original names`);
+            alert(`Would update ${assistant} to "${newName}" - refresh to see original names`);
         }
     }
 
-    function exportPersonaThoughts(persona, personaName) {
-        const thoughts = getPersonaThoughts(persona);
+    function exportPersonaThoughts(assistant, personaName) {
+        const thoughts = getPersonaThoughts(assistant);
         alert(`${personaName}'s thoughts would be exported to Google Docs:\n\n${thoughts}`);
     }
 
@@ -244,9 +244,9 @@
         alert(`All personas' thoughts would be exported to Google Docs:\n\n${allThoughts}`);
     }
 
-    function getPersonaThoughts(persona) {
+    function getPersonaThoughts(assistant) {
         const chatMessages = document.getElementById('chatMessages').innerHTML;
-        return `Thoughts from ${persona} (${currentFocus}):\n- Sample thought 1\n- Sample thought 2\n(Extracted from chat: ${chatMessages.length} characters)`;
+        return `Thoughts from ${assistant} (${currentFocus}):\n- Sample thought 1\n- Sample thought 2\n(Extracted from chat: ${chatMessages.length} characters)`;
     }
 
     function toggleSidebar() {
