@@ -12,13 +12,13 @@ import java.util.Optional;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    
+
     @Query("SELECT s FROM Subscription s " +
-           "WHERE s.company.id = :companyId " +
-           "AND s.startDate <= :date " +
-           "AND (s.endDate IS NULL OR s.endDate >= :date)")
+            "WHERE s.company.id = :companyId " +
+            "AND s.startDate <= :date " +
+            "AND (s.endDate IS NULL OR s.endDate >= :date)")
     Optional<Subscription> findActiveSubscriptionForCompany(@Param("companyId") Long companyId,
-                                                          @Param("date") LocalDate date);
+                                                            @Param("date") LocalDate date);
 
     List<Subscription> findByCompanyId(Long companyId);
 
