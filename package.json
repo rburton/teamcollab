@@ -6,6 +6,7 @@
     "@hotwired/stimulus-webpack-helpers": "^1.0.1",
     "@hotwired/turbo": "^8.0.13",
     "@tailwindcss/postcss": "^4.0.9",
+    "showdown": "^2.1.0",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3"
   },
