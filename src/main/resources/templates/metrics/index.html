@@ -17,7 +17,7 @@
         <!-- Statistics Summary -->
         <div class="bg-white shadow rounded-lg p-6 mb-6" th:unless="${#lists.isEmpty(metrics)}">
             <h2 class="text-xl font-semibold mb-4" th:text="#{metrics.overview.title}">Metrics Overview</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 <div class="p-4 bg-gray-50 rounded-lg">
                     <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.duration}">Average Duration</h3>
                     <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${#numbers.formatDecimal(statistics.averageDuration, 1, 2)} + ' ms'">0 ms</p>
@@ -34,6 +34,14 @@
                 <div class="p-4 bg-gray-50 rounded-lg">
                     <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.model}">Most Used Model</h3>
                     <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${statistics.mostUsedModel}">N/A</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.companies}">Total Companies</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${#numbers.formatInteger(statistics.totalCompanies, 1, 'COMMA')}">0</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-500" th:text="#{metrics.overview.users}">Total Users</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900" th:text="${#numbers.formatInteger(statistics.totalUsers, 1, 'COMMA')}">0</p>
                 </div>
             </div>
         </div>

@@ -4,6 +4,8 @@ import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.repository.CompanyRepository;
+import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MetricsService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ public class MetricsViewController {
     private final MetricsService metricsService;
     private final MessageSource messageSource;
     private final ConversationService conversationService;
+    private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
 
     @GetMapping
@@ -47,6 +51,10 @@ public class MetricsViewController {
             final var pageable = PageRequest.of(page, size);
             final var metricsPage = metricsService.getMetricsPaginated(pageable);
             final var statistics = metricsService.getMetricsStatistics();
+
+            // Add company and user counts to statistics
+            statistics.put("totalCompanies", companyRepository.count());
+            statistics.put("totalUsers", userRepository.count());
 
             model.addAttribute("metrics", metricsPage.getContent());
             model.addAttribute("statistics", statistics);
