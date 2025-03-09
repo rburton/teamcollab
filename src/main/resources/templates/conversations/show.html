@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <ul role="list" class="divide-y divide-gray-100" id="personaList">
+            <ul role="list" class="divide-y divide-gray-100 space-y-2" id="personaList">
                 <th:block th:each="persona: ${personas}">
                     <th:block th:replace="conversations/fragements/persona_row :: persona_row"
                               th:id="'persona_' + ${persona.id}">

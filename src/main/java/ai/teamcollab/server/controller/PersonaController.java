@@ -60,7 +60,7 @@ public class PersonaController {
 
         try {
             final var company = user.getCompany();
-            personaService.createPersona(persona.getName(), persona.getExpertises(), company);
+            personaService.createPersona(persona.getName(), persona.getExpertise(), persona.getExpertisePrompt(), company);
             redirectAttributes.addFlashAttribute("successMessage", "Persona created successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -91,8 +91,8 @@ public class PersonaController {
                 throw new IllegalArgumentException("Access denied");
             }
 
-            persona.setExpertises(expertise);
-            personaService.updatePersona(persona.getId(), persona.getName(), persona.getExpertises());
+            persona.setExpertise(expertise);
+            personaService.updatePersona(persona.getId(), persona.getName(), persona.getExpertise());
             redirectAttributes.addFlashAttribute("successMessage", "Expertise added successfully!");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

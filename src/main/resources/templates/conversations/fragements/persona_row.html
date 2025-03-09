@@ -6,8 +6,8 @@
                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                  alt="User Avatar">
             <div class="flex-1">
-                <h2 class="text-xl font-bold text-gray-800" th:text="${persona.name}">John Doe</h2>
-                <p class="text-sm text-gray-500" th:text="${persona.expertises}">Software Engineer</p>
+                <h3 class="text-lg font-bold text-gray-800" th:text="${persona.name}">John Doe</h3>
+                <p class="text-sm text-gray-500" th:text="${persona.expertise}">Software Engineer</p>
             </div>
         </div>
         <th:block th:replace="conversations/fragements/persona_status :: persona_status(status='Waiting')"/>

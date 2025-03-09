@@ -17,10 +17,13 @@ public class PersonaResponse {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("expertises")
-    private String expertises;
+    @JsonProperty("expertise")
+    private String expertise;
+
+    @JsonProperty("description")
+    private String description;
 
     public static PersonaResponse fromPersona(ai.teamcollab.server.domain.Persona persona) {
-        return new PersonaResponse(persona.getId(), persona.getName(), persona.getExpertises());
+        return new PersonaResponse(persona.getId(), persona.getName(), persona.getExpertise(), persona.getExpertisePrompt());
     }
 }

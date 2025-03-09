@@ -24,9 +24,13 @@ public class PersonaService {
         this.conversationRepository = conversationRepository;
     }
 
-    public Persona createPersona(String name, String expertise, Company company) {
+    public Persona createPersona(String name, String expertise, String description, Company company) {
         log.debug("Creating new persona: {} with company ID: {}", name, company.getId());
-        Persona persona = new Persona(name, expertise);
+        Persona persona = Persona.builder()
+                .name(name)
+                .expertise(expertise)
+                .expertisePrompt(description)
+                .build();
         persona.setCompany(company);
         return personaRepository.save(persona);
     }
@@ -46,7 +50,7 @@ public class PersonaService {
                 .orElseThrow(() -> new IllegalArgumentException("Persona not found with ID: " + id));
 
         persona.setName(name);
-        persona.setExpertises(expertiseAreas);
+        persona.setExpertise(expertiseAreas);
         return personaRepository.save(persona);
     }
 

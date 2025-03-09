@@ -46,7 +46,12 @@ public class Persona {
     @Column(name = "expertise_areas")
     @NotBlank(message = "At least one area of expertise is required")
     @Size(min = 1, message = "At least one area of expertise is required")
-    private String expertises;
+    private String expertise;
+
+    @Column(name = "expertise_prompt")
+    @NotBlank(message = "Please describe the role to guide the behavior of the Persona")
+    @Size(min = 1, message = "The expertise prompt is too short")
+    private String expertisePrompt;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
@@ -56,9 +61,9 @@ public class Persona {
     @ManyToMany(mappedBy = "personas")
     private Set<Conversation> conversations = new HashSet<>();
 
-    public Persona(String name, String expertises) {
+    public Persona(String name, String expertise) {
         this.name = name;
-        this.expertises = expertises;
+        this.expertise = expertise;
     }
 
     public void addToConversation(Conversation conversation) {
