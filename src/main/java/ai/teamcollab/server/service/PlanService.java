@@ -28,35 +28,46 @@ public class PlanService {
     }
 
     @Transactional(readOnly = true)
+    public List<Plan> getAllPlansWithDetails() {
+        return planRepository.findAllWithDetails();
+    }
+
+    @Transactional(readOnly = true)
     public Plan getPlanById(Long planId) {
         return planRepository.findById(planId)
+            .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
+    }
+
+    @Transactional(readOnly = true)
+    public Plan getPlanByIdWithDetails(Long planId) {
+        return planRepository.findByIdWithDetails(planId)
             .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
     }
 
     @Transactional
     public Plan createPlan(String name, String description) {
         log.info("Creating new plan with name: {}", name);
-        
+
         var plan = Plan.builder()
             .name(name)
             .description(description)
             .build();
-        
+
         return planRepository.save(plan);
     }
 
     @Transactional
     public PlanDetail addPlanPrice(Long planId, LocalDate effectiveDate, BigDecimal monthlyPrice) {
         log.info("Adding new price for plan: {}, effective from: {}", planId, effectiveDate);
-        
+
         var plan = getPlanById(planId);
-        
+
         var planDetail = PlanDetail.builder()
             .plan(plan)
             .effectiveDate(effectiveDate)
             .monthlyPrice(monthlyPrice)
             .build();
-        
+
         return planDetailRepository.save(planDetail);
     }
 

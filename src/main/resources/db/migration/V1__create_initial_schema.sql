@@ -2,6 +2,7 @@ CREATE TABLE companies
 (
     company_id         BIGSERIAL PRIMARY KEY,
     name               VARCHAR(255) NOT NULL,
+    llm_model          VARCHAR(255),
     stripe_customer_id VARCHAR(255) UNIQUE, -- Links to Stripe Customer
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -63,7 +64,7 @@ CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
 
 CREATE TABLE assistants
 (
-    assistant_id       BIGSERIAL PRIMARY KEY,
+    assistant_id     BIGSERIAL PRIMARY KEY,
     name             VARCHAR(100) NOT NULL,
     expertise_areas  TEXT         NOT NULL,
     expertise_prompt TEXT         NOT NULL,
@@ -76,29 +77,17 @@ CREATE TABLE assistants
 CREATE TABLE conversation_assistant
 (
     conversation_id BIGINT NOT NULL,
-    assistant_id      BIGINT NOT NULL,
+    assistant_id    BIGINT NOT NULL,
     CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
     CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)
 );
 
-INSERT INTO assistants (name, expertise_areas, expertise_prompt)
-VALUES ('Dash', 'Marketing', 'Marketing expert with deep knowledge of branding, customer acquisition strategies, and digital campaign optimization. Specializing in leveraging data insights to craft effective marketing plans that drive business growth and engagement.'),
-       ('Eli', 'Product Management', 'Excels at defining product vision, strategy, and roadmaps, ensuring alignment with customer needs and business objectives. They possess strong skills in market research, stakeholder collaboration, and prioritizing features to drive product development and growth.'),
-       ('Leo', 'Growth Hacker', 'Specializes in using creative, data-driven strategies to rapidly scale user acquisition and engagement. Leveraging digital marketing, A/B testing, and automation to optimize growth channels while minimizing costs and maximizing results.'),
-       ('Rich', 'CTO', 'Responsible for overseeing the technology strategy, ensuring the technical vision aligns with the company’s goals, and leading the development of scalable, innovative products. Their expertise includes managing engineering teams, evaluating emerging technologies, and making critical decisions on architecture and infrastructure.'),
-       ('Ken', 'CFO', 'Skilled in financial planning, analysis, and strategy, ensuring the company’s financial health through effective budgeting, forecasting, and risk management. Oversees accounting operations, financial reporting, and investment decisions to align financial goals with overall business objectives.'),
-       ('Riley', 'HR', 'Expert specializes in recruiting, talent management, and employee relations, ensuring a productive and positive work environment. They excel at developing company policies, handling performance management, and fostering a strong organizational culture.'),
-       ('Max', 'Content Creator', 'Excels at producing engaging and high-quality content across multiple platforms, including blogs, videos, and social media. They have a strong understanding of audience behavior, SEO best practices, and storytelling, ensuring content resonates with target audiences and drives brand awareness.'),
-       ('Mandy', 'Marketing Lead', 'Excels at developing and executing comprehensive marketing strategies to drive customer acquisition and brand awareness. They are skilled in data analysis, campaign management, and team leadership, ensuring alignment with business objectives and optimizing marketing efforts across multiple channels.'),
-       ('Lily', 'Sales Lead/Business Development', 'Excels at identifying new business opportunities, building relationships, and driving revenue growth through strategic partnerships and customer acquisition. They possess strong negotiation, communication, and market analysis skills to effectively position the company’s products or services and expand its market presence.')
-;
-
 CREATE TABLE messages
 (
     message_id      BIGSERIAL PRIMARY KEY,
     conversation_id BIGINT    NOT NULL,
-    assistant_id      BIGINT,
+    assistant_id    BIGINT,
     user_id         BIGINT,
     content         TEXT      NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -132,6 +121,7 @@ CREATE TABLE plans
     plan_id     BIGSERIAL PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     description TEXT,
+    badge       VARCHAR(255),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -175,7 +165,3 @@ CREATE INDEX idx_plan_details_plan_id ON plan_details (plan_id);
 CREATE INDEX idx_subscriptions_company_id ON subscriptions (company_id);
 CREATE INDEX idx_subscriptions_plan_id ON subscriptions (plan_id);
 CREATE INDEX idx_payments_subscription_id ON payments (subscription_id);
-
--- Insert default settings
-INSERT INTO system_settings (system_setting_id, llm_model)
-VALUES (1, 'gpt-3.5-turbo');

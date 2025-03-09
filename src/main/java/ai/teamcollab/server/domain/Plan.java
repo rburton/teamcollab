@@ -47,6 +47,8 @@ public class Plan {
     @Size(max = 1000, message = "Description cannot exceed 1000 characters")
     private String description;
 
+    private String badge;
+
     @Builder.Default
     @OneToMany(mappedBy = "plan", cascade = ALL, orphanRemoval = true)
     private List<PlanDetail> planDetails = new ArrayList<>();
