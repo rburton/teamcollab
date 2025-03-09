@@ -1,0 +1,4 @@
+- message length
+- Identify power users
+- Conversation depth: Number of back-and-forth exchanges per session.
+- Number of invites sent by users
