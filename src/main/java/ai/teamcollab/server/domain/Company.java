@@ -55,6 +55,9 @@ public class Company implements Serializable {
     @Column(name = "llm_model")
     private String llmModel;
 
+    @Column(name = "monthly_spending_limit")
+    private Double monthlySpendingLimit;
+
     public void addUser(User user) {
         this.users.add(user);
     }

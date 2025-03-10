@@ -6,7 +6,9 @@ import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.exception.MonthlyLimitExceededException;
 import ai.teamcollab.server.repository.MessageRepository;
+import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.ChatService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.domain.ChatContext;
@@ -23,7 +25,10 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -36,11 +41,65 @@ import static java.util.Objects.requireNonNull;
 public class ChatServiceImpl implements ChatService {
     private final MessageRepository messageRepository;
     private final SystemSettingsService systemSettingsService;
+    private final MetricsRepository metricsRepository;
 
     @Autowired
-    public ChatServiceImpl(MessageRepository messageRepository, SystemSettingsService systemSettingsService) {
+    public ChatServiceImpl(MessageRepository messageRepository, SystemSettingsService systemSettingsService, MetricsRepository metricsRepository) {
         this.messageRepository = messageRepository;
         this.systemSettingsService = systemSettingsService;
+        this.metricsRepository = metricsRepository;
+    }
+
+    /**
+     * Calculates the current month's spending for a company.
+     *
+     * @param company the company
+     * @return the current month's spending as a BigDecimal
+     */
+    private BigDecimal calculateCurrentMonthSpending(Company company) {
+        if (company == null) {
+            return BigDecimal.ZERO;
+        }
+
+        // Get the start and end dates for the current month
+        final var now = LocalDateTime.now();
+        final var currentMonth = YearMonth.from(now);
+        final var startDate = currentMonth.atDay(1).atStartOfDay();
+        final var endDate = currentMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        // Get all metrics for the company for the current month
+        final var metrics = metricsRepository.findByCompanyAndDateRange(company.getId(), startDate, endDate);
+
+        // Calculate the total spending
+        return metrics.stream()
+                .map(Metrics::getCost)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Checks if a company has exceeded its monthly spending limit.
+     *
+     * @param company the company
+     * @throws MonthlyLimitExceededException if the company has exceeded its monthly spending limit
+     */
+    private void checkMonthlySpendingLimit(Company company) {
+        if (company == null || company.getMonthlySpendingLimit() == null) {
+            // No company or no limit set, so no limit to exceed
+            return;
+        }
+
+        final var currentSpending = calculateCurrentMonthSpending(company);
+        final var limit = BigDecimal.valueOf(company.getMonthlySpendingLimit());
+
+        if (currentSpending.compareTo(limit) >= 0) {
+            log.warn("Company {} has exceeded its monthly spending limit of {}", company.getId(), limit);
+            throw new MonthlyLimitExceededException(
+                    "Monthly spending limit exceeded. Please contact your administrator to increase your limit.",
+                    company.getId(),
+                    company.getMonthlySpendingLimit(),
+                    currentSpending.doubleValue()
+            );
+        }
     }
 
     @Override
@@ -87,9 +146,15 @@ public class ChatServiceImpl implements ChatService {
 
                 final var currentSettings = systemSettingsService.getCurrentSettings();
 
-                final var llmModel = Optional.ofNullable(conversation)
+                final var company = Optional.ofNullable(conversation)
                         .map(Conversation::getUser)
                         .map(User::getCompany)
+                        .orElse(null);
+
+                // Check if the company has exceeded its monthly spending limit
+                checkMonthlySpendingLimit(company);
+
+                final var llmModel = Optional.ofNullable(company)
                         .map(Company::getLlmModel)
                         .filter(Strings::isNotBlank)
                         .orElse(currentSettings.getLlmModel());
