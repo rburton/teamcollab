@@ -1,18 +1,27 @@
 <turbo-frame id="assistantPanelList">
-    <th:inline th:each="assistant : ${assistants}">
-        <a data-turbo="true" data-turbo-method="post" th:id="'assistant_' + ${assistant.id} + '_row'"
-           th:href="@{/assistants/{assistantId}/conversations/{id}(id=${conversationId},assistantId=${assistant.id})}"
-           class="p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
-                </div>
-                <div class="flex justify-between">
+    <div class="text-center mb-4 text-gray-600" th:if="${#lists.isEmpty(assistants)}">
+        <p>No available assistants found.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3" th:if="${not #lists.isEmpty(assistants)}">
+        <th:inline th:each="assistant : ${assistants}">
+            <a data-turbo="true" data-turbo-method="post" th:id="'assistant_' + ${assistant.id} + '_row'"
+               th:href="@{/assistants/{assistantId}/conversations/{id}(id=${conversationId},assistantId=${assistant.id})}"
+               class="p-4 hover:bg-blue-50 border border-gray-200 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-lg">
+                        <span th:text="${#strings.substring(assistant.name, 0, 1).toUpperCase()}">A</span>
+                    </div>
                     <div>
-                        <h4 class="font-medium" th:text="${assistant.name}"></h4>
-                        <p class="text-sm text-gray-600" th:text="${assistant.expertise}"></p>
+                        <h4 class="font-medium text-gray-900" th:text="${assistant.name}">Assistant Name</h4>
+                        <p class="text-sm text-gray-600" th:text="${assistant.expertise}">Expertise</p>
                     </div>
                 </div>
-            </div>
-        </a>
-    </th:inline>
+                <div class="text-blue-500">
+                    <i class="fas fa-plus-circle"></i>
+                    <span class="sr-only">Add to conversation</span>
+                </div>
+            </a>
+        </th:inline>
+    </div>
 </turbo-frame>

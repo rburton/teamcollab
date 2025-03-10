@@ -5,10 +5,21 @@
       layout:decorate="~{layout/base}">
 <head>
     <title>View Conversation</title>
+    <style>
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content" data-controller="conversation"
      th:data-conversation-chat-id-value="${conversation.id}">
+
+    <!-- Notification container -->
+    <div id="notifications" class="fixed bottom-4 right-4 z-50"></div>
 
     <nav class="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
         <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 px-4 sm:px-6 lg:px-8">
@@ -86,21 +97,31 @@
 
             <!-- Assistants Modal -->
             <div data-assistant-target="modal"
-                 class="fixed inset-0 backdrop-blur-xs hidden items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                 class="fixed inset-0 backdrop-blur-sm hidden items-center justify-center z-50 bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-semibold">All Assistant</h3>
+                        <h3 class="text-xl font-semibold">All Assistants</h3>
                         <button data-action="click->assistant#close" class="text-gray-500 hover:text-gray-700">
                             <i class="fas fa-times fa-lg"></i>
                         </button>
                     </div>
-                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                    <div class="space-y-4 max-h-96 overflow-y-auto border border-gray-100 rounded-lg p-4">
                         <turbo-frame id="assistantPanelList" src="/assistants/conversations/1" th:attr="target='/assistants/conversations/' + ${conversation.id}">
                             Loading Assistants...
                         </turbo-frame>
                     </div>
                     <!-- Error Message -->
                     <div id="errorMessage" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <button data-action="click->assistant#close" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button data-action="click->assistant#close" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            Okay
+                        </button>
+                    </div>
                 </div>
             </div>
 
