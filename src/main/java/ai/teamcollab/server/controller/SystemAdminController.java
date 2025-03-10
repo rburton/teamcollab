@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+
 @Controller
 @RequestMapping("/system/admin")
 @PreAuthorize("hasRole('SUPER_ADMIN')")
@@ -44,6 +46,22 @@ public class SystemAdminController {
             companyService.updateCompanyLlmModel(companyId, llmModel);
             redirectAttributes.addFlashAttribute("successMessage", 
                     llmModel == null ? "Company LLM model reset to system default" : "Company LLM model updated successfully");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/system/admin/companies/" + companyId + "/settings";
+    }
+
+    @PostMapping("/companies/{companyId}/settings/monthly-spending-limit")
+    public String updateCompanyMonthlySpendingLimit(
+            @PathVariable Long companyId,
+            @RequestParam BigDecimal monthlySpendingLimit,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            companyService.updateCompanyMonthlySpendingLimit(companyId, monthlySpendingLimit);
+            redirectAttributes.addFlashAttribute("successMessage", "Monthly spending limit updated successfully");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

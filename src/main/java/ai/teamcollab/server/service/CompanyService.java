@@ -8,6 +8,7 @@ import ai.teamcollab.server.repository.PlanDetailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
@@ -51,6 +52,13 @@ public class CompanyService {
     public Company updateCompanyLlmModel(Long companyId, String llmModel) {
         Company company = getCompanyById(companyId);
         company.setLlmModel(llmModel);
+        return companyRepository.save(company);
+    }
+
+    @Transactional
+    public Company updateCompanyMonthlySpendingLimit(Long companyId, BigDecimal monthlySpendingLimit) {
+        Company company = getCompanyById(companyId);
+        company.setMonthlySpendingLimit(monthlySpendingLimit);
         return companyRepository.save(company);
     }
 

@@ -11,5 +11,7 @@
 - On new conversation—add assistants
 - Assistant Modal improvements
 - Add Assistant Bug
-- Conversation summary and Assitsnat replying
-- 
+- Conversation summary and Assistants replying
+
+- Add logic to limit how much money is spent a month by user.
+  
