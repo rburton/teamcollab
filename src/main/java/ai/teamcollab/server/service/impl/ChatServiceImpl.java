@@ -85,20 +85,26 @@ public class ChatServiceImpl implements ChatService {
     private void checkMonthlySpendingLimit(Company company) {
         if (company == null || company.getMonthlySpendingLimit() == null) {
             // No company or no limit set, so no limit to exceed
+            log.debug("No company or no spending limit set, skipping check");
             return;
         }
 
         final var currentSpending = calculateCurrentMonthSpending(company);
-        final var limit = BigDecimal.valueOf(company.getMonthlySpendingLimit());
+        final var limit = company.getMonthlySpendingLimit();
+
+        log.debug("Checking monthly spending limit: current={}, limit={}, comparison={}", 
+                currentSpending, limit, currentSpending.compareTo(limit));
 
         if (currentSpending.compareTo(limit) >= 0) {
             log.warn("Company {} has exceeded its monthly spending limit of {}", company.getId(), limit);
             throw new MonthlyLimitExceededException(
                     "Monthly spending limit exceeded. Please contact your administrator to increase your limit.",
                     company.getId(),
-                    company.getMonthlySpendingLimit(),
+                    company.getMonthlySpendingLimit().doubleValue(),
                     currentSpending.doubleValue()
             );
+        } else {
+            log.debug("Company {} has not exceeded its monthly spending limit of {}", company.getId(), limit);
         }
     }
 
