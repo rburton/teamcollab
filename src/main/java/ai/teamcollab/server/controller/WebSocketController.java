@@ -59,7 +59,7 @@ public class WebSocketController {
 
         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
         final var assistants = conversation.getAssistants();
-        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Thinking"));
+        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Thinking..."));
         return WsMessageResponse.turbo(List.of(html, htmlStatus));
     }
 

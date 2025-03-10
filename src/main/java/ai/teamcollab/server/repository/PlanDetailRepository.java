@@ -19,4 +19,9 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
            "LIMIT 1")
     Optional<PlanDetail> findActivePriceForPlan(@Param("planId") Long planId, 
                                                @Param("date") LocalDate date);
+    @Query("SELECT pd FROM PlanDetail pd " +
+           "WHERE pd.monthlyPrice IS NULL " +
+           "ORDER BY pd.createdAt DESC " +
+           "LIMIT 1")
+    Optional<PlanDetail> findFreePlan();
 }

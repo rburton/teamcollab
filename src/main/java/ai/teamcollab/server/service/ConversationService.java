@@ -134,7 +134,7 @@ public class ConversationService {
                         final var row = MessageRow.from(responseMessage);
                         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
                         final var assistants = conversation.getAssistants();
-                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Waiting"));
+                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Ready"));
 
                         messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(List.of(html, htmlStatus)));
                         log.debug("Message processed successfully for conversation: {}", message.getId());

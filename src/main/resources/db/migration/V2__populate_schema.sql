@@ -25,15 +25,17 @@ VALUES ('Dash', 'Marketing',
 ;
 
 INSERT INTO plans (name, description, badge)
-VALUES ('Starter', 'Starter plan', null),
-       ('Basic', 'Basic plan', null),
+VALUES ('Free', 'Free plan', 'Free'),
+       ('Starter', 'Starter plan', NULL),
+       ('Basic', 'Basic plan', NULL),
        ('Popular', 'Popular plan', 'Popular'),
-       ('Enterprise', 'Enterprise plan', null)
+       ('Enterprise', 'Enterprise plan', NULL)
 ;
 
-INSERT INTO plan_details (plan_id, effective_date, monthly_price)
-VALUES (1, NOW(), 9.99),
-       (2, NOW(), 19.00),
-       (3, NOW(), 40.00),
-       (4, NOW(), 199.00)
+INSERT INTO plan_details (plan_id, effective_date, monthly_price, monthly_spending_limit)
+VALUES (1, NOW(), NULL, 1.00),
+       (2, NOW(), 9.99, 4.99),
+       (3, NOW(), 19.00, 10.00),
+       (4, NOW(), 40.00, 20.00),
+       (5, NOW(), 199.00, 100.00)
 ;

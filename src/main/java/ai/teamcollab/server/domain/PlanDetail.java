@@ -60,6 +60,10 @@ public class PlanDetail {
     @Column(name = "monthly_price", nullable = false)
     private BigDecimal monthlyPrice;
 
+    @Digits(integer = 10, fraction = 2, message = "Monthly price must have at most 10 digits and 2 decimal places")
+    @Column(name = "monthly_spending_limit", nullable = false)
+    private BigDecimal monthlySpendingLimit;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

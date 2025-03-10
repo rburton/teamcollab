@@ -9,7 +9,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -55,9 +54,8 @@ public class Subscription {
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
 
-    @NotBlank(message = "Stripe subscription ID is required")
     @Pattern(regexp = "^sub_[a-zA-Z0-9]+$", message = "Invalid Stripe subscription ID format")
-    @Column(name = "stripe_subscription_id", nullable = false, unique = true)
+    @Column(name = "stripe_subscription_id", nullable = true, unique = true)
     private String stripeSubscriptionId;
 
     @NotNull(message = "Start date is required")

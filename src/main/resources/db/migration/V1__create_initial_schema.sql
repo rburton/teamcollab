@@ -1,11 +1,12 @@
 CREATE TABLE companies
 (
-    company_id         BIGSERIAL PRIMARY KEY,
-    name               VARCHAR(255) NOT NULL,
-    llm_model          VARCHAR(255),
-    stripe_customer_id VARCHAR(255) UNIQUE, -- Links to Stripe Customer
-    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    company_id             BIGSERIAL PRIMARY KEY,
+    name                   VARCHAR(255) NOT NULL,
+    llm_model              VARCHAR(255),
+    monthly_spending_limit DECIMAL(10, 2),
+    stripe_customer_id     VARCHAR(255) UNIQUE, -- Links to Stripe Customer
+    created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE roles
@@ -128,21 +129,22 @@ CREATE TABLE plans
 
 CREATE TABLE plan_details
 (
-    plan_detail_id BIGSERIAL PRIMARY KEY,
-    plan_id        BIGINT         NOT NULL REFERENCES plans (plan_id),
-    effective_date DATE           NOT NULL,
-    monthly_price  DECIMAL(10, 2) NOT NULL,
-    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    plan_detail_id         BIGSERIAL PRIMARY KEY,
+    plan_id                BIGINT         NOT NULL REFERENCES plans (plan_id),
+    effective_date         DATE           NOT NULL,
+    monthly_price          DECIMAL(10, 2),
+    monthly_spending_limit DECIMAL(10, 2) NOT NULL,
+    created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE subscriptions
 (
     subscription_id        BIGSERIAL PRIMARY KEY,
-    company_id             BIGINT       NOT NULL REFERENCES companies (company_id),
-    plan_id                BIGINT       NOT NULL REFERENCES plans (plan_id),
-    stripe_subscription_id VARCHAR(255) NOT NULL UNIQUE,
-    start_date             DATE         NOT NULL,
+    company_id             BIGINT NOT NULL REFERENCES companies (company_id),
+    plan_id                BIGINT NOT NULL REFERENCES plans (plan_id),
+    stripe_subscription_id VARCHAR(255) UNIQUE,
+    start_date             DATE   NOT NULL,
     end_date               DATE,
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -167,27 +169,29 @@ CREATE INDEX idx_subscriptions_plan_id ON subscriptions (plan_id);
 CREATE INDEX idx_payments_subscription_id ON payments (subscription_id);
 
 -- Create tables for Spring Session JDBC
-CREATE TABLE SPRING_SESSION (
-                                PRIMARY_ID CHAR(36) NOT NULL,
-                                SESSION_ID CHAR(36) NOT NULL,
-                                CREATION_TIME BIGINT NOT NULL,
-                                LAST_ACCESS_TIME BIGINT NOT NULL,
-                                MAX_INACTIVE_INTERVAL INT NOT NULL,
-                                EXPIRY_TIME BIGINT NOT NULL,
-                                PRINCIPAL_NAME VARCHAR(100),
-                                CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
+CREATE TABLE spring_session
+(
+    primary_id            CHAR(36) NOT NULL,
+    session_id            CHAR(36) NOT NULL,
+    creation_time         BIGINT   NOT NULL,
+    last_access_time      BIGINT   NOT NULL,
+    max_inactive_interval INT      NOT NULL,
+    expiry_time           BIGINT   NOT NULL,
+    principal_name        VARCHAR(100),
+    CONSTRAINT spring_session_pk PRIMARY KEY (primary_id)
 );
 
-CREATE UNIQUE INDEX SPRING_SESSION_IX1 ON SPRING_SESSION (SESSION_ID);
-CREATE INDEX SPRING_SESSION_IX2 ON SPRING_SESSION (EXPIRY_TIME);
-CREATE INDEX SPRING_SESSION_IX3 ON SPRING_SESSION (PRINCIPAL_NAME);
+CREATE UNIQUE INDEX spring_session_ix1 ON spring_session (session_id);
+CREATE INDEX spring_session_ix2 ON spring_session (expiry_time);
+CREATE INDEX spring_session_ix3 ON spring_session (principal_name);
 
-CREATE TABLE SPRING_SESSION_ATTRIBUTES (
-                                           SESSION_PRIMARY_ID CHAR(36) NOT NULL,
-                                           ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
-                                           ATTRIBUTE_BYTES BYTEA NOT NULL,
-                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
-                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION(PRIMARY_ID) ON DELETE CASCADE
+CREATE TABLE spring_session_attributes
+(
+    session_primary_id CHAR(36)     NOT NULL,
+    attribute_name     VARCHAR(200) NOT NULL,
+    attribute_bytes    bytea        NOT NULL,
+    CONSTRAINT spring_session_attributes_pk PRIMARY KEY (session_primary_id, attribute_name),
+    CONSTRAINT spring_session_attributes_fk FOREIGN KEY (session_primary_id) REFERENCES spring_session (primary_id) ON DELETE CASCADE
 );
 
-CREATE INDEX SPRING_SESSION_ATTRIBUTES_IX1 ON SPRING_SESSION_ATTRIBUTES (SESSION_PRIMARY_ID);
+CREATE INDEX spring_session_attributes_ix1 ON spring_session_attributes (session_primary_id);
