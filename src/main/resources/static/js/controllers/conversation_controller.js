@@ -31,6 +31,7 @@ export default class extends Controller {
                         const element = this.createMessage(message);
                         this.chatTarget.appendChild(element);
                     }
+                    this.scrollToBottom();
                 } else if (this.isTurbo(response)) {
                     if (Array.isArray(response.payload)) {
                         for (let i = 0; i < response.payload.length; i++) {
@@ -39,6 +40,7 @@ export default class extends Controller {
                     } else {
                         Turbo.renderStreamMessage(response.payload);
                     }
+                    this.scrollToBottom();
                 }
             });
 
@@ -85,6 +87,13 @@ export default class extends Controller {
         if (this.stompClient !== null) {
             this.stompClient.disconnect();
             console.log('Disconnected');
+        }
+    }
+
+    scrollToBottom() {
+        const chatContainer = document.getElementById('chatMessages');
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     }
 
