@@ -2,6 +2,8 @@ package ai.teamcollab.server.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -46,9 +48,14 @@ public class ConversationAssistant {
     @Column(name = "muted")
     private boolean muted;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tone")
+    private AssistantTone tone;
+
     public ConversationAssistant(Conversation conversation, Assistant assistant) {
         this.conversation = conversation;
         this.assistant = assistant;
         this.muted = false;
+        this.tone = AssistantTone.FORMAL; // Default tone is formal
     }
 }

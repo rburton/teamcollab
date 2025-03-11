@@ -1,6 +1,7 @@
 package ai.teamcollab.server.api;
 
 import ai.teamcollab.server.api.domain.AssistantResponse;
+import ai.teamcollab.server.domain.AssistantTone;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.AssistantService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -64,5 +66,32 @@ public class AssistantRestController {
         log.debug("Checking if assistant {} is muted in conversation {}", assistantId, conversationId);
         boolean muted = assistantService.isAssistantMutedInConversation(assistantId, conversationId);
         return ResponseEntity.ok(muted);
+    }
+
+    @PostMapping("/{assistantId}/conversations/{conversationId}/tone")
+    public ResponseEntity<Void> setAssistantToneInConversation(
+            @PathVariable Long assistantId,
+            @PathVariable Long conversationId,
+            @RequestParam("tone") String toneName,
+            @AuthenticationPrincipal User user) {
+        log.debug("Setting tone {} for assistant {} in conversation {}", toneName, assistantId, conversationId);
+        try {
+            AssistantTone tone = AssistantTone.fromName(toneName);
+            assistantService.setAssistantToneInConversation(assistantId, conversationId, tone);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid tone name: {}", toneName, e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{assistantId}/conversations/{conversationId}/tone")
+    public ResponseEntity<String> getAssistantToneInConversation(
+            @PathVariable Long assistantId,
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal User user) {
+        log.debug("Getting tone for assistant {} in conversation {}", assistantId, conversationId);
+        AssistantTone tone = assistantService.getAssistantToneInConversation(assistantId, conversationId);
+        return ResponseEntity.ok(tone.name());
     }
 }

@@ -81,6 +81,7 @@ CREATE TABLE conversation_assistant
     conversation_id BIGINT  NOT NULL,
     assistant_id    BIGINT  NOT NULL,
     muted           BOOLEAN NOT NULL DEFAULT FALSE,
+    tone            VARCHAR(20)      DEFAULT 'FORMAL' NOT NULL,
     CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
     CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)

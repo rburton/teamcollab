@@ -1,6 +1,7 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Assistant;
+import ai.teamcollab.server.domain.AssistantTone;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.repository.AssistantRepository;
 import ai.teamcollab.server.repository.ConversationRepository;
@@ -123,5 +124,31 @@ public class AssistantService {
     public List<Assistant> findAssistantsNotInConversation(Long companyId, Long conversationId) {
         log.debug("Finding assistants not in conversation {} for company {}", conversationId, companyId);
         return assistantRepository.findAssistantsNotInConversation(companyId, conversationId);
+    }
+
+    @Transactional
+    public void setAssistantToneInConversation(Long assistantId, Long conversationId, AssistantTone tone) {
+        log.debug("Setting tone {} for assistant {} in conversation {}", tone, assistantId, conversationId);
+
+        final var assistant = assistantRepository.findById(assistantId)
+                .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
+
+        final var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
+
+        assistant.setToneInConversation(conversation, tone);
+        assistantRepository.save(assistant);
+    }
+
+    public AssistantTone getAssistantToneInConversation(Long assistantId, Long conversationId) {
+        log.debug("Getting tone for assistant {} in conversation {}", assistantId, conversationId);
+
+        final var assistant = assistantRepository.findById(assistantId)
+                .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
+
+        final var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
+
+        return assistant.getToneInConversation(conversation);
     }
 }

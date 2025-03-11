@@ -87,7 +87,7 @@
     <div class="flex flex-1 overflow-hidden">
         <!-- Left Sidebar with assistants -->
         <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
-             id="sidebar" data-controller="assistant assistant-mute" th:data-assistant-conversation-id-value="${conversation.id}">
+             id="sidebar" data-controller="assistant assistant-mute " th:data-assistant-conversation-id-value="${conversation.id}">
             <div class="flex justify-between mb-4">
                 <h2 class="text-lg font-semibold">Assistants</h2>
                 <button data-action="click->assistant#open" class="text-blue-500 hover:text-blue-700">
@@ -125,12 +125,56 @@
                 </div>
             </div>
 
-            <ul role="list" class="divide-y divide-gray-100 space-y-2" id="assistantList">
+            <ul role="list" class="divide-y divide-gray-100 space-y-2" id="assistantList" data-controller="tone mute">
                 <th:block th:each="assistant: ${assistants}">
                     <th:block th:replace="conversations/fragements/assistant_row :: assistant_row"
                               th:id="'assistant_' + ${assistant.id}">
                     </th:block>
                 </th:block>
+                <div data-tone-target="modal" class="fixed inset-0 backdrop-blur-xs backdrop-grayscale hidden items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Change Assistant Tone</h3>
+                            <button data-action="click->tone#closeModal" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times fa-lg"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-gray-600">Select a communication style for this assistant:</p>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" id="tone-formal" name="tone" value="FORMAL" data-tone-target="toneOption" class="h-4 w-4 text-blue-600">
+                                    <label for="tone-formal" class="ml-2 block text-sm text-gray-900">Formal - Professional and structured communication</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="tone-casual" name="tone" value="CASUAL" data-tone-target="toneOption" class="h-4 w-4 text-blue-600">
+                                    <label for="tone-casual" class="ml-2 block text-sm text-gray-900">Casual - Friendly and conversational style</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="tone-technical" name="tone" value="TECHNICAL" data-tone-target="toneOption" class="h-4 w-4 text-blue-600">
+                                    <label for="tone-technical" class="ml-2 block text-sm text-gray-900">Technical - Detailed with specialized terminology</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="tone-simplified" name="tone" value="SIMPLIFIED" data-tone-target="toneOption" class="h-4 w-4 text-blue-600">
+                                    <label for="tone-simplified" class="ml-2 block text-sm text-gray-900">Simplified - Clear and easy to understand</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div id="toneErrorMessage" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end mt-6 space-x-3">
+                            <button data-action="click->tone#closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                                Cancel
+                            </button>
+                            <button data-action="click->tone#saveTone" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </ul>
         </div>
 

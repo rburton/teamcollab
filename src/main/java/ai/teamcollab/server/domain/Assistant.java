@@ -100,4 +100,19 @@ public class Assistant {
                 .map(ConversationAssistant::isMuted)
                 .orElse(false);
     }
+
+    public void setToneInConversation(Conversation conversation, AssistantTone tone) {
+        conversationAssistants.stream()
+                .filter(ca -> ca.getConversation().equals(conversation))
+                .findFirst()
+                .ifPresent(ca -> ca.setTone(tone));
+    }
+
+    public AssistantTone getToneInConversation(Conversation conversation) {
+        return conversationAssistants.stream()
+                .filter(ca -> ca.getConversation().equals(conversation))
+                .findFirst()
+                .map(ConversationAssistant::getTone)
+                .orElse(AssistantTone.FORMAL);
+    }
 }
