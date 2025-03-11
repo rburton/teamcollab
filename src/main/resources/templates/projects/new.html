@@ -14,6 +14,12 @@
             <span class="block sm:inline" th:text="${errorMessage}"></span>
         </div>
 
+        <!-- Introduction -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Create a New Project</h1>
+            <p class="text-gray-600">Projects help you organize your team's work and conversations around specific goals or initiatives. Each project can contain multiple conversations focused on different aspects of your work.</p>
+        </div>
+
         <!-- Project Creation Form -->
         <div class="bg-white shadow rounded-lg p-6">
             <form action="/projects/create" method="POST" class="space-y-6" th:object="${projectCreateRequest}">
@@ -21,10 +27,11 @@
                 <!-- Project Name -->
                 <div>
                     <label th:for="name" class="block text-sm font-medium text-gray-700">Project Name</label>
+                    <p class="text-xs text-gray-500 mb-1">Choose a clear, descriptive name that your team will recognize.</p>
                     <div class="mt-1">
                         <input type="text" th:field="*{name}" required autocomplete="off"
                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                               placeholder="Project Name"
+                               placeholder="e.g., Website Redesign, Q4 Marketing Campaign"
                                th:classappend="${#fields.hasErrors('name')} ? 'border-red-300'">
                         <p th:if="${#fields.hasErrors('name')}" class="mt-2 text-sm text-red-600" th:errors="*{name}"></p>
                     </div>
@@ -32,11 +39,12 @@
 
                 <!-- Project Overview (Topic) -->
                 <div>
-                    <label th:for="overview" class="block text-sm font-medium text-gray-700">Project Topic</label>
+                    <label th:for="overview" class="block text-sm font-medium text-gray-700">Project Overview</label>
+                    <p class="text-xs text-gray-500 mb-1">Describe what this project is about and what you aim to achieve.</p>
                     <div class="mt-1">
                         <textarea th:field="*{overview}" rows="3" required
                                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                                  placeholder="Provide an overview of the project"
+                                  placeholder="e.g., Redesign our company website to improve user experience and increase conversion rates."
                                   th:classappend="${#fields.hasErrors('overview')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('overview')}" class="mt-2 text-sm text-red-600" th:errors="*{overview}"></p>
                     </div>
@@ -44,21 +52,23 @@
 
                 <!-- First Conversation Purpose -->
                 <div>
-                    <label th:for="purpose" class="block text-sm font-medium text-gray-700">Conversation Purpose</label>
+                    <label th:for="purpose" class="block text-sm font-medium text-gray-700">Initial Conversation Topic</label>
+                    <p class="text-xs text-gray-500 mb-1">Every project starts with a conversation. What would you like to discuss first?</p>
                     <div class="mt-1">
                         <textarea th:field="*{purpose}" rows="3" required
                                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                                  placeholder="What is the purpose of your first team conversation?"
+                                  placeholder="e.g., Brainstorm website features, Discuss project timeline and milestones"
                                   th:classappend="${#fields.hasErrors('purpose')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('purpose')}" class="mt-2 text-sm text-red-600" th:errors="*{purpose}"></p>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end">
+                <div class="flex items-center justify-between p-2 border-t border-gray-200 ">
+                    <p class="text-sm text-gray-500">You can add more conversations after creating the project.</p>
                     <button type="submit"
                             class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Create Project
+                        Create Project & Start Conversation
                     </button>
                 </div>
             </form>
