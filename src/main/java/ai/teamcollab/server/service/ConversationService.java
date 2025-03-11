@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static ai.teamcollab.server.controller.WebSocketController.DIRECT_MESSAGE_TOPIC;
-import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplatePath.ASSISTANT_STATUSES_TEMPLATE;
-import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.ASSISTANTS;
+import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 import static java.util.Collections.reverse;
 import static java.util.Objects.nonNull;
@@ -115,6 +115,10 @@ public class ConversationService {
             final var message = messageRepository.findById(messageId).orElseThrow();
             final var conversation = message.getConversation();
             final var chatContext = buildChatContext(conversation, sessionId);
+
+//            if (false) {
+                chatService.generatePointInTimeSummary(conversation, chatContext);
+//            }
 
             return chatService.process(conversation, message, chatContext)
                     .thenAccept(response -> {

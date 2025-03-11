@@ -22,7 +22,7 @@ public interface PointInTimeSummaryRepository extends JpaRepository<PointInTimeS
      * @param conversation the conversation
      * @return the most recent active summary, if any
      */
-    @Query("SELECT p FROM PointInTimeSummary p WHERE p.conversation = :conversation AND p.isActive = true ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM PointInTimeSummary p WHERE p.conversation = :conversation AND p.isActive = true ORDER BY p.createdAt DESC LIMIT 1")
     Optional<PointInTimeSummary> findMostRecentActiveByConversation(@Param("conversation") Conversation conversation);
 
     /**
@@ -40,4 +40,12 @@ public interface PointInTimeSummaryRepository extends JpaRepository<PointInTimeS
      * @return list of active summaries
      */
     List<PointInTimeSummary> findByConversationAndIsActiveTrueOrderByCreatedAtDesc(Conversation conversation);
+
+    /**
+     * Count all summaries for a conversation.
+     *
+     * @param conversation the conversation
+     * @return count of summaries
+     */
+    long countByConversation(Conversation conversation);
 }

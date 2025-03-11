@@ -1,6 +1,5 @@
 package ai.teamcollab.server.service.impl;
 
-import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.GptModel;
@@ -8,6 +7,7 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.exception.EmptyConversationException;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.service.ChatService;
@@ -37,14 +37,17 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 @Service
 public class ChatServiceImpl implements ChatService {
+    public static final int SUMMARY_BATCH_SIZE = 10;
+    public static final String USER = "User";
+    public static final String ASSISTANT = "Assistant";
     private final MessageRepository messageRepository;
     private final SystemSettingsService systemSettingsService;
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
 
     @Autowired
-    public ChatServiceImpl(MessageRepository messageRepository, 
-                          SystemSettingsService systemSettingsService,
-                          PointInTimeSummaryRepository pointInTimeSummaryRepository) {
+    public ChatServiceImpl(MessageRepository messageRepository,
+                           SystemSettingsService systemSettingsService,
+                           PointInTimeSummaryRepository pointInTimeSummaryRepository) {
         this.messageRepository = messageRepository;
         this.systemSettingsService = systemSettingsService;
         this.pointInTimeSummaryRepository = pointInTimeSummaryRepository;
@@ -150,14 +153,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     /**
-     * Generates a point-in-time summary for a conversation.
-     * The summary includes:
-     * - A list of topics and key points talked about
-     * - A summary of each topic and key point with critical information
-     * - A summary for each assistant in the conversation
+     * Generates a point-in-time summary for a conversation. The summary includes: - A list of topics and key points
+     * talked about - A summary of each topic and key point with critical information - A summary for each assistant in
+     * the conversation
      *
      * @param conversation the conversation to summarize
-     * @param chatContext the context of the conversation
+     * @param chatContext  the context of the conversation
      * @return a CompletableFuture containing the generated PointInTimeSummary
      */
     @Override
@@ -170,13 +171,35 @@ public class ChatServiceImpl implements ChatService {
         // Get the most recent message
         final var messages = chatContext.getLastMessages();
         if (messages.isEmpty()) {
-            throw new IllegalArgumentException("Cannot generate summary for conversation with no messages");
+            throw new EmptyConversationException("Cannot generate summary for conversation with no messages");
         }
 
-        final var latestMessage = messages.get(messages.size() - 1);
+        final var latestMessage = messages.getLast();
+
+        // Check if we already have a recent summary
+        final var existingSummary = pointInTimeSummaryRepository.findMostRecentActiveByConversation(conversation);
 
         return CompletableFuture.supplyAsync(() -> {
             try {
+                // If we have an existing summary, check if we need a new one
+                if (existingSummary.isPresent()) {
+                    final var lastSummaryMessage = existingSummary.get().getLatestMessage();
+
+                    // Count messages created after the last summary message
+                    final var messageCount = messageRepository.countMessagesAfter(
+                            conversation.getId(),
+                            lastSummaryMessage.getId()
+                    );
+
+                    // If less than 10 messages have been added since the last summary, return the existing summary
+                    if (messageCount < SUMMARY_BATCH_SIZE) {
+                        log.debug("Using existing summary as only {} messages have been added since last summary", messageCount);
+                        return existingSummary.get();
+                    }
+                }
+
+                log.debug("Generating new point-in-time summary");
+
                 // Create prompts for each part of the summary
                 final var topicsPrompt = createTopicsPrompt(chatContext);
                 final var topicSummariesPrompt = createTopicSummariesPrompt(chatContext);
@@ -198,14 +221,14 @@ public class ChatServiceImpl implements ChatService {
                                 .build())
                         .defaultOptions(OpenAiChatOptions.builder()
                                 .model(model.getId())
-                                .temperature(0.3) // Lower temperature for more focused responses
+                                .temperature(model.getTemperature()) // Lower temperature for more focused responses
                                 .build())
                         .build();
 
                 // Generate each part of the summary
-                final var topicsAndKeyPoints = chatModel.call(topicsPrompt).getResult().getOutput().getText();
-                final var topicSummaries = chatModel.call(topicSummariesPrompt).getResult().getOutput().getText();
-                final var assistantSummaries = chatModel.call(assistantSummariesPrompt).getResult().getOutput().getText();
+                final var topicsAndKeyPoints = callAndGetResponse(chatModel, topicsPrompt);
+                final var topicSummaries = callAndGetResponse(chatModel, topicSummariesPrompt);
+                final var assistantSummaries = callAndGetResponse(chatModel, assistantSummariesPrompt);
 
                 // Create and save the summary
                 final var summary = PointInTimeSummary.create(
@@ -218,6 +241,9 @@ public class ChatServiceImpl implements ChatService {
 
                 return pointInTimeSummaryRepository.save(summary);
 
+            } catch (EmptyConversationException e) {
+                log.error("Empty conversation error while generating summary: {}", e.getMessage(), e);
+                throw e;
             } catch (IllegalArgumentException e) {
                 log.error("Invalid argument while generating summary: {}", e.getMessage(), e);
                 throw new IllegalArgumentException("Invalid input for summary generation", e);
@@ -226,6 +252,13 @@ public class ChatServiceImpl implements ChatService {
                 throw new RuntimeException("Failed to generate summary: " + e.getMessage(), e);
             }
         });
+    }
+
+    private static String callAndGetResponse(OpenAiChatModel chatModel, Prompt topicsPrompt) {
+        var aiResponse = chatModel.call(topicsPrompt);
+        var result = aiResponse.getResult();
+        var output = result.getOutput();
+        return output.getText();
     }
 
     /**
@@ -237,9 +270,9 @@ public class ChatServiceImpl implements ChatService {
         // Add system message with instructions
         messages.add(new SystemMessage(
                 "You are an expert at analyzing conversations and identifying the main topics and key points discussed. " +
-                "Extract a list of topics and key points from the conversation. " +
-                "Format your response as a bulleted list with main topics as headers and key points as sub-bullets. " +
-                "Be comprehensive but concise."
+                        "Extract a list of topics and key points from the conversation. " +
+                        "Format your response as a bulleted list with main topics as headers and key points as sub-bullets. " +
+                        "Be comprehensive but concise."
         ));
 
         // Add context
@@ -251,14 +284,20 @@ public class ChatServiceImpl implements ChatService {
 
         // Add conversation history
         for (final var message : chatContext.getLastMessages()) {
-            final var sender = message.isAssistant() ? 
-                    (message.getAssistant() != null ? message.getAssistant().getName() : "Assistant") : 
-                    (message.getUser() != null ? message.getUser().getUsername() : "User");
+            final var sender = message.isAssistant() ? isAssistant(message) : isUser(message);
 
             messages.add(new UserMessage(String.format("%s: %s", sender, message.getContent())));
         }
 
         return new Prompt(messages.toArray(new org.springframework.ai.chat.messages.Message[0]));
+    }
+
+    private static String isUser(Message message) {
+        return !message.isAssistant() ? message.getUser().getUsername() : USER;
+    }
+
+    private static String isAssistant(Message message) {
+        return message.isAssistant() ? message.getAssistant().getName() : ASSISTANT;
     }
 
     /**
@@ -270,9 +309,9 @@ public class ChatServiceImpl implements ChatService {
         // Add system message with instructions
         messages.add(new SystemMessage(
                 "You are an expert at summarizing complex discussions. " +
-                "For each topic and key point in the conversation, provide a concise summary that captures the critical information. " +
-                "Focus on information that would be important for continuing the conversation. " +
-                "Format your response with topic headers and summaries as paragraphs."
+                        "For each topic and key point in the conversation, provide a concise summary that captures the critical information. " +
+                        "Focus on information that would be important for continuing the conversation. " +
+                        "Format your response with topic headers and summaries as paragraphs."
         ));
 
         // Add context
@@ -284,8 +323,8 @@ public class ChatServiceImpl implements ChatService {
 
         // Add conversation history
         for (final var message : chatContext.getLastMessages()) {
-            final var sender = message.isAssistant() ? 
-                    (message.getAssistant() != null ? message.getAssistant().getName() : "Assistant") : 
+            final var sender = message.isAssistant() ?
+                    (message.getAssistant() != null ? message.getAssistant().getName() : "Assistant") :
                     (message.getUser() != null ? message.getUser().getUsername() : "User");
 
             messages.add(new UserMessage(String.format("%s: %s", sender, message.getContent())));
@@ -303,8 +342,8 @@ public class ChatServiceImpl implements ChatService {
         // Add system message with instructions
         messages.add(new SystemMessage(
                 "You are an expert at analyzing conversations and understanding the role of different participants. " +
-                "For each assistant in the conversation, provide a summary of their contributions and the critical points related to their expertise. " +
-                "Format your response with assistant names as headers and summaries as paragraphs."
+                        "For each assistant in the conversation, provide a summary of their contributions and the critical points related to their expertise. " +
+                        "Format your response with assistant names as headers and summaries as paragraphs."
         ));
 
         // Add context about assistants
@@ -317,14 +356,12 @@ public class ChatServiceImpl implements ChatService {
                 "Conversation Purpose: %s\nProject Overview: %s\n\n%s\n\nPlease summarize the contributions of each assistant:",
                 chatContext.getPurpose(),
                 chatContext.getProjectOverview(),
-                assistantsInfo.toString()
+                assistantsInfo
         )));
 
         // Add conversation history
         for (final var message : chatContext.getLastMessages()) {
-            final var sender = message.isAssistant() ? 
-                    (message.getAssistant() != null ? message.getAssistant().getName() : "Assistant") : 
-                    (message.getUser() != null ? message.getUser().getUsername() : "User");
+            final var sender = message.isAssistant() ? isAssistant(message) : isUser(message);
 
             messages.add(new UserMessage(String.format("%s: %s", sender, message.getContent())));
         }
