@@ -1,7 +1,7 @@
 <th:block th:each="assistant: ${assistants}">
     <turbo-stream action="replace" th:attr="target='assistant_' + ${assistant.id} + '_status'">
         <template>
-            <th:block th:replace="conversations/fragements/assistant_status :: assistant_status(status=${status})"/>
+            <th:block th:replace="~{conversations/fragements/assistant_status :: assistant_status(status=${status})}"/>
         </template>
     </turbo-stream>
 </th:block>

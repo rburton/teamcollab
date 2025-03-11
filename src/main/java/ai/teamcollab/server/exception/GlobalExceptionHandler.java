@@ -1,6 +1,5 @@
 package ai.teamcollab.server.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.PAYMENT_REQUIRED;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,7 +26,7 @@ public class GlobalExceptionHandler {
         );
 
         response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("status", BAD_REQUEST.value());
         response.put("errors", errors);
 
         return ResponseEntity.badRequest().body(response);
@@ -34,7 +37,18 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
 
         response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("status", BAD_REQUEST.value());
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(EmptyConversationException.class)
+    public ResponseEntity<Map<String, Object>> handleEmptyConversationException(EmptyConversationException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", BAD_REQUEST.value());
         response.put("message", ex.getMessage());
 
         return ResponseEntity.badRequest().body(response);
@@ -45,13 +59,13 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
 
         response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.PAYMENT_REQUIRED.value());
+        response.put("status", PAYMENT_REQUIRED.value());
         response.put("message", ex.getMessage());
         response.put("companyId", ex.getCompanyId());
         response.put("limit", ex.getLimit());
         response.put("currentSpending", ex.getCurrentSpending());
 
-        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(response);
+        return ResponseEntity.status(PAYMENT_REQUIRED).body(response);
     }
 
     @ExceptionHandler(Exception.class)
@@ -59,9 +73,9 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
 
         response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("status", INTERNAL_SERVER_ERROR.value());
         response.put("message", "An unexpected error occurred");
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(response);
     }
 }

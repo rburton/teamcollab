@@ -5,6 +5,7 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.CompanyRepository;
+import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MetricsService;
@@ -39,6 +40,7 @@ public class MetricsViewController {
     private final ConversationService conversationService;
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
 
 
     @GetMapping
@@ -78,8 +80,12 @@ public class MetricsViewController {
             var conversation = conversationService.findConversationById(id);
             var messages = conversationService.findMessagesByConversation(id);
 
+            // Count point-in-time summaries for this conversation
+            long summaryCount = pointInTimeSummaryRepository.countByConversation(conversation);
+
             model.addAttribute("conversation", conversation);
             model.addAttribute("messageCount", messages.size());
+            model.addAttribute("summaryCount", summaryCount);
             model.addAttribute("user", conversation.getUser());
             model.addAttribute("assistants", conversation.getAssistants());
 

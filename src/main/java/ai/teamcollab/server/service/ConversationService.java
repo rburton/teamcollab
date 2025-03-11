@@ -118,6 +118,10 @@ public class ConversationService {
                     .orElseThrow();
             final var chatContext = buildChatContext(conversation, sessionId);
 
+//            if (false) {
+                chatService.generatePointInTimeSummary(conversation, chatContext);
+//            }
+
             return chatService.process(conversation, message, chatContext)
                     .thenAccept(response -> {
                         final var responseMessage = Message.builder()

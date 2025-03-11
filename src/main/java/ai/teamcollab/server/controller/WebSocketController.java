@@ -48,7 +48,7 @@ public class WebSocketController {
         final var newMessage = Message.builder()
                 .content(message.getContent())
                 .build();
-        final var conversation = conversationService.findConversationById(message.getConversationId());
+        final var conversation = conversationService.findConversationByIdWithAssistant(message.getConversationId());
 
         final var savedMessage = conversationService.addToConversation(conversation.getId(), newMessage, user);
         conversationService.sendMessage(savedMessage.getId(), user.getUsername());
