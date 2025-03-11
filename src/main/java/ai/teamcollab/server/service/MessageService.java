@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,11 +23,13 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+    private final BookmarkService bookmarkService;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, ConversationRepository conversationRepository) {
+    public MessageService(MessageRepository messageRepository, ConversationRepository conversationRepository, BookmarkService bookmarkService) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
+        this.bookmarkService = bookmarkService;
     }
 
     @Transactional
@@ -50,6 +55,30 @@ public class MessageService {
         log.debug("Successfully created message {} in conversation {}", savedMessage.getId(), conversationId);
 
         return savedMessage;
+    }
+
+    /**
+     * Returns a collection of message IDs that have been bookmarked by the specified user.
+     *
+     * @param messageIds the collection of message IDs to check
+     * @param userId the ID of the user
+     * @return a collection of message IDs that have been bookmarked by the user
+     */
+    @Transactional(readOnly = true)
+    public Set<Long> getBookmarkedMessageIds(Collection<Long> messageIds, Long userId) {
+        requireNonNull(messageIds, "Message IDs cannot be null");
+        requireNonNull(userId, "User ID cannot be null");
+
+        log.debug("Checking bookmarked messages for user {} among {} message IDs", userId, messageIds.size());
+
+        // Get all bookmarked messages for the user
+        final var bookmarkedMessages = bookmarkService.getBookmarkedMessages(userId);
+
+        // Filter the bookmarked messages to only include those in the provided collection of message IDs
+        return bookmarkedMessages.stream()
+                .map(Message::getId)
+                .filter(messageIds::contains)
+                .collect(Collectors.toSet());
     }
 
 }

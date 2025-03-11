@@ -5,12 +5,14 @@ import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Getter
-@Builder
+@Setter
+@Builder(toBuilder = true)
 public class MessageRow {
     private Long id;
     private String username;

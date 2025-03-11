@@ -4,6 +4,7 @@ import ai.teamcollab.server.controller.domain.WsMessage;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
+import ai.teamcollab.server.service.MessageService;
 import ai.teamcollab.server.service.domain.MessageRow;
 import ai.teamcollab.server.templates.ThymeleafTemplateRender;
 import ai.teamcollab.server.ws.domain.WsMessageResponse;
@@ -31,10 +32,12 @@ public class WebSocketController {
 
     private final ThymeleafTemplateRender thymeleafTemplateRender;
     private final ConversationService conversationService;
+    private final MessageService messageService;
 
-    public WebSocketController(ThymeleafTemplateRender thymeleafTemplateRender, ConversationService conversationService) {
+    public WebSocketController(ThymeleafTemplateRender thymeleafTemplateRender, ConversationService conversationService, MessageService messageService) {
         this.thymeleafTemplateRender = thymeleafTemplateRender;
         this.conversationService = conversationService;
+        this.messageService = messageService;
     }
 
     @MessageMapping("/chat.send")
@@ -64,14 +67,28 @@ public class WebSocketController {
 
     @MessageMapping("/chat.join")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
-    public WsMessageResponse joinChat(@Payload WsMessage message) {
+    public WsMessageResponse joinChat(@Payload WsMessage message,
+                                      UsernamePasswordAuthenticationToken principal) {
+        final var user = (User) principal.getPrincipal();
+
         final var messages = conversationService.findMessagesByConversation(message.getConversationId())
                 .stream()
-                .map(MessageRow::from)
                 .toList();
+
+        final var ids = messages.stream()
+                .map(Message::getId)
+                .toList();
+
+        final var bookMarked = messageService.getBookmarkedMessageIds(ids, user.getId());
+
         final var elements = messages.stream()
+                .map(MessageRow::from)
+                .map(row -> row.toBuilder()
+                        .bookmarked(bookMarked.contains(row.getId()))
+                        .build())
                 .map(row -> thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row)))
                 .toList();
+
 
         return WsMessageResponse.turbo(elements);
     }
@@ -79,7 +96,6 @@ public class WebSocketController {
     @MessageExceptionHandler
     @SendToUser(ERROR_EVENT_TOPIC)
     public String handleException(Throwable exception) {
-        exception.printStackTrace();
         return exception.getMessage();
     }
 
