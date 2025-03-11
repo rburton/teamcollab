@@ -55,19 +55,19 @@
                     <div class="flex space-x-4">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                         <a href="/dashboard" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
-                           aria-current="page">Dashboard</a>
+                           aria-current="page"><i class="fas fa-home mr-2"></i>Dashboard</a>
                         <a href="/projects"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">All Projects</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-project-diagram mr-2"></i>All Projects</a>
                         <a href="/assistants"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-robot mr-2"></i>Assistants</a>
                         <a href="/company/admin" sec:authorize="hasRole('ADMIN')"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Company Settings</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-building mr-2"></i><span th:text="#{navigation.menu.admin}">Company Settings</span></a>
                         <a href="/company/billing" sec:authorize="hasRole('ADMIN')"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Billing</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-credit-card mr-2"></i>Billing</a>
                         <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">System Settings</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-cogs mr-2"></i>System Settings</a>
                         <form th:action="@{/logout}" method="post" class="inline-block">
-                            <button type="submit" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</button>
+                            <button type="submit" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
                         </form>
                     </div>
                 </div>
@@ -75,9 +75,7 @@
             <div class="flex items-center">
                 <div class="shrink-0">
                     <a href="/projects/new" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                        <svg class="-ml-0.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                            <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
-                        </svg>
+                        <i class="fas fa-plus-circle"></i>
                         Project
                     </a>
                 </div>
@@ -87,11 +85,7 @@
                         class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                     <span class="absolute -inset-1.5"></span>
                     <span class="sr-only">View notifications</span>
-                    <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                         aria-hidden="true" data-slot="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
-                    </svg>
+                    <i class="fas fa-bell size-6"></i>
                 </button>
 
                 <!-- Profile dropdown -->
@@ -111,11 +105,11 @@
                          role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
                         <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                           id="user-menu-item-0">Your Profile</a>
+                           id="user-menu-item-0"><i class="fas fa-user mr-2"></i>Your Profile</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                           id="user-menu-item-1">Settings</a>
+                           id="user-menu-item-1"><i class="fas fa-cog mr-2"></i>Settings</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                           id="user-menu-item-2">Sign out</a>
+                           id="user-menu-item-2"><i class="fas fa-sign-out-alt mr-2"></i>Sign out</a>
                     </div>
                 </div>
             </div>
@@ -127,21 +121,21 @@
         <div class="space-y-1 px-2 pt-2 pb-3">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
             <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
-               aria-current="page">Dashboard</a>
+               aria-current="page"><i class="fas fa-home mr-2"></i>Dashboard</a>
             <a href="/projects"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-project-diagram mr-2"></i>Projects</a>
             <a href="/projects/new"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">New Project</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-plus-circle mr-2"></i>New Project</a>
             <a href="/assistants"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-robot mr-2"></i>Assistants</a>
             <a href="/metrics"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Metrics</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-chart-line mr-2"></i>Metrics</a>
             <a href="/admin" sec:authorize="hasRole('ADMIN')"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Admin</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-building mr-2"></i><span th:text="#{navigation.menu.admin}">Admin</span></a>
             <a href="/company/billing" sec:authorize="hasRole('ADMIN')"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Billing</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-credit-card mr-2"></i>Billing</a>
             <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
-               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">System Settings</a>
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-cogs mr-2"></i>System Settings</a>
         </div>
     </div>
 </nav>
