@@ -5,12 +5,14 @@ import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.AssistantService;
+import ai.teamcollab.server.service.BookmarkService;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.domain.MessageRow;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -33,12 +35,18 @@ public class ConversationController {
 
     private final ConversationService conversationService;
     private final AssistantService assistantService;
+    private final BookmarkService bookmarkService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ConversationController(@NonNull ConversationService conversationService, @NonNull AssistantService assistantService, SimpMessagingTemplate messagingTemplate) {
+    public ConversationController(
+            @NonNull ConversationService conversationService,
+            @NonNull AssistantService assistantService,
+            @NonNull BookmarkService bookmarkService,
+            SimpMessagingTemplate messagingTemplate) {
         this.conversationService = conversationService;
         this.assistantService = assistantService;
+        this.bookmarkService = bookmarkService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -84,7 +92,36 @@ public class ConversationController {
         model.addAttribute("conversation", conversation);
         model.addAttribute("conversationId", conversation.getId());
         model.addAttribute("assistants", AssistantView.from(conversation.getConversationAssistants()));
+
         return "conversations/show";
+    }
+
+    @PostMapping("/{conversationId}/messages/{messageId}/bookmark")
+    public ResponseEntity<?> bookmarkMessage(
+            @PathVariable Long conversationId,
+            @PathVariable Long messageId,
+            @NonNull @AuthenticationPrincipal User user) {
+
+        try {
+            bookmarkService.bookmarkMessage(user.getId(), messageId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{conversationId}/messages/{messageId}/unbookmark")
+    public ResponseEntity<?> unbookmarkMessage(
+            @PathVariable Long conversationId,
+            @PathVariable Long messageId,
+            @NonNull @AuthenticationPrincipal User user) {
+
+        try {
+            bookmarkService.unbookmarkMessage(user.getId(), messageId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/{conversationId}/messages")

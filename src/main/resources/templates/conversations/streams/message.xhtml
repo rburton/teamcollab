@@ -10,9 +10,19 @@
                 </p>
                 <p class="text-gray-800" 
                    th:attr="data-controller='message', data-message-content-value=${message.content}, data-message-target='message'"></p>
-                <p class="text-xs text-gray-500 mt-1"
-                   th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
-                </p>
+                <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-gray-500"
+                       th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
+                    </p>
+                    <button th:unless="${message.id == null}"
+                            th:data-message-id="${message.id}"
+                            th:data-conversation-id="${message.conversationId}"
+                            th:classappend="${message.bookmarked} ? 'bookmark-active' : ''"
+                            class="bookmark-btn text-gray-400 hover:text-yellow-500 focus:outline-none transition-colors duration-200"
+                            data-controller="bookmark">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </template>
