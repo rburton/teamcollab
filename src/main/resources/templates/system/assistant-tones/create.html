@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Create Assistant Tone</title>
+</head>
+<body>
+<div layout:fragment="content" class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Create Assistant Tone</h1>
+            <a href="/system/assistant-tones" 
+               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:border-gray-700 focus:ring focus:ring-gray-300 disabled:opacity-25 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to List
+            </a>
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline" th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/system/assistant-tones/create}" method="post" th:object="${tone}" class="space-y-6">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                <div class="mt-1">
+                    <input type="text" id="name" name="name" th:field="*{name}" required
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                           placeholder="Enter a unique identifier (e.g. professional, friendly)">
+                </div>
+                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="mt-2 text-sm text-red-600"></p>
+            </div>
+
+            <div>
+                <label for="displayName" class="block text-sm font-medium text-gray-700">Display Name</label>
+                <div class="mt-1">
+                    <input type="text" id="displayName" name="displayName" th:field="*{displayName}" required
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                           placeholder="Enter a user-friendly name (e.g. Professional, Friendly)">
+                </div>
+                <p th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}" class="mt-2 text-sm text-red-600"></p>
+            </div>
+
+            <div>
+                <label for="prompt" class="block text-sm font-medium text-gray-700">Prompt</label>
+                <div class="mt-1">
+                    <textarea id="prompt" name="prompt" th:field="*{prompt}" rows="5"
+                              class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              placeholder="Enter the prompt instructions for this tone"></textarea>
+                </div>
+                <p th:if="${#fields.hasErrors('prompt')}" th:errors="*{prompt}" class="mt-2 text-sm text-red-600"></p>
+                <p class="mt-2 text-sm text-gray-500">
+                    The prompt will be used to instruct the AI assistant on how to respond in this tone.
+                </p>
+            </div>
+
+            <div class="flex justify-end">
+                <a href="/system/assistant-tones" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Create Tone
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
