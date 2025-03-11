@@ -12,7 +12,7 @@
         <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 px-4 sm:px-6 lg:px-8 py-3">
             <li class="flex">
                 <div class="flex items-center">
-                    <a href="/dashboard" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">
+                    <a href="/dashboard" class="text-gray-500 hover:text-primary transition-colors duration-200">
                         <svg class="size-5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
                              data-slot="icon">
                             <path fill-rule="evenodd"
@@ -29,7 +29,7 @@
                          fill="currentColor" aria-hidden="true">
                         <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors duration-200">Projects</a>
+                    <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-primary transition-colors duration-200">Projects</a>
                 </div>
             </li>
             <li class="flex">
@@ -38,7 +38,7 @@
                          fill="currentColor" aria-hidden="true">
                         <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="#" class="ml-4 text-sm font-medium text-indigo-600" aria-current="page"
+                    <a href="#" class="ml-4 text-sm font-medium text-primary" aria-current="page"
                        th:text="${project.name}">Project Nero</a>
                 </div>
             </li>
@@ -51,14 +51,14 @@
             <!-- Project header top section -->
             <div class="relative">
                 <!-- Decorative header background -->
-                <div class="absolute inset-0 h-24 bg-gradient-to-r from-indigo-500/90 to-purple-500/90"></div>
+                <div class="absolute inset-0 h-24 bg-primary/90"></div>
 
                 <!-- Project title and icon section -->
                 <div class="relative pt-12 px-6 pb-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-white rounded-full p-3 shadow-md transform transition-transform duration-300 hover:scale-105">
-                                <i class="fas fa-project-diagram text-2xl text-indigo-600"></i>
+                                <i class="fas fa-project-diagram text-2xl text-primary"></i>
                             </div>
                             <h2 class="ml-4 text-2xl font-bold text-white tracking-tight" th:text="${project.name}">
                                 Job Postings
@@ -92,12 +92,12 @@
                 <!-- Project stats and actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
                     <div class="flex items-center space-x-4">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                             <i class="fas fa-comments mr-1.5"></i>
                             <span th:text="${#lists.size(project.conversations)} + ' Conversations'">5 Conversations</span>
                         </span>
                     </div>
-                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
+                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105">
                         <i class="fas fa-plus mr-2"></i> New Conversation
                     </a>
                 </div>
@@ -126,9 +126,9 @@
             <!-- Section Header with Search -->
             <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex flex-wrap items-center justify-between">
                 <div class="flex items-center">
-                    <i class="fas fa-comments text-indigo-600 mr-3 text-xl"></i>
+                    <i class="fas fa-comments text-primary mr-3 text-xl"></i>
                     <h3 class="text-lg font-medium text-gray-900">Project Conversations</h3>
-                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800" th:text="${#lists.size(project.conversations)}">5</span>
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary/90" th:text="${#lists.size(project.conversations)}">5</span>
                 </div>
 
                 <!-- Search Box -->
@@ -137,7 +137,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
-                        <input type="text" id="conversation-search" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search conversations...">
+                        <input type="text" id="conversation-search" class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search conversations...">
                     </div>
                 </div>
             </div>
@@ -150,8 +150,8 @@
                         <div class="p-5 flex-grow">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-center mb-3">
-                                    <div class="flex-shrink-0 bg-indigo-100 rounded-full p-2">
-                                        <i class="fas fa-comments text-indigo-600"></i>
+                                    <div class="flex-shrink-0 bg-primary/10 rounded-full p-2">
+                                        <i class="fas fa-comments text-primary"></i>
                                     </div>
                                     <h4 class="ml-3 text-lg font-semibold text-gray-900 line-clamp-1" th:text="${conversation.purpose}">Conversation Purpose</h4>
                                 </div>
@@ -173,7 +173,7 @@
                                 <i class="fas fa-user-circle text-gray-400 mr-1.5"></i>
                                 <span class="text-sm text-gray-500" th:text="${conversation.createdBy}">John Doe</span>
                             </div>
-                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-primary bg-primary/10 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                                 <i class="fas fa-arrow-right mr-1.5"></i>
                                 View Conversation
                             </a>
@@ -187,7 +187,7 @@
                         </div>
                         <h3 class="mt-2 text-lg font-medium text-gray-900">No conversations yet</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by creating your first conversation for this project.</p>
-                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                             <i class="fas fa-plus mr-2"></i> Start New Conversation
                         </a>
                     </div>
@@ -199,10 +199,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10" id="new-conversation">
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <!-- Form Header -->
-            <div class="bg-gradient-to-r from-indigo-300 to-purple-300 px-6 py-4">
+            <div class="bg-secondary/80 px-6 py-4">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-white rounded-full p-2 shadow-md">
-                        <i class="fas fa-plus text-indigo-600"></i>
+                        <i class="fas fa-plus text-primary"></i>
                     </div>
                     <h3 class="ml-3 text-lg font-medium text-white">Start a New Conversation</h3>
                 </div>
@@ -238,7 +238,7 @@
                                       name="purpose"
                                       th:field="*{purpose}"
                                       required
-                                      class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-colors duration-200"
+                                      class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-colors duration-200"
                                       placeholder="What would you like to discuss about this project? Be specific to help others understand the context."
                                       rows="4"></textarea>
                         </div>
@@ -255,7 +255,7 @@
                             Cancel
                         </a>
                         <button type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                             <i class="fas fa-plus mr-2"></i>
                             Start New Conversation
                         </button>
