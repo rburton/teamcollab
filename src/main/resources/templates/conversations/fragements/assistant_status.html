@@ -1,5 +1,5 @@
-<div class="flex items-center justify-end space-x-2 py-2"
-     th:fragment="assistant_status"  th:id="'assistant_' + ${assistant.id} + '_status'">
+<div class="flex items-center gap-2"
+     th:fragment="assistant_status" th:id="'assistant_' + ${assistant.id} + '_status'">
     <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
-    <span class="text-sm text-black"><span th:text="${status}"></span>...</span>
+    <span class="text-xs font-medium text-gray-600"><span th:text="${status}"></span></span>
 </div>
