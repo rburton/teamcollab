@@ -21,7 +21,7 @@
         </div>
 
         <!-- Project Creation Form -->
-        <div class="bg-white shadow rounded-lg p-6">
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-100">
             <form action="/projects/create" method="POST" class="space-y-6" th:object="${projectCreateRequest}">
 
                 <!-- Project Name -->
@@ -30,7 +30,7 @@
                     <p class="text-xs text-gray-500 mb-1">Choose a clear, descriptive name that your team will recognize.</p>
                     <div class="mt-1">
                         <input type="text" th:field="*{name}" required autocomplete="off"
-                               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                               class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 shadow-sm transition-all duration-200 hover:outline-gray-400"
                                placeholder="e.g., Website Redesign, Q4 Marketing Campaign"
                                th:classappend="${#fields.hasErrors('name')} ? 'border-red-300'">
                         <p th:if="${#fields.hasErrors('name')}" class="mt-2 text-sm text-red-600" th:errors="*{name}"></p>
@@ -43,7 +43,7 @@
                     <p class="text-xs text-gray-500 mb-1">Describe what this project is about and what you aim to achieve.</p>
                     <div class="mt-1">
                         <textarea th:field="*{overview}" rows="3" required
-                                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                  class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 shadow-sm transition-all duration-200 hover:outline-gray-400"
                                   placeholder="e.g., Redesign our company website to improve user experience and increase conversion rates."
                                   th:classappend="${#fields.hasErrors('overview')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('overview')}" class="mt-2 text-sm text-red-600" th:errors="*{overview}"></p>
@@ -56,7 +56,7 @@
                     <p class="text-xs text-gray-500 mb-1">Every project starts with a conversation. What would you like to discuss first?</p>
                     <div class="mt-1">
                         <textarea th:field="*{purpose}" rows="3" required
-                                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                  class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 shadow-sm transition-all duration-200 hover:outline-gray-400"
                                   placeholder="e.g., Brainstorm website features, Discuss project timeline and milestones"
                                   th:classappend="${#fields.hasErrors('purpose')} ? 'border-red-300'"></textarea>
                         <p th:if="${#fields.hasErrors('purpose')}" class="mt-2 text-sm text-red-600" th:errors="*{purpose}"></p>
@@ -64,10 +64,10 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex items-center justify-between p-2 border-t border-gray-200 ">
+                <div class="flex items-center justify-between p-4 border-t border-gray-200 mt-2">
                     <p class="text-sm text-gray-500">You can add more conversations after creating the project.</p>
                     <button type="submit"
-                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105">
                         Create Project & Start Conversation
                     </button>
                 </div>
