@@ -118,6 +118,15 @@ public class ChatServiceImpl implements ChatService {
         log.debug("Using chat context - Purpose: {}, Project Overview: {}, History Size: {}",
                 chatContext.getPurpose(), chatContext.getProjectOverview(), chatContext.getLastMessages().size());
 
+        // Check if the assistant is muted in the conversation
+        if (recent.getAssistant() != null && conversation.isAssistantMuted(recent.getAssistant())) {
+            log.debug("Assistant {} is muted in conversation {}, skipping message processing", 
+                    recent.getAssistant().getId(), conversation.getId());
+            return CompletableFuture.completedFuture(MessageResponse.builder()
+                    .content("This assistant is currently muted in this conversation.")
+                    .build());
+        }
+
         final var start = now();
 
         return CompletableFuture.supplyAsync(() -> {

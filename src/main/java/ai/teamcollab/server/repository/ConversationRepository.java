@@ -19,6 +19,6 @@ public interface ConversationRepository extends CrudRepository<Conversation, Lon
      * @param id the ID of the conversation to find
      * @return the conversation with eagerly fetched assistants, or empty if not found
      */
-    @Query("SELECT c FROM Conversation c LEFT JOIN FETCH c.assistants WHERE c.id = :id")
+    @Query("SELECT c FROM Conversation c LEFT JOIN FETCH c.conversationAssistants ca LEFT JOIN FETCH ca.assistant WHERE c.id = :id")
     Optional<Conversation> findByIdWithAssistant(@Param("id") Long id);
 }

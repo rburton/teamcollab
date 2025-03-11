@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.controller.domain.AssistantView;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
@@ -81,7 +82,8 @@ public class ConversationController {
         }
 
         model.addAttribute("conversation", conversation);
-        model.addAttribute("assistants", conversation.getAssistants());
+        model.addAttribute("conversationId", conversation.getId());
+        model.addAttribute("assistants", AssistantView.from(conversation.getConversationAssistants()));
         return "conversations/show";
     }
 

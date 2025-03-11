@@ -87,7 +87,7 @@
     <div class="flex flex-1 overflow-hidden">
         <!-- Left Sidebar with assistants -->
         <div class="w-1/4 bg-white border-r border-gray-200 p-4 overflow-y-auto transition-all duration-300"
-             id="sidebar" data-controller="assistant" th:data-assistant-conversation-id-value="${conversation.id}">
+             id="sidebar" data-controller="assistant assistant-mute" th:data-assistant-conversation-id-value="${conversation.id}">
             <div class="flex justify-between mb-4">
                 <h2 class="text-lg font-semibold">Assistants</h2>
                 <button data-action="click->assistant#open" class="text-blue-500 hover:text-blue-700">

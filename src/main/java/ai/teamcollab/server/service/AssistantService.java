@@ -80,8 +80,48 @@ public class AssistantService {
         assistantRepository.save(assistant);
     }
 
+    @Transactional
+    public void muteAssistantInConversation(Long assistantId, Long conversationId) {
+        log.debug("Muting assistant {} in conversation {}", assistantId, conversationId);
+
+        final var assistant = assistantRepository.findById(assistantId)
+                .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
+
+        final var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
+
+        assistant.muteInConversation(conversation);
+        assistantRepository.save(assistant);
+    }
+
+    @Transactional
+    public void unmuteAssistantInConversation(Long assistantId, Long conversationId) {
+        log.debug("Unmuting assistant {} in conversation {}", assistantId, conversationId);
+
+        final var assistant = assistantRepository.findById(assistantId)
+                .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
+
+        final var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
+
+        assistant.unmuteInConversation(conversation);
+        assistantRepository.save(assistant);
+    }
+
+    public boolean isAssistantMutedInConversation(Long assistantId, Long conversationId) {
+        log.debug("Checking if assistant {} is muted in conversation {}", assistantId, conversationId);
+
+        final var assistant = assistantRepository.findById(assistantId)
+                .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
+
+        final var conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found with ID: " + conversationId));
+
+        return assistant.isMutedInConversation(conversation);
+    }
+
     public List<Assistant> findAssistantsNotInConversation(Long companyId, Long conversationId) {
         log.debug("Finding assistants not in conversation {} for company {}", conversationId, companyId);
-        return assistantRepository.findByCompanyIdAndConversationsIdNotOrConversationsIsEmpty(companyId, conversationId);
+        return assistantRepository.findAssistantsNotInConversation(companyId, conversationId);
     }
 }

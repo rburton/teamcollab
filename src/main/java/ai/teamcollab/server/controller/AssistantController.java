@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.controller.domain.AssistantView;
 import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.AssistantService;
@@ -116,7 +117,8 @@ public class AssistantController {
             }
 
             assistantService.addToConversation(id, conversationId);
-            model.addAttribute("assistant", assistant);
+            model.addAttribute("conversationId", conversationId);
+            model.addAttribute("assistant", AssistantView.from(assistant));
         } catch (IllegalArgumentException e) {
             log.error("Failed to add to conversation", e);
         }
@@ -149,7 +151,7 @@ public class AssistantController {
             log.debug("Getting assistants not in conversation {} for company {}", conversationId, user.getCompany().getId());
             final var company = user.getCompany();
             final var assistants = assistantService.findAssistantsNotInConversation(company.getId(), conversationId);
-            model.addAttribute("assistants", assistants);
+            model.addAttribute("assistants", assistants.stream().map(AssistantView::from).toList());
             model.addAttribute("conversationId", conversationId);
             return "assistants/assistants";
         } catch (IllegalArgumentException e) {

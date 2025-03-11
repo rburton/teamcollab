@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,10 +16,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -57,9 +57,8 @@ public class Assistant {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @Lazy
-    @ManyToMany(mappedBy = "assistants")
-    private Set<Conversation> conversations = new HashSet<>();
+    @OneToMany(mappedBy = "assistant")
+    private Set<ConversationAssistant> conversationAssistants = new HashSet<>();
 
     public Assistant(String name, String expertise) {
         this.name = name;
@@ -71,6 +70,34 @@ public class Assistant {
     }
 
     public void removeFromConversation(Conversation conversation) {
-        this.conversations.remove(conversation);
+        conversationAssistants.removeIf(ca -> ca.getConversation().equals(conversation));
+    }
+
+    public Set<Conversation> getConversations() {
+        return conversationAssistants.stream()
+                .map(ConversationAssistant::getConversation)
+                .collect(Collectors.toSet());
+    }
+
+    public void muteInConversation(Conversation conversation) {
+        conversationAssistants.stream()
+                .filter(ca -> ca.getConversation().equals(conversation))
+                .findFirst()
+                .ifPresent(ca -> ca.setMuted(true));
+    }
+
+    public void unmuteInConversation(Conversation conversation) {
+        conversationAssistants.stream()
+                .filter(ca -> ca.getConversation().equals(conversation))
+                .findFirst()
+                .ifPresent(ca -> ca.setMuted(false));
+    }
+
+    public boolean isMutedInConversation(Conversation conversation) {
+        return conversationAssistants.stream()
+                .filter(ca -> ca.getConversation().equals(conversation))
+                .findFirst()
+                .map(ConversationAssistant::isMuted)
+                .orElse(false);
     }
 }

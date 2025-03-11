@@ -6,8 +6,11 @@ import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.AssistantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,4 +36,33 @@ public class AssistantRestController {
                 .toList();
     }
 
+    @PostMapping("/{assistantId}/conversations/{conversationId}/mute")
+    public ResponseEntity<Void> muteAssistantInConversation(
+            @PathVariable Long assistantId,
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal User user) {
+        log.debug("Muting assistant {} in conversation {}", assistantId, conversationId);
+        assistantService.muteAssistantInConversation(assistantId, conversationId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{assistantId}/conversations/{conversationId}/unmute")
+    public ResponseEntity<Void> unmuteAssistantInConversation(
+            @PathVariable Long assistantId,
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal User user) {
+        log.debug("Unmuting assistant {} in conversation {}", assistantId, conversationId);
+        assistantService.unmuteAssistantInConversation(assistantId, conversationId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{assistantId}/conversations/{conversationId}/muted")
+    public ResponseEntity<Boolean> isAssistantMutedInConversation(
+            @PathVariable Long assistantId,
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal User user) {
+        log.debug("Checking if assistant {} is muted in conversation {}", assistantId, conversationId);
+        boolean muted = assistantService.isAssistantMutedInConversation(assistantId, conversationId);
+        return ResponseEntity.ok(muted);
+    }
 }

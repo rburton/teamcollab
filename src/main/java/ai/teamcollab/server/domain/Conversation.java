@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -17,12 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
@@ -58,14 +55,8 @@ public class Conversation {
     @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
 
-    @ManyToMany(fetch = EAGER)
-    @JoinTable(
-            name = "conversation_assistant",
-            joinColumns = @JoinColumn(name = "conversation_id"),
-            inverseJoinColumns = @JoinColumn(name = "assistant_id")
-    )
-    @Fetch(FetchMode.JOIN)
-    private Set<Assistant> assistants = new HashSet<>();
+    @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
+    private Set<ConversationAssistant> conversationAssistants = new HashSet<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -77,7 +68,35 @@ public class Conversation {
     }
 
     public void addAssistant(Assistant assistant) {
-        assistants.add(assistant);
-        assistant.getConversations().add(this);
+        ConversationAssistant conversationAssistant = new ConversationAssistant(this, assistant);
+        conversationAssistants.add(conversationAssistant);
+    }
+
+    public Set<Assistant> getAssistants() {
+        return conversationAssistants.stream()
+                .map(ConversationAssistant::getAssistant)
+                .collect(Collectors.toSet());
+    }
+
+    public void muteAssistant(Assistant assistant) {
+        conversationAssistants.stream()
+                .filter(ca -> ca.getAssistant().equals(assistant))
+                .findFirst()
+                .ifPresent(ca -> ca.setMuted(true));
+    }
+
+    public void unmuteAssistant(Assistant assistant) {
+        conversationAssistants.stream()
+                .filter(ca -> ca.getAssistant().equals(assistant))
+                .findFirst()
+                .ifPresent(ca -> ca.setMuted(false));
+    }
+
+    public boolean isAssistantMuted(Assistant assistant) {
+        return conversationAssistants.stream()
+                .filter(ca -> ca.getAssistant().equals(assistant))
+                .findFirst()
+                .map(ConversationAssistant::isMuted)
+                .orElse(false);
     }
 }
