@@ -10,7 +10,6 @@ import ai.teamcollab.server.ws.domain.WsMessageResponse;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -18,10 +17,10 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 import java.util.Map;
 
-import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplatePath.ASSISTANT_STATUSES_TEMPLATE;
-import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
+import static ai.teamcollab.server.templates.TemplatePath.CONVERSATION_MESSAGE_TEMPLATE;
 import static ai.teamcollab.server.templates.TemplateVariableName.ASSISTANTS;
+import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 
 @Controller
@@ -41,8 +40,7 @@ public class WebSocketController {
     @MessageMapping("/chat.send")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
     public WsMessageResponse sendMessage(@Payload WsMessage message,
-                                         UsernamePasswordAuthenticationToken principal,
-                                         SimpMessageHeaderAccessor headerAccessor) {
+                                         UsernamePasswordAuthenticationToken principal) {
         final var user = (User) principal.getPrincipal();
         final var newMessage = Message.builder()
                 .content(message.getContent())
@@ -55,6 +53,7 @@ public class WebSocketController {
                 .content(savedMessage.getContent())
                 .username(principal.getName())
                 .createdAt(savedMessage.getCreatedAt())
+                .bookmarked(false)
                 .build();
 
         final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
@@ -65,7 +64,7 @@ public class WebSocketController {
 
     @MessageMapping("/chat.join")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
-    public WsMessageResponse joinChat(@Payload WsMessage message, SimpMessageHeaderAccessor headerAccessor) {
+    public WsMessageResponse joinChat(@Payload WsMessage message) {
         final var messages = conversationService.findMessagesByConversation(message.getConversationId())
                 .stream()
                 .map(MessageRow::from)
@@ -80,6 +79,7 @@ public class WebSocketController {
     @MessageExceptionHandler
     @SendToUser(ERROR_EVENT_TOPIC)
     public String handleException(Throwable exception) {
+        exception.printStackTrace();
         return exception.getMessage();
     }
 

@@ -12,9 +12,12 @@ import java.util.Optional;
 @Getter
 @Builder
 public class MessageRow {
+    private Long id;
     private String username;
     private String assistantName;
     private String content;
+    private Long conversationId;
+    private boolean bookmarked;
     private LocalDateTime createdAt;
 
     public static MessageRow from(Message message) {
@@ -26,9 +29,12 @@ public class MessageRow {
                 .orElse(null);
 
         return MessageRow.builder()
+                .id(message.getId())
                 .content(message.getContent())
                 .username(username)
                 .assistantName(assistantName)
+                .bookmarked(false)
+                .conversationId(message.getConversation().getId())
                 .createdAt(message.getCreatedAt())
                 .build();
     }

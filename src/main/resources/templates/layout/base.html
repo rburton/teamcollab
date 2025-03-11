@@ -60,6 +60,10 @@
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">All Projects</a>
                         <a href="/assistants"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
+                        <a href="/bookmarks"
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                           <i class="fas fa-bookmark mr-1"></i>Bookmarks
+                        </a>
                         <a href="/company/admin" sec:authorize="hasRole('ADMIN')"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Company Settings</a>
                         <a href="/company/billing" sec:authorize="hasRole('ADMIN')"
@@ -134,6 +138,10 @@
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">New Project</a>
             <a href="/assistants"
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
+            <a href="/bookmarks"
+               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+               <i class="fas fa-bookmark mr-1"></i>Bookmarks
+            </a>
             <a href="/metrics"
                class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Metrics</a>
             <a href="/admin" sec:authorize="hasRole('ADMIN')"

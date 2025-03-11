@@ -96,6 +96,20 @@ CREATE TABLE messages
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );
+CREATE TABLE bookmarks
+(
+    bookmark_id BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT    NOT NULL,
+    message_id  BIGINT    NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE,
+    CONSTRAINT uk_user_message UNIQUE (user_id, message_id)
+);
+
+CREATE INDEX idx_bookmarks_user_id ON bookmarks (user_id);
+CREATE INDEX idx_bookmarks_message_id ON bookmarks (message_id);
+CREATE INDEX idx_bookmarks_created_at ON bookmarks (created_at DESC);
 
 CREATE TABLE metrics
 (

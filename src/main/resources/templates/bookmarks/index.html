@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Bookmarked Messages</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md flex justify-between items-center gap-6 rounded-lg mb-4">
+        <h1 class="text-xl text-white font-semibold">Bookmarked Messages</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div th:if="${#lists.isEmpty(bookmarkedMessages)}" class="text-center py-8">
+            <i class="fas fa-bookmark text-gray-300 text-5xl mb-4"></i>
+            <p class="text-gray-500">You don't have any bookmarked messages yet.</p>
+            <p class="text-gray-500 mt-2">Bookmark messages in your conversations to save them here.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(bookmarkedMessages)}" class="space-y-6">
+            <div th:each="message : ${bookmarkedMessages}" class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2"
+                         th:if="${message.user != null}"
+                         th:text="${#strings.substring(message.user.username, 0, 1)}">
+                    </div>
+                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white mr-2"
+                         th:if="${message.assistant != null}"
+                         th:text="${#strings.substring(message.assistant.name, 0, 1)}">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-2">
+                            <div>
+                                <span class="font-semibold" 
+                                      th:text="${message.user != null ? message.user.username : message.assistant.name}">
+                                </span>
+                                <span class="text-xs text-gray-500 ml-2"
+                                      th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy, hh:mm a')}">
+                                </span>
+                            </div>
+                            <div>
+                                <a th:href="@{/conversations/{id}(id=${message.conversation.id})}" 
+                                   class="text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    View in Conversation
+                                </a>
+                                <form th:action="@{/conversations/{conversationId}/messages/{messageId}/unbookmark(conversationId=${message.conversation.id},messageId=${message.id})}"
+                                      method="post" class="inline-block ml-4">
+                                    <button type="submit" class="text-yellow-500 hover:text-yellow-700 focus:outline-none">
+                                        <i class="fas fa-bookmark"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <p class="text-gray-800" th:text="${message.content}"></p>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <span class="font-medium">Conversation:</span>
+                            <span th:text="${message.conversation.purpose}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
