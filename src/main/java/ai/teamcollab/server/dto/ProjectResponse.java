@@ -24,6 +24,7 @@ public class ProjectResponse {
     public static class ConversationResponse {
         private Long id;
         private String purpose;
+        private String createdBy;
         private LocalDateTime createdAt;
     }
 }

@@ -6,12 +6,13 @@
     <title>Project Details</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <nav class="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
-        <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 px-4 sm:px-6 lg:px-8">
+<div layout:fragment="content" class="bg-gray-50">
+    <!-- Breadcrumb with enhanced styling -->
+    <nav class="flex border-b border-gray-200 bg-white shadow-sm mb-6" aria-label="Breadcrumb">
+        <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 px-4 sm:px-6 lg:px-8 py-3">
             <li class="flex">
                 <div class="flex items-center">
-                    <a href="/dashboard" class="text-gray-400 hover:text-gray-500">
+                    <a href="/dashboard" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">
                         <svg class="size-5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
                              data-slot="icon">
                             <path fill-rule="evenodd"
@@ -28,7 +29,7 @@
                          fill="currentColor" aria-hidden="true">
                         <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">Projects</a>
+                    <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors duration-200">Projects</a>
                 </div>
             </li>
             <li class="flex">
@@ -37,107 +38,225 @@
                          fill="currentColor" aria-hidden="true">
                         <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="#" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" aria-current="page"
+                    <a href="#" class="ml-4 text-sm font-medium text-indigo-600" aria-current="page"
                        th:text="${project.name}">Project Nero</a>
                 </div>
             </li>
         </ol>
     </nav>
 
-    <div class="border-b border-gray-200 pb-5 bg-white shadow rounded-lg p-3">
-        <h3 class="text-base font-semibold text-gray-900">
-            <span th:text="${project.name}">Job Postings</span>
-        </h3>
-        <p class="mt-2 max-w-4xl text-sm text-gray-500" th:text="${project.overview}">
-            Workcation is a property rental website. Etiam ullamcorper massa viverra consequat, consectetur id nulla
-            tempus. Fringilla egestas justo massa purus sagittis malesuada.
-        </p>
-        <p class="mt-1 text-xs text-gray-400"
-           th:text="'Created: ' + ${#temporals.format(project.createdAt, 'MMM dd, yyyy')}">Created Date</p>
-    </div>
-    <div th:if="${errorMessage}"
-         class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <span class="block sm:inline" th:text="${errorMessage}"></span>
-    </div>
+    <!-- Modern project header with clean styling -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md">
+            <!-- Project header top section -->
+            <div class="relative">
+                <!-- Decorative header background -->
+                <div class="absolute inset-0 h-24 bg-gradient-to-r from-indigo-500/90 to-purple-500/90"></div>
 
-
-    <!-- Conversations List -->
-    <div class="bg-white shadow rounded-lg p-4">
-        <div class="mt-2">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                    <tr>
-                        <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                            Conversation Name
-                        </th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At
-                        </th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"></th>
-                    </tr>
-                    </thead>
-
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    <tr th:each="conversation : ${project.conversations}" class="hover:bg-gray-50">
-                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
-                            <div class="text-sm font-bold text-blue-800">
-                                <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="hover:underline">
-                                    <i class="fas fa-comments text-gray-500 mr-2"></i>
-                                    <span th:text="${conversation.purpose}">Conversation Purpose</span>
-                                </a>
+                <!-- Project title and icon section -->
+                <div class="relative pt-12 px-6 pb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-white rounded-full p-3 shadow-md transform transition-transform duration-300 hover:scale-105">
+                                <i class="fas fa-project-diagram text-2xl text-indigo-600"></i>
                             </div>
-                        </td>
-                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
-                            <div class="text-sm text-gray-500"
-                                 th:text="${#temporals.format(conversation.createdAt, 'MMM dd, yyyy')}">Date
-                            </div>
-                        </td>
-                        <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
-                            <a th:href="@{/conversations/{id}(id=${conversation.id})}"
-                               class="text-indigo-600 hover:text-indigo-900">
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(project.conversations)}">
-                        <td colspan="3" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                            No conversations found
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                            <h2 class="ml-4 text-2xl font-bold text-white tracking-tight" th:text="${project.name}">
+                                Job Postings
+                            </h2>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/90 text-indigo-700 shadow-sm">
+                                <i class="fas fa-calendar-alt mr-1.5"></i>
+                                <span th:text="${#temporals.format(project.createdAt, 'MMM dd, yyyy')}">Created Date</span>
+                            </span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 shadow-sm">
+                                <i class="fas fa-check-circle mr-1.5"></i>
+                                <span>Active</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project content section -->
+            <div class="px-6 py-5 bg-white">
+                <!-- Project overview -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Overview</h3>
+                    <p class="text-gray-700 text-base leading-relaxed" th:text="${project.overview}">
+                        Workcation is a property rental website. Etiam ullamcorper massa viverra consequat, consectetur id nulla
+                        tempus. Fringilla egestas justo massa purus sagittis malesuada.
+                    </p>
+                </div>
+
+                <!-- Project stats and actions -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center space-x-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            <i class="fas fa-comments mr-1.5"></i>
+                            <span th:text="${#lists.size(project.conversations)} + ' Conversations'">5 Conversations</span>
+                        </span>
+                    </div>
+                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-plus mr-2"></i> New Conversation
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="bg-white shadow rounded-lg p-6 py-2">
-        <div class="text-center py-4">
-            <!-- New Conversation Form -->
-            <div class="mt-6 max-w-xl mx-auto">
+
+    <!-- Alert messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div th:if="${errorMessage}"
+             class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+            <i class="fas fa-exclamation-circle text-red-500 mr-3 text-lg"></i>
+            <span class="block sm:inline" th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${successMessage}"
+             class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+            <i class="fas fa-check-circle text-green-500 mr-3 text-lg"></i>
+            <span class="block sm:inline" th:text="${successMessage}"></span>
+        </div>
+    </div>
+
+
+    <!-- Conversations Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <!-- Section Header with Search -->
+            <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex flex-wrap items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-comments text-indigo-600 mr-3 text-xl"></i>
+                    <h3 class="text-lg font-medium text-gray-900">Project Conversations</h3>
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800" th:text="${#lists.size(project.conversations)}">5</span>
+                </div>
+
+                <!-- Search Box -->
+                <div class="mt-2 sm:mt-0 w-full sm:w-auto">
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" id="conversation-search" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search conversations...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversations Grid -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="conversations-container">
+                    <!-- Conversation Cards -->
+                    <div th:each="conversation : ${project.conversations}" class="conversation-card bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
+                        <div class="p-5 flex-grow">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center mb-3">
+                                    <div class="flex-shrink-0 bg-indigo-100 rounded-full p-2">
+                                        <i class="fas fa-comments text-indigo-600"></i>
+                                    </div>
+                                    <h4 class="ml-3 text-lg font-semibold text-gray-900 line-clamp-1" th:text="${conversation.purpose}">Conversation Purpose</h4>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-circle text-xs mr-1"></i>
+                                    <span>Active</span>
+                                </span>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 line-clamp-2" th:text="${conversation.purpose}">
+                                This is a brief description of the conversation purpose and what it's about.
+                            </p>
+                            <div class="mt-4 flex items-center text-sm text-gray-500">
+                                <i class="fas fa-calendar-alt mr-1.5 text-gray-400"></i>
+                                <span th:text="${#temporals.format(conversation.createdAt, 'MMM dd, yyyy')}">June 8, 2023</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-circle text-gray-400 mr-1.5"></i>
+                                <span class="text-sm text-gray-500" th:text="${conversation.createdBy}">John Doe</span>
+                            </div>
+                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                <i class="fas fa-arrow-right mr-1.5"></i>
+                                View Conversation
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div th:if="${#lists.isEmpty(project.conversations)}" class="col-span-full flex flex-col items-center justify-center py-12 px-4 text-center">
+                        <div class="bg-gray-100 rounded-full p-4 mb-4">
+                            <i class="fas fa-comments text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="mt-2 text-lg font-medium text-gray-900">No conversations yet</h3>
+                        <p class="mt-1 text-sm text-gray-500">Get started by creating your first conversation for this project.</p>
+                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i> Start New Conversation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- New Conversation Form Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10" id="new-conversation">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <!-- Form Header -->
+            <div class="bg-gradient-to-r from-indigo-300 to-purple-300 px-6 py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-white rounded-full p-2 shadow-md">
+                        <i class="fas fa-plus text-indigo-600"></i>
+                    </div>
+                    <h3 class="ml-3 text-lg font-medium text-white">Start a New Conversation</h3>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="px-6 py-6">
+                <div class="mb-6 bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                Create a new conversation to discuss specific aspects of this project. Be clear about the purpose to help team members understand the context.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <form th:action="@{/projects/{id}/conversations(id=${project.id})}"
                       th:object="${conversationCreateRequest}"
                       method="post"
-                      class="space-y-4">
+                      class="space-y-6">
 
-                    <div class="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <label for="purpose" class="sr-only">Conversation Purpose</label>
+                    <div>
+                        <label for="purpose" class="block text-sm font-medium text-gray-700 mb-1">Conversation Purpose</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-comment-alt text-gray-400"></i>
+                            </div>
                             <textarea id="purpose"
                                       name="purpose"
                                       th:field="*{purpose}"
                                       required
-                                      class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                      placeholder="What would you like to discuss about this project?"
-                                      rows="3"></textarea>
+                                      class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-colors duration-200"
+                                      placeholder="What would you like to discuss about this project? Be specific to help others understand the context."
+                                      rows="4"></textarea>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Clearly describe the purpose of this conversation (e.g., "Discuss project timeline and milestones")</p>
+
+                        <div th:if="${#fields.hasErrors('purpose')}" class="mt-2 text-sm text-red-600 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1.5"></i>
+                            <span th:errors="*{purpose}"></span>
                         </div>
                     </div>
 
-                    <div th:if="${#fields.hasErrors('purpose')}" class="text-red-500 text-sm mt-1">
-                        <span th:errors="*{purpose}"></span>
-                    </div>
-
-                    <div>
+                    <div class="flex items-center justify-end">
+                        <a href="#" class="text-sm font-medium text-gray-600 hover:text-gray-900 mr-4">
+                            Cancel
+                        </a>
                         <button type="submit"
-                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>
                             Start New Conversation
                         </button>
                     </div>
@@ -145,6 +264,55 @@
             </div>
         </div>
     </div>
+
+    <!-- JavaScript for Search Functionality -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('conversation-search');
+        const conversationCards = document.querySelectorAll('.conversation-card');
+        const conversationsContainer = document.getElementById('conversations-container');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+
+            let visibleCount = 0;
+            conversationCards.forEach(card => {
+                const purpose = card.querySelector('h4').textContent.toLowerCase();
+                if (purpose.includes(searchTerm)) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show empty state if no results
+            if (visibleCount === 0 && conversationCards.length > 0) {
+                // Check if we already have a no-results element
+                let noResults = document.getElementById('no-search-results');
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.id = 'no-search-results';
+                    noResults.className = 'col-span-full flex flex-col items-center justify-center py-12 px-4 text-center';
+                    noResults.innerHTML = `
+                        <div class="bg-gray-100 rounded-full p-4 mb-4">
+                            <i class="fas fa-search text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="mt-2 text-lg font-medium text-gray-900">No matching conversations</h3>
+                        <p class="mt-1 text-sm text-gray-500">Try adjusting your search terms.</p>
+                    `;
+                    conversationsContainer.appendChild(noResults);
+                }
+                noResults.style.display = '';
+            } else {
+                const noResults = document.getElementById('no-search-results');
+                if (noResults) {
+                    noResults.style.display = 'none';
+                }
+            }
+        });
+    });
+    </script>
 
 </div>
 
