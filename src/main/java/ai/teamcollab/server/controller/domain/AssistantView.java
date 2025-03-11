@@ -40,7 +40,7 @@ public class AssistantView {
                 .id(String.valueOf(assistant.getId()))
                 .name(assistant.getName())
                 .muted(conversationAssistant.isMuted())
-                .tone(tone.name())
+                .tone(tone != null ? tone.getName() : "FORMAL")
                 .expertise(assistant.getExpertise())
                 .build();
     }

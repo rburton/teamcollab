@@ -113,6 +113,6 @@ public class Assistant {
                 .filter(ca -> ca.getConversation().equals(conversation))
                 .findFirst()
                 .map(ConversationAssistant::getTone)
-                .orElse(AssistantTone.FORMAL);
+                .orElse(null); // Default tone will be set by the service layer
     }
 }

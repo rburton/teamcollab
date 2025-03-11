@@ -74,6 +74,16 @@ CREATE TABLE assistants
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
+-- Create the assistant_tone table
+CREATE TABLE assistant_tone (
+                                id BIGSERIAL PRIMARY KEY,
+                                name VARCHAR(50) NOT NULL UNIQUE,
+                                display_name VARCHAR(100) NOT NULL,
+                                prompt TEXT,
+                                created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                deleted_time TIMESTAMP
+);
 
 CREATE TABLE conversation_assistant
 (
@@ -81,7 +91,8 @@ CREATE TABLE conversation_assistant
     conversation_id BIGINT  NOT NULL,
     assistant_id    BIGINT  NOT NULL,
     muted           BOOLEAN NOT NULL DEFAULT FALSE,
-    tone            VARCHAR(20)      DEFAULT 'FORMAL' NOT NULL,
+    tone_id         BIGINT,
+    CONSTRAINT fk_tone FOREIGN KEY (tone_id) REFERENCES assistant_tone(id),
     CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
     CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)

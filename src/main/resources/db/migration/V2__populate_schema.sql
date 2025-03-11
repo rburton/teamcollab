@@ -39,3 +39,11 @@ VALUES (1, NOW(), NULL, 1.00),
        (4, NOW(), 40.00, 20.00),
        (5, NOW(), 199.00, 100.00)
 ;
+
+-- Insert the existing tones from the enum
+INSERT INTO assistant_tone (name, display_name, prompt)
+VALUES
+    ('FORMAL', 'Formal', 'Communicate in a professional and structured manner.'),
+    ('CASUAL', 'Casual', 'Communicate in a friendly and conversational style.'),
+    ('TECHNICAL', 'Technical', 'Communicate with detailed and specialized terminology.'),
+    ('SIMPLIFIED', 'Simplified', 'Communicate in a clear and easy to understand manner.');

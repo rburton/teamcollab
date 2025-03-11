@@ -76,8 +76,7 @@ public class AssistantRestController {
             @AuthenticationPrincipal User user) {
         log.debug("Setting tone {} for assistant {} in conversation {}", toneName, assistantId, conversationId);
         try {
-            AssistantTone tone = AssistantTone.fromName(toneName);
-            assistantService.setAssistantToneInConversation(assistantId, conversationId, tone);
+            assistantService.setAssistantToneInConversation(assistantId, conversationId, toneName);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             log.error("Invalid tone name: {}", toneName, e);
@@ -92,6 +91,6 @@ public class AssistantRestController {
             @AuthenticationPrincipal User user) {
         log.debug("Getting tone for assistant {} in conversation {}", assistantId, conversationId);
         AssistantTone tone = assistantService.getAssistantToneInConversation(assistantId, conversationId);
-        return ResponseEntity.ok(tone.name());
+        return ResponseEntity.ok(tone != null ? tone.getName() : "FORMAL");
     }
 }
