@@ -33,6 +33,25 @@ CREATE TABLE user_roles
     role_id BIGINT REFERENCES roles (role_id),
     PRIMARY KEY (user_id, role_id)
 );
+-- Create auth_providers table for OAuth2 authentication
+CREATE TABLE auth_providers
+(
+    auth_provider_id     BIGSERIAL PRIMARY KEY,
+    provider_name        VARCHAR(50) NOT NULL,
+    provider_user_id     VARCHAR(255),
+    provider_email       VARCHAR(255),
+    provider_picture_url VARCHAR(1000),
+    user_id              BIGINT,
+    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    CONSTRAINT uk_provider_user UNIQUE (provider_name, provider_user_id)
+);
+
+-- Create indexes for faster lookups
+CREATE INDEX idx_auth_providers_user_id ON auth_providers (user_id);
+CREATE INDEX idx_auth_providers_provider_name_user_id ON auth_providers (provider_name, provider_user_id);
+CREATE INDEX idx_auth_providers_provider_name_email ON auth_providers (provider_name, provider_email);
 
 INSERT INTO roles (name)
 VALUES ('SUPER_ADMIN'),
@@ -75,14 +94,15 @@ CREATE TABLE assistants
     CONSTRAINT fk_company FOREIGN KEY (company_id) REFERENCES companies (company_id)
 );
 -- Create the assistant_tone table
-CREATE TABLE assistant_tone (
-                                id BIGSERIAL PRIMARY KEY,
-                                name VARCHAR(50) NOT NULL UNIQUE,
-                                display_name VARCHAR(100) NOT NULL,
-                                prompt TEXT,
-                                created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                deleted_time TIMESTAMP
+CREATE TABLE assistant_tone
+(
+    id           BIGSERIAL PRIMARY KEY,
+    name         VARCHAR(50)  NOT NULL UNIQUE,
+    display_name VARCHAR(100) NOT NULL,
+    prompt       TEXT,
+    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_time TIMESTAMP
 );
 
 CREATE TABLE conversation_assistant
@@ -92,7 +112,7 @@ CREATE TABLE conversation_assistant
     assistant_id    BIGINT  NOT NULL,
     muted           BOOLEAN NOT NULL DEFAULT FALSE,
     tone_id         BIGINT,
-    CONSTRAINT fk_tone FOREIGN KEY (tone_id) REFERENCES assistant_tone(id),
+    CONSTRAINT fk_tone FOREIGN KEY (tone_id) REFERENCES assistant_tone (id),
     CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
     CONSTRAINT uk_assistant_conversation UNIQUE (assistant_id, conversation_id)
@@ -223,3 +243,52 @@ CREATE TABLE spring_session_attributes
 );
 
 CREATE INDEX spring_session_attributes_ix1 ON spring_session_attributes (session_primary_id);
+
+CREATE TABLE point_in_time_summaries
+(
+    summary_id            BIGSERIAL PRIMARY KEY,
+    conversation_id       BIGINT    NOT NULL,
+    message_id            BIGINT    NOT NULL,
+    topics_and_key_points TEXT      NOT NULL,
+    topic_summaries       TEXT      NOT NULL,
+    assistant_summaries   TEXT      NOT NULL,
+    created_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_active             BOOLEAN   NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE,
+    CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_summaries_conversation_id ON point_in_time_summaries (conversation_id);
+CREATE INDEX idx_summaries_message_id ON point_in_time_summaries (message_id);
+CREATE INDEX idx_summaries_created_at ON point_in_time_summaries (created_at DESC);
+CREATE INDEX idx_summaries_is_active ON point_in_time_summaries (is_active);
+
+-- Create the audits table for tracking user actions
+CREATE TABLE audits
+(
+    id          BIGSERIAL PRIMARY KEY,
+    action_type VARCHAR(50)  NOT NULL,
+    user_id     BIGINT,
+    username    VARCHAR(255) NOT NULL,
+    ip_address  VARCHAR(50),
+    details     VARCHAR(1000),
+    timestamp   TIMESTAMP    NOT NULL,
+    entity_type VARCHAR(100),
+    entity_id   BIGINT,
+    company_id  BIGINT,
+
+    -- Foreign key constraints
+    CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE SET NULL,
+    CONSTRAINT fk_audit_company FOREIGN KEY (company_id) REFERENCES companies (company_id) ON DELETE SET NULL
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_audit_user_id ON audits (user_id);
+CREATE INDEX idx_audit_company_id ON audits (company_id);
+CREATE INDEX idx_audit_action_type ON audits (action_type);
+CREATE INDEX idx_audit_timestamp ON audits (timestamp);
+CREATE INDEX idx_audit_entity ON audits (entity_type, entity_id);
+
+-- Add a comment to the table
+COMMENT ON TABLE audits IS 'Stores audit events for tracking user actions in the system';
