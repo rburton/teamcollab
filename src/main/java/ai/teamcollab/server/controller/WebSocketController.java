@@ -3,7 +3,6 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.controller.domain.WsMessage;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.ConversationService;
 import ai.teamcollab.server.service.MessageService;
 import ai.teamcollab.server.service.domain.MessageRow;
@@ -13,8 +12,7 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -45,8 +43,9 @@ public class WebSocketController {
     @MessageMapping("/chat.send")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
     public WsMessageResponse sendMessage(@Payload WsMessage message,
-                                         UsernamePasswordAuthenticationToken principal) {
-        final var user = (User) principal.getPrincipal();
+                                         AbstractAuthenticationToken principal) {
+        final var user = (LoginUserDetails) principal.getPrincipal();
+
         final var newMessage = Message.builder()
                 .content(message.getContent())
                 .build();
@@ -69,7 +68,8 @@ public class WebSocketController {
 
     @MessageMapping("/chat.join")
     @SendToUser(DIRECT_MESSAGE_TOPIC)
-    public WsMessageResponse joinChat(@Payload WsMessage message, @AuthenticationPrincipal LoginUserDetails user) {
+    public WsMessageResponse joinChat(@Payload WsMessage message, AbstractAuthenticationToken principal) {
+        final var user = (LoginUserDetails) principal.getPrincipal();
 
         final var messages = conversationService.findMessagesByConversation(message.getConversationId())
                 .stream()
