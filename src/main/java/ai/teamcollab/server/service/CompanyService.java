@@ -25,10 +25,7 @@ public class CompanyService {
     @Transactional
     public Company createCompany(Company company) {
         planDetailRepository.findFreePlan()
-                .ifPresent(planDetails -> {
-
-                    company.addSubscription(planDetails);
-                });
+                .ifPresent(company::addSubscription);
 
         return companyRepository.save(company);
     }

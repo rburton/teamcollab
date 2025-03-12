@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"roles"})
+@ToString(exclude = {"roles", "authProviders"})
 @Builder
 public class User implements UserDetails {
 
@@ -72,6 +73,11 @@ public class User implements UserDetails {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    @Builder.Default
+    private Set<AuthProvider> authProviders = new HashSet<>();
+
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
@@ -80,6 +86,10 @@ public class User implements UserDetails {
 
     public void addRole(Role role) {
         this.roles.add(role);
+    }
+
+    public void addAuthProvider(AuthProvider authProvider) {
+        this.authProviders.add(authProvider);
     }
 
     @Override
