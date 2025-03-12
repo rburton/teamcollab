@@ -1,6 +1,6 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,8 +16,8 @@ public class DashboardController {
 
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal User user, Model model) {
-        final var projects = projectService.getProjectsByCompany(user.getCompany().getId());
+    public String dashboard(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+        final var projects = projectService.getProjectsByCompany(loginUserDetails.getCompanyId());
         model.addAttribute("projects", projects);
         return "dashboard/dashboard";
     }

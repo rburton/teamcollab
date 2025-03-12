@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.CreateUserDTO;
 import ai.teamcollab.server.service.RoleService;
@@ -31,22 +32,22 @@ public class CompanyAdminController {
     private final RoleService roleService;
 
     @GetMapping("")
-    public String dashboard(@AuthenticationPrincipal User currentUser, Model model) {
-        var stats = userService.getUserStats(currentUser.getCompany().getId());
+    public String dashboard(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+        var stats = userService.getUserStats(loginUserDetails.getCompanyId());
         model.addAttribute("stats", stats);
         return "company/admin/dashboard";
     }
 
     @GetMapping("/users")
-    public String listUsers(@AuthenticationPrincipal User currentUser, Model model) {
-        final var users = userService.getUsersByCompany(currentUser.getCompany().getId());
+    public String listUsers(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+        final var users = userService.getUsersByCompany(loginUserDetails.getCompanyId());
         model.addAttribute("users", users);
         model.addAttribute("allRoles", roleService.getAllRoles());
         return "company/admin/users/index";
     }
 
     @GetMapping("/users/new")
-    public String showCreateUserForm(@AuthenticationPrincipal User currentUser, Model model) {
+    public String showCreateUserForm(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
         model.addAttribute("user", new CreateUserDTO());
         model.addAttribute("roles", roleService.getAllRoles());
         return "company/admin/users/create";
@@ -57,7 +58,7 @@ public class CompanyAdminController {
             @Valid @ModelAttribute("user") CreateUserDTO createUserDTO,
             BindingResult result,
             @RequestParam Set<String> roles,
-            @AuthenticationPrincipal User currentUser,
+            @AuthenticationPrincipal LoginUserDetails loginUserDetails,
             Model model,
             RedirectAttributes redirectAttributes) {
 
@@ -74,7 +75,7 @@ public class CompanyAdminController {
                     .enabled(true)
                     .build();
 
-            userService.createCompanyUser(user, currentUser.getCompany().getId(), roles);
+            userService.createCompanyUser(user, loginUserDetails.getCompanyId(), roles);
             redirectAttributes.addFlashAttribute("successMessage", "User created successfully");
             return "redirect:/company/admin/users";
         } catch (IllegalArgumentException e) {
@@ -87,12 +88,12 @@ public class CompanyAdminController {
     public String updateUserRoles(
             @PathVariable Long userId,
             @RequestParam Set<String> roles,
-            @AuthenticationPrincipal User currentUser,
+            @AuthenticationPrincipal LoginUserDetails loginUserDetails,
             RedirectAttributes redirectAttributes) {
 
         try {
             final var targetUser = userService.getUserById(userId);
-            if (!targetUser.getCompany().getId().equals(currentUser.getCompany().getId())) {
+            if (!targetUser.getCompany().getId().equals(loginUserDetails.getCompanyId())) {
                 throw new IllegalArgumentException("User not found in your company");
             }
 
@@ -108,13 +109,13 @@ public class CompanyAdminController {
     @PostMapping("/users/{userId}/toggle")
     public String toggleUserStatus(
             @PathVariable Long userId,
-            @AuthenticationPrincipal User currentUser,
+            @AuthenticationPrincipal LoginUserDetails loginUserDetails,
             RedirectAttributes redirectAttributes) {
 
         try {
             // Verify user belongs to current user's company
             final var targetUser = userService.getUserById(userId);
-            if (!targetUser.getCompany().getId().equals(currentUser.getCompany().getId())) {
+            if (!targetUser.getCompany().getId().equals(loginUserDetails.getCompanyId())) {
                 throw new IllegalArgumentException("User not found in your company");
             }
 

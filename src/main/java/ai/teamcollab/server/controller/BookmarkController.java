@@ -1,6 +1,6 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.service.BookmarkService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class BookmarkController {
     }
 
     @GetMapping
-    public String index(@NonNull @AuthenticationPrincipal User user, Model model) {
+    public String index(@NonNull @AuthenticationPrincipal LoginUserDetails user, Model model) {
         model.addAttribute("bookmarkedMessages", bookmarkService.getBookmarkedMessages(user.getId()));
         return "bookmarks/index";
     }

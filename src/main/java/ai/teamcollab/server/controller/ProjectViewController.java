@@ -1,13 +1,12 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.domain.Conversation;
-import ai.teamcollab.server.domain.Project;
-import ai.teamcollab.server.dto.ProjectCreateRequest;
-import ai.teamcollab.server.dto.ProjectResponse;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.dto.ConversationCreateRequest;
-import ai.teamcollab.server.service.ProjectService;
+import ai.teamcollab.server.dto.ProjectCreateRequest;
 import ai.teamcollab.server.service.ConversationService;
+import ai.teamcollab.server.service.ProjectService;
+import ai.teamcollab.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
 @Slf4j
 @Controller
 @RequestMapping("/projects")
@@ -32,10 +29,11 @@ public class ProjectViewController {
 
     private final ProjectService projectService;
     private final ConversationService conversationService;
+    private final UserService userService;
 
     @GetMapping
-    public String index(@AuthenticationPrincipal User user, Model model) {
-        final var projects = projectService.getProjectsByCompany(user.getCompany().getId());
+    public String index(@AuthenticationPrincipal LoginUserDetails user, Model model) {
+        final var projects = projectService.getProjectsByCompany(user.getCompanyId());
         model.addAttribute("projects", projects);
         return "projects/index";
     }
@@ -47,12 +45,8 @@ public class ProjectViewController {
     }
 
     @PostMapping("/create")
-    public String create(
-            @AuthenticationPrincipal User user,
-            @Valid @ModelAttribute("projectCreateRequest") ProjectCreateRequest request,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String create(@Valid @ModelAttribute("projectCreateRequest") ProjectCreateRequest request,
+                         BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
         if (bindingResult.hasErrors()) {
             return "projects/new";
@@ -69,12 +63,12 @@ public class ProjectViewController {
     }
 
     @GetMapping("/{projectId}")
-    public String show(@PathVariable Long projectId, 
-                      @AuthenticationPrincipal User user,
-                      Model model,
-                      RedirectAttributes redirectAttributes) {
+    public String show(@PathVariable Long projectId,
+                       @AuthenticationPrincipal LoginUserDetails user,
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
         try {
-            final var project = projectService.getProjectById(projectId, user.getCompany().getId());
+            final var project = projectService.getProjectById(projectId, user.getCompanyId());
             model.addAttribute("project", project);
             var conversationRequest = new ConversationCreateRequest();
             conversationRequest.setProjectId(projectId);
@@ -92,19 +86,19 @@ public class ProjectViewController {
     @PostMapping("/{projectId}/conversations")
     public String createConversation(
             @PathVariable Long projectId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal LoginUserDetails userLogin,
             @Valid @ModelAttribute("conversationCreateRequest") ConversationCreateRequest request,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
 
-        log.debug("[DEBUG_LOG] Starting conversation creation for project {} by user {}", projectId, user.getUsername());
+        log.debug("[DEBUG_LOG] Starting conversation creation for project {} by user {}", projectId, userLogin.getUsername());
         log.debug("[DEBUG_LOG] Conversation purpose: {}", request.getPurpose());
 
         if (bindingResult.hasErrors()) {
             log.debug("[DEBUG_LOG] Validation errors found: {}", bindingResult.getAllErrors());
             try {
-                final var project = projectService.getProjectById(projectId, user.getCompany().getId());
+                final var project = projectService.getProjectById(projectId, userLogin.getCompanyId());
                 model.addAttribute("project", project);
                 model.addAttribute("conversationCreateRequest", request);
                 return "projects/show";
@@ -117,14 +111,15 @@ public class ProjectViewController {
 
         try {
             log.debug("[DEBUG_LOG] Fetching project entity for ID: {}", projectId);
-            var project = projectService.getProjectEntityById(projectId, user.getCompany().getId());
+            var project = projectService.getProjectEntityById(projectId, userLogin.getCompanyId());
 
             log.debug("[DEBUG_LOG] Creating new conversation");
+            final var user = userService.getUserById(userLogin.getId());
             var conversation = new Conversation(request.getPurpose(), user);
             conversation.setProject(project);
 
             log.debug("[DEBUG_LOG] Saving conversation");
-            var savedConversation = conversationService.createConversation(conversation, user.getId());
+            var savedConversation = conversationService.createConversation(conversation, userLogin.getId());
             log.debug("[DEBUG_LOG] Conversation saved with ID: {}", savedConversation.getId());
 
             redirectAttributes.addFlashAttribute("successMessage", "Conversation created successfully");

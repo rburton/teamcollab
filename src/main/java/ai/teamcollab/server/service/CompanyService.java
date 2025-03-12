@@ -1,7 +1,6 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Company;
-import ai.teamcollab.server.domain.Subscription;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.PlanDetailRepository;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Service
 public class CompanyService {

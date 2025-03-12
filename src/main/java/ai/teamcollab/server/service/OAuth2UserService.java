@@ -2,6 +2,7 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.AuthProvider;
 import ai.teamcollab.server.domain.Company;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.AuthProviderRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -16,7 +17,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ai.teamcollab.server.security.UserOAuth2User;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    private LoginUserDetails processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         final var providerName = oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
         final var attributes = oAuth2User.getAttributes();
 
@@ -125,16 +125,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2User.getAttributes(),
                 "email");
 
-        // Create a UserOAuth2User that extends User and implements OAuth2User
-        final var userOAuth2User = new UserOAuth2User(defaultOAuth2User, user);
 
-        // Create an authentication token with the UserOAuth2User as the principal
-        // This ensures compatibility with code that expects a UsernamePasswordAuthenticationToken
-        // with a User entity as the principal, since UserOAuth2User extends User
-        final var authentication = new UsernamePasswordAuthenticationToken(userOAuth2User, null, userOAuth2User.getAuthorities());
+        final var loginUserDetails = new LoginUserDetails(user);
+        final var authentication = new UsernamePasswordAuthenticationToken(loginUserDetails, null, loginUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return userOAuth2User;
+        // Create a UserOAuth2User that extends User and implements OAuth2User
+        return loginUserDetails;
     }
 
     private User createNewUser(String email) {

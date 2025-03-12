@@ -1,20 +1,22 @@
 package ai.teamcollab.server.service;
 
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.UserStats;
 import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.RoleRepository;
 import ai.teamcollab.server.repository.UserRepository;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -38,8 +40,9 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+        final var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return new LoginUserDetails(user);
     }
 
     @Transactional

@@ -18,7 +18,7 @@ public class WebSocketEventListener {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @EventListener
+//    @EventListener
     public void handleWebSocketConnect(SessionConnectEvent event) {
         final var headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         final var principal = (UsernamePasswordAuthenticationToken) headerAccessor.getUser();
@@ -26,7 +26,7 @@ public class WebSocketEventListener {
         System.out.println("Connected - Session ID: " + user.getUsername());
     }
 
-    @EventListener
+//    @EventListener
     public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
         final var headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         final var principal = (UsernamePasswordAuthenticationToken) headerAccessor.getUser();

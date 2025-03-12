@@ -1,7 +1,6 @@
 package ai.teamcollab.server.controller.domain;
 
 import ai.teamcollab.server.domain.Assistant;
-import ai.teamcollab.server.domain.AssistantTone;
 import ai.teamcollab.server.domain.ConversationAssistant;
 import lombok.Builder;
 import lombok.Getter;

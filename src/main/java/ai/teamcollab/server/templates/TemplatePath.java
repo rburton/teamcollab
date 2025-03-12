@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static ai.teamcollab.server.templates.TemplateVariableName.ASSISTANTS;
+import static ai.teamcollab.server.templates.TemplateVariableName.MESSAGE;
 import static ai.teamcollab.server.templates.TemplateVariableName.STATUS;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toUnmodifiableSet;

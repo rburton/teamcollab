@@ -1,7 +1,7 @@
 package ai.teamcollab.server.service.domain;
 
-import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Assistant;
+import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import lombok.Builder;
 import lombok.Getter;

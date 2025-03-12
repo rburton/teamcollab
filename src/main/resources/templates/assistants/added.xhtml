@@ -5,7 +5,7 @@
 
 <turbo-stream action="append" target='assistantList'>
 <template>
-    <th:block th:replace="conversations/fragements/assistant_row :: assistant_row" th:id="'assistant_' + ${assistant.id}">
+    <th:block th:replace="~{conversations/fragements/assistant_row :: assistant_row}" th:id="'assistant_' + ${assistant.id}">
     </th:block>
 </template>
 </turbo-stream>

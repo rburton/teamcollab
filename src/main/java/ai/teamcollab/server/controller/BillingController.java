@@ -1,8 +1,7 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.PlanDetail;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Subscription;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.PlanService;
 import ai.teamcollab.server.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-
 @Slf4j
 @Controller
 @RequestMapping("/company/billing")
@@ -30,9 +27,9 @@ public class BillingController {
     private final SubscriptionService subscriptionService;
 
     @GetMapping("")
-    public String billingPage(@AuthenticationPrincipal User currentUser, Model model) {
-        log.info("Displaying billing page for company: {}", currentUser.getCompany().getId());
-        final var companyId = currentUser.getCompany().getId();
+    public String billingPage(@AuthenticationPrincipal LoginUserDetails currentUser, Model model) {
+        log.info("Displaying billing page for company: {}", currentUser.getCompanyId());
+        final var companyId = currentUser.getCompanyId();
         final var plans = planService.getAllPlansWithDetails();
 
         // Get current subscription if exists
@@ -52,11 +49,11 @@ public class BillingController {
 
     @PostMapping("/subscribe")
     public String subscribe(@RequestParam Long planId,
-                            @AuthenticationPrincipal User currentUser,
+                            @AuthenticationPrincipal LoginUserDetails currentUser,
                             RedirectAttributes redirectAttributes) {
 
         try {
-            final var companyId = currentUser.getCompany().getId();
+            final var companyId = currentUser.getCompanyId();
             log.info("Creating subscription for company: {} with plan: {}", companyId, planId);
 
             // In a real implementation, this would create a Stripe checkout session

@@ -2,12 +2,10 @@ package ai.teamcollab.server.api;
 
 import ai.teamcollab.server.api.domain.AddAssistantRequest;
 import ai.teamcollab.server.api.domain.AssistantResponse;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.AssistantService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,8 +34,7 @@ public class ConversationRestController {
     @PostMapping("/{conversationId}/assistant")
     public ResponseEntity<AssistantResponse> addAssistantToConversation(
             @PathVariable Long conversationId,
-            @Valid @RequestBody AddAssistantRequest request,
-            @AuthenticationPrincipal User user) {
+            @Valid @RequestBody AddAssistantRequest request) {
 
         log.debug("Adding assistant {} to conversation {}", request.getAssistantId(), conversationId);
 

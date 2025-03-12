@@ -2,8 +2,8 @@ package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.controller.domain.AssistantView;
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.service.AssistantService;
 import ai.teamcollab.server.service.BookmarkService;
 import ai.teamcollab.server.service.ConversationService;
@@ -39,11 +39,10 @@ public class ConversationController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ConversationController(
-            @NonNull ConversationService conversationService,
-            @NonNull AssistantService assistantService,
-            @NonNull BookmarkService bookmarkService,
-            SimpMessagingTemplate messagingTemplate) {
+    public ConversationController(@NonNull ConversationService conversationService,
+                                  @NonNull AssistantService assistantService,
+                                  @NonNull BookmarkService bookmarkService,
+                                  @NonNull SimpMessagingTemplate messagingTemplate) {
         this.conversationService = conversationService;
         this.assistantService = assistantService;
         this.bookmarkService = bookmarkService;
@@ -51,7 +50,7 @@ public class ConversationController {
     }
 
     @GetMapping
-    public String index(@NonNull @AuthenticationPrincipal User user, Model model) {
+    public String index(@NonNull @AuthenticationPrincipal LoginUserDetails user, Model model) {
         model.addAttribute("conversations", conversationService.getUserConversations(user.getId()));
         if (!model.containsAttribute("conversation")) {
             model.addAttribute("conversation", new Conversation());
@@ -62,7 +61,7 @@ public class ConversationController {
     @PostMapping
     public String create(@Valid @ModelAttribute("conversation") Conversation conversation,
                          BindingResult bindingResult,
-                         @NonNull @AuthenticationPrincipal User user,
+                         @NonNull @AuthenticationPrincipal LoginUserDetails user,
                          RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
@@ -83,9 +82,9 @@ public class ConversationController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal User user, @NonNull Model model) {
+    public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal LoginUserDetails user, @NonNull Model model) {
         final var conversation = conversationService.findConversationByIdWithAssistant(id);
-        if (!user.equals(conversation.getUser())) {
+        if (!user.getId().equals(conversation.getUser().getId())) {
             throw new IllegalArgumentException("Access denied");
         }
 
@@ -100,7 +99,7 @@ public class ConversationController {
     public ResponseEntity<?> bookmarkMessage(
             @PathVariable Long conversationId,
             @PathVariable Long messageId,
-            @NonNull @AuthenticationPrincipal User user) {
+            @NonNull @AuthenticationPrincipal LoginUserDetails user) {
 
         try {
             bookmarkService.bookmarkMessage(user.getId(), messageId);
@@ -114,7 +113,7 @@ public class ConversationController {
     public ResponseEntity<?> unbookmarkMessage(
             @PathVariable Long conversationId,
             @PathVariable Long messageId,
-            @NonNull @AuthenticationPrincipal User user) {
+            @NonNull @AuthenticationPrincipal LoginUserDetails user) {
 
         try {
             bookmarkService.unbookmarkMessage(user.getId(), messageId);
@@ -128,7 +127,7 @@ public class ConversationController {
     public String postMessage(@PathVariable Long conversationId,
                               @Valid @ModelAttribute("newMessage") Message message,
                               BindingResult bindingResult,
-                              @AuthenticationPrincipal User user,
+                              @AuthenticationPrincipal LoginUserDetails user,
                               RedirectAttributes redirectAttributes,
                               Model mode,
                               @RequestHeader("Accept") String accept) {
@@ -151,7 +150,7 @@ public class ConversationController {
         }
 
         try {
-            final var savedMessage = conversationService.addToConversation(conversationId, message, user);
+            final var savedMessage = conversationService.addToConversation(conversationId, message, user.getId());
             this.messagingTemplate.convertAndSend("/topic/public", "{}");
 
             //            conversationService.sendMessage(savedMessage);
@@ -173,7 +172,6 @@ public class ConversationController {
     public String addAssistantToConversation(
             @PathVariable Long conversationId,
             @PathVariable Long assistantId,
-            @AuthenticationPrincipal User user,
             Model model) {
 
         log.debug("Adding assistant {} to conversation {}", assistantId, conversationId);

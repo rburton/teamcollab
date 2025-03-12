@@ -1,9 +1,9 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.GptModel;
+import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.Metrics;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.CompanyRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -138,12 +138,12 @@ public class MetricsViewController {
 
     @GetMapping("/company/{companyId}/costs")
     public String showCompanyCosts(@PathVariable Long companyId,
-                                   @AuthenticationPrincipal User currentUser,
+                                   @AuthenticationPrincipal LoginUserDetails currentUser,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
         try {
             // Verify user and company access
-            if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getCompany()) ||
+            if (Objects.isNull(currentUser) || Objects.isNull(currentUser.getCompanyId()) ||
                     !currentUser.getAuthorities().stream()
                             .anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
                 log.warn("Unauthorized access attempt for company {}", companyId);
@@ -154,7 +154,7 @@ public class MetricsViewController {
             }
 
             // Verify user has access to the company
-            if (!currentUser.getCompany().getId().equals(companyId)) {
+            if (!currentUser.getCompanyId().equals(companyId)) {
                 log.warn("User {} attempted to access costs for company {}", currentUser.getId(), companyId);
                 redirectAttributes.addFlashAttribute("errorMessage",
                         messageSource.getMessage("metrics.error.unauthorized",
@@ -173,7 +173,7 @@ public class MetricsViewController {
             model.addAttribute("weeklyCost", weeklyCost.toString());
             model.addAttribute("monthlyCost", monthlyCost.toString());
             model.addAttribute("companyId", companyId);
-            model.addAttribute("companyName", currentUser.getCompany().getName());
+            model.addAttribute("companyName", currentUser.getCompanyName());
 
             return "metrics/company-costs";
         } catch (Exception e) {

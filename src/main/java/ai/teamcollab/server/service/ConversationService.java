@@ -2,7 +2,6 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -94,7 +93,8 @@ public class ConversationService {
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found with id: " + id));
     }
 
-    public Message addToConversation(Long conversationId, Message message, User user) {
+    public Message addToConversation(Long conversationId, Message message, Long userId) {
+        final var user = userRepository.findById(userId).orElseThrow();
         log.debug("Asynchronously sending message for conversation: {}, user: {}", conversationId, user.getId());
         return messageService.createMessage(message, conversationId, user);
     }
@@ -119,7 +119,7 @@ public class ConversationService {
             final var chatContext = buildChatContext(conversation, sessionId);
 
 //            if (false) {
-                chatService.generatePointInTimeSummary(conversation, chatContext);
+            chatService.generatePointInTimeSummary(conversation, chatContext);
 //            }
 
             return chatService.process(conversation, message, chatContext)
