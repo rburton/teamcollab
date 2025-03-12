@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h1 class="text-xl font-semibold text-gray-900">Edit Your Profile</h1>
+                <p class="mt-2 text-sm text-gray-700">Update your personal information and password.</p>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${successMessage}" class="bg-green-50 border-l-4 border-green-400 p-4 mb-4 mx-6 mt-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700" th:text="${successMessage}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${errorMessage}" class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 mx-6 mt-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700" th:text="${errorMessage}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Forms -->
+            <div class="px-6 py-4">
+                <!-- Basic Info Form -->
+                <div class="mb-8">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
+                    <form th:action="@{/profile/basic-info}" th:object="${user}" method="post" class="space-y-6" data-turbo="false">
+                        <!-- Username Field -->
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <div class="mt-1">
+                                <input type="text" 
+                                       name="username" 
+                                       id="username" 
+                                       th:field="*{username}" 
+                                       th:classappend="${#fields.hasErrors('username')} ? 'border-red-300' : 'border-gray-300'"
+                                       class="block w-full rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                                       required>
+                            </div>
+                            <p th:if="${#fields.hasErrors('username')}" 
+                               th:errors="*{username}" 
+                               class="mt-2 text-sm text-red-600"></p>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <div class="mt-1">
+                                <input type="email" 
+                                       name="email" 
+                                       id="email" 
+                                       th:field="*{email}" 
+                                       th:classappend="${#fields.hasErrors('email')} ? 'border-red-300' : 'border-gray-300'"
+                                       class="block w-full rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                                       required>
+                            </div>
+                            <p th:if="${#fields.hasErrors('email')}" 
+                               th:errors="*{email}" 
+                               class="mt-2 text-sm text-red-600"></p>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-end space-x-3">
+                            <a href="/dashboard" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Update Information
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Password Form -->
+                <div class="pt-6 border-t border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Change Password</h2>
+                    <form th:action="@{/profile/password}" method="post" class="space-y-6" data-turbo="false">
+                        <!-- Password Field -->
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">New Password</label>
+                            <div class="mt-1">
+                                <input type="password" 
+                                       name="password" 
+                                       id="password" 
+                                       class="block w-full rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm border-gray-300">
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500">Enter your new password.</p>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-end space-x-3">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

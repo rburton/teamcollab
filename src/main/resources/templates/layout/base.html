@@ -70,20 +70,10 @@
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"><i class="fas fa-credit-card mr-2"></i>Billing</a>
                         <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">System Settings</a>
-                        <form th:action="@{/logout}" method="post" class="inline-block">
-                            <button type="submit" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</button>
-                        </form>
                     </div>
                 </div>
             </div>
-            <div class="flex items-center">
-                <div class="shrink-0">
-                    <a href="/projects/new" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 transform hover:scale-105">
-                        <i class="fas fa-plus-circle"></i>
-                        Project
-                    </a>
-                </div>
-                </div>
+
             <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button type="button"
                         class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
@@ -97,11 +87,12 @@
                 </button>
 
                 <!-- Profile dropdown -->
-                <div class="relative ml-3">
+                <div class="relative ml-3" data-controller="user-menu">
                     <div>
                         <button type="button"
                                 class="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
-                                id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                id="user-menu-button" aria-expanded="false" aria-haspopup="true"
+                                data-action="click->user-menu#toggle">
                             <span class="absolute -inset-1.5"></span>
                             <span class="sr-only">Open user menu</span>
                             <img class="size-8 rounded-full"
@@ -110,14 +101,16 @@
                         </button>
                     </div>
                     <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden"
-                         role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                         role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
+                         data-user-menu-target="menu">
                         <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                        <a href="/profile" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                            id="user-menu-item-0">Your Profile</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                            id="user-menu-item-1">Settings</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                           id="user-menu-item-2">Sign out</a>
+                        <form th:action="@{/logout}" method="post" class="inline-block">
+                            <button type="submit" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</button>
+                        </form>
                     </div>
                 </div>
             </div>

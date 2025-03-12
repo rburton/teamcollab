@@ -145,4 +145,56 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
+
+    @Transactional
+    public User updateUserBasicInfo(Long userId, String username, String email) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        // Check if username is being changed and if it's already taken
+        if (!user.getUsername().equals(username) && existsByUsername(username)) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        // Check if email is being changed and if it's already taken
+        if (!user.getEmail().equals(email) && existsByEmail(email)) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateUserPassword(Long userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        // Only update password if it's provided
+        if (password != null && !password.isEmpty()) {
+            user.setPassword(passwordEncoder.encode(password));
+        } else {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * @deprecated Use updateUserBasicInfo and updateUserPassword instead
+     */
+    @Deprecated
+    @Transactional
+    public User updateUserProfile(Long userId, String username, String email, String password) {
+        User user = updateUserBasicInfo(userId, username, email);
+
+        // Only update password if it's provided
+        if (password != null && !password.isEmpty()) {
+            user = updateUserPassword(userId, password);
+        }
+
+        return user;
+    }
 }
