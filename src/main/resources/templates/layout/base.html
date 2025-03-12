@@ -12,15 +12,15 @@
     <script th:src="@{/dist/styles.js}"></script>
     <script th:src="@{/dist/application.js}" data-turbo-track="reload"></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 min-h-screen">
 
-<nav class="bg-gray-800">
+<nav class="bg-gray-800 shadow-md">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div class="relative flex h-16 items-center justify-between">
             <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 <!-- Mobile menu button-->
                 <button type="button"
-                        class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
+                        class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
                         aria-controls="mobile-menu" aria-expanded="false">
                     <span class="absolute -inset-0.5"></span>
                     <span class="sr-only">Open main menu</span>
@@ -54,20 +54,20 @@
                 <div class="hidden sm:ml-6 sm:block">
                     <div class="flex space-x-4">
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                        <a href="/dashboard" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                        <a href="/dashboard" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white transition-colors duration-200 shadow-sm"
                            aria-current="page">Dashboard</a>
                         <a href="/projects"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">All Projects</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"><i class="fas fa-project-diagram mr-2"></i>All Projects</a>
                         <a href="/assistants"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Assistants</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"><i class="fas fa-robot mr-2"></i>Assistants</a>
                         <a href="/bookmarks"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
                            <i class="fas fa-bookmark mr-1"></i>Bookmarks
                         </a>
                         <a href="/company/admin" sec:authorize="hasRole('ADMIN')"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" th:text="#{navigation.menu.admin}">Company Settings</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"><i class="fas fa-building mr-2"></i><span th:text="#{navigation.menu.admin}">Company Settings</span></a>
                         <a href="/company/billing" sec:authorize="hasRole('ADMIN')"
-                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Billing</a>
+                           class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"><i class="fas fa-credit-card mr-2"></i>Billing</a>
                         <a href="/system" sec:authorize="hasRole('SUPER_ADMIN')"
                            class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">System Settings</a>
                         <form th:action="@{/logout}" method="post" class="inline-block">
@@ -78,10 +78,8 @@
             </div>
             <div class="flex items-center">
                 <div class="shrink-0">
-                    <a href="/projects/new" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                        <svg class="-ml-0.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                            <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
-                        </svg>
+                    <a href="/projects/new" class="relative inline-flex items-center gap-x-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-plus-circle"></i>
                         Project
                     </a>
                 </div>
@@ -186,20 +184,30 @@
 <!--</nav>-->
 
 <!-- Main Content -->
-<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 flex-grow">
     <div class="px-4 py-1 sm:px-0">
-        <div id="content" data-turbo-frame="content" layout:fragment="content">
+        <div id="content" data-turbo-frame="content" layout:fragment="content" class="animate-fadeIn">
             <!-- Page content will be inserted here -->
         </div>
     </div>
 </main>
 
 <!-- Footer -->
-<footer class="bg-white shadow-lg mt-8">
+<footer class="bg-white shadow-lg mt-8 border-t border-gray-200">
     <div class="max-w-7xl mx-auto py-4 px-4">
         <p class="text-center text-gray-600">&copy; 2024 Version2. All rights reserved.</p>
     </div>
 </footer>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
 
 </body>
 </html>

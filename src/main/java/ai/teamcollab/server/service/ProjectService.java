@@ -58,6 +58,7 @@ public class ProjectService {
                         .id(conversation.getId())
                         .purpose(conversation.getPurpose())
                         .createdAt(conversation.getCreatedAt())
+                        .createdBy(conversation.getUser().getUsername())
                         .build())
                 .conversations(project.getConversations().stream()
                         .map(c -> ConversationResponse.builder()
