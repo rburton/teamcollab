@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
 
@@ -54,88 +56,98 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private LoginUserDetails processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        final var providerName = oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
-        final var attributes = oAuth2User.getAttributes();
+        final var providerName = extractProviderName(oAuth2UserRequest);
+        final var userInfo = extractUserInfo(oAuth2User.getAttributes());
 
-        // Extract user details from OAuth2 provider
-        final var email = (String) attributes.get("email");
-        final var providerId = (String) attributes.get("sub");
-        final var pictureUrl = (String) attributes.get("picture");
+        User user = findOrCreateUser(providerName, userInfo);
 
-        // Check if user exists by provider and provider ID
-        final var existingAuthProvider = authProviderRepository
-                .findByProviderNameAndProviderUserId(providerName, providerId);
+        setupAuthentication(oAuth2User, user);
 
-        User user;
+        return new LoginUserDetails(user);
+    }
+
+    private String extractProviderName(OAuth2UserRequest oAuth2UserRequest) {
+        return oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
+    }
+
+    private UserInfo extractUserInfo(Map<String, Object> attributes) {
+        return new UserInfo(
+            (String) attributes.get("email"),
+            (String) attributes.get("sub"),
+            (String) attributes.get("picture")
+        );
+    }
+
+    private User findOrCreateUser(String providerName, UserInfo userInfo) {
+        Optional<AuthProvider> existingAuthProvider = authProviderRepository
+                .findByProviderNameAndProviderUserId(providerName, userInfo.providerId());
 
         if (existingAuthProvider.isPresent()) {
-            // User exists, get the user from the auth provider
-            final var authProvider = existingAuthProvider.get();
-            user = authProvider.getUser();
-
-            if (user == null) {
-                // If user is not set in the auth provider, we have an inconsistent state
-                // Try to find a user with the same email as the auth provider
-                final var providerEmail = authProvider.getProviderEmail();
-                if (providerEmail != null) {
-                    final var userByEmail = userRepository.findByEmail(providerEmail);
-                    if (userByEmail.isPresent()) {
-                        user = userByEmail.get();
-
-                        // Update the auth provider with the user
-                        authProvider.setUser(user);
-                        authProviderRepository.save(authProvider);
-                    } else {
-                        // Create a new user if we can't find one
-                        user = createNewUser(providerEmail);
-
-                        // Update the auth provider with the user
-                        authProvider.setUser(user);
-                        authProviderRepository.save(authProvider);
-                    }
-                } else {
-                    // If we don't have an email, we can't create a user
-                    throw new RuntimeException("Auth provider has no user and no email: " + authProvider.getId());
-                }
-            }
+            return handleExistingAuthProvider(existingAuthProvider.get());
         } else {
-            // User doesn't exist, check if user exists by email
-            final var userByEmail = userRepository.findByEmail(email);
+            return handleNewAuthProvider(providerName, userInfo);
+        }
+    }
 
-            if (userByEmail.isPresent()) {
-                // User exists by email, link the auth provider
-                user = userByEmail.get();
-            } else {
-                // Create new user
-                user = createNewUser(email);
-            }
+    private User handleExistingAuthProvider(AuthProvider authProvider) {
+        User user = authProvider.getUser();
 
-            // Create and link auth provider
-            final var authProvider = createAuthProvider(providerName, providerId, email, pictureUrl);
-            authProvider.setUser(user);
-            authProviderRepository.save(authProvider);
-
-            user.addAuthProvider(authProvider);
-            user = userRepository.save(user);
+        if (user == null) {
+            user = findOrCreateUserByEmail(authProvider.getProviderEmail());
+            linkUserToAuthProvider(user, authProvider);
         }
 
-        // Create a DefaultOAuth2User with the OAuth2User attributes
+        return user;
+    }
+
+    private User findOrCreateUserByEmail(String email) {
+        if (email == null) {
+            throw new RuntimeException("Cannot create user without email");
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> createNewUser(email));
+    }
+
+    private void linkUserToAuthProvider(User user, AuthProvider authProvider) {
+        authProvider.setUser(user);
+        authProviderRepository.save(authProvider);
+    }
+
+    private User handleNewAuthProvider(String providerName, UserInfo userInfo) {
+        User user = userRepository.findByEmail(userInfo.email())
+                .orElseGet(() -> createNewUser(userInfo.email()));
+
+        AuthProvider authProvider = createAuthProvider(
+            providerName, 
+            userInfo.providerId(), 
+            userInfo.email(), 
+            userInfo.pictureUrl()
+        );
+
+        linkUserToAuthProvider(user, authProvider);
+
+        user.addAuthProvider(authProvider);
+        return userRepository.save(user);
+    }
+
+    private void setupAuthentication(OAuth2User oAuth2User, User user) {
         final var defaultOAuth2User = new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 oAuth2User.getAttributes(),
                 "email");
 
-
         final var loginUserDetails = new LoginUserDetails(user);
-        final var authentication = new UsernamePasswordAuthenticationToken(loginUserDetails, null, loginUserDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final var authentication = new UsernamePasswordAuthenticationToken(
+            loginUserDetails, 
+            null, 
+            loginUserDetails.getAuthorities()
+        );
 
-        // Create a UserOAuth2User that extends User and implements OAuth2User
-        return loginUserDetails;
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private User createNewUser(String email) {
-
         final var company = Company.builder()
                 .name("Company Name").build();
 
@@ -167,4 +179,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         return authProviderRepository.save(authProvider);
     }
+
+    /**
+     * Record to hold user information extracted from OAuth2 provider.
+     */
+    private record UserInfo(String email, String providerId, String pictureUrl) {}
 }
