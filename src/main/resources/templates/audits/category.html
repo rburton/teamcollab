@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="'Audit Events - ' + ${categoryName}">Audit Events</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Page Title -->
+        <div class="pb-5 border-b border-gray-200 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold leading-tight text-gray-900" th:text="'Audit Events - ' + ${categoryName}">Audit Events - Category</h1>
+                <p class="mt-2 text-sm text-gray-600">Viewing all audit events in this category</p>
+            </div>
+            <a href="/audits" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Audit Events Table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-xl font-semibold" th:text="'Events for ' + ${categoryName}">Events for Category</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entity Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entity ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="audit, iterStat : ${audits}" th:class="${iterStat.odd} ? 'bg-gray-50' : 'bg-white'">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${audit.username}">Username</div>
+                                    <div class="text-sm text-gray-500" th:if="${audit.company != null}" th:text="${audit.company.name}">Company Name</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(audit.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Timestamp</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${audit.entityType}">Entity Type</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${audit.entityId}">Entity ID</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${audit.ipAddress}">IP Address</td>
+                        <td class="px-6 py-4 text-sm text-gray-500" th:text="${audit.details}">Details</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(audits)}">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No audit events available for this category</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="px-6 py-4 bg-white border-t border-gray-200" th:if="${totalPages > 0}">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium" th:text="${currentPage * pageSize + 1}">1</span> to 
+                        <span class="font-medium" th:text="${(currentPage * pageSize) + audits.size()}">10</span> of 
+                        <span class="font-medium" th:text="${totalItems}">100</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        <!-- Previous Page Button -->
+                        <a th:if="${currentPage > 0}" 
+                           th:href="@{/audits/category(type=${categoryName}, page=${currentPage - 1}, size=${pageSize})}"
+                           class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            Previous
+                        </a>
+                        <span th:unless="${currentPage > 0}" 
+                              class="px-3 py-1 border border-gray-200 rounded-md text-sm font-medium text-gray-400 bg-gray-50 cursor-not-allowed">
+                            Previous
+                        </span>
+
+                        <!-- Page Numbers -->
+                        <div class="flex space-x-1">
+                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                               th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
+                               th:href="@{/audits/category(type=${categoryName}, page=${i}, size=${pageSize})}"
+                               th:text="${i + 1}"
+                               th:class="${i == currentPage} ? 'px-3 py-1 border border-indigo-500 rounded-md text-sm font-medium text-indigo-600 bg-indigo-50' : 'px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'">
+                            </a>
+                        </div>
+
+                        <!-- Next Page Button -->
+                        <a th:if="${currentPage < totalPages - 1}" 
+                           th:href="@{/audits/category(type=${categoryName}, page=${currentPage + 1}, size=${pageSize})}"
+                           class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            Next
+                        </a>
+                        <span th:unless="${currentPage < totalPages - 1}" 
+                              class="px-3 py-1 border border-gray-200 rounded-md text-sm font-medium text-gray-400 bg-gray-50 cursor-not-allowed">
+                            Next
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

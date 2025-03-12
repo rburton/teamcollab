@@ -1,5 +1,6 @@
 package ai.teamcollab.server.service;
 
+import ai.teamcollab.server.domain.Audit;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.repository.ConversationRepository;
@@ -40,11 +41,13 @@ public class ConversationService {
     private final ConversationRepository conversationRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ThymeleafTemplateRender thymeleafTemplateRender;
+    private final AuditService auditService;
 
     @Autowired
     public ConversationService(ChatService chatService, MessageService messageService, UserRepository userRepository,
                                MessageRepository messageRepository, ConversationRepository conversationRepository,
-                               SimpMessagingTemplate messagingTemplate, ThymeleafTemplateRender thymeleafTemplateRender) {
+                               SimpMessagingTemplate messagingTemplate, ThymeleafTemplateRender thymeleafTemplateRender,
+                               AuditService auditService) {
         this.chatService = chatService;
         this.messageService = messageService;
         this.userRepository = userRepository;
@@ -52,6 +55,7 @@ public class ConversationService {
         this.conversationRepository = conversationRepository;
         this.messagingTemplate = messagingTemplate;
         this.thymeleafTemplateRender = thymeleafTemplateRender;
+        this.auditService = auditService;
     }
 
     public Conversation createConversation(Conversation conversation, Long userId) {
@@ -60,7 +64,18 @@ public class ConversationService {
         conversation.setUser(user);
         conversation.setCreatedAt(java.time.LocalDateTime.now());
 
-        return conversationRepository.save(conversation);
+        Conversation savedConversation = conversationRepository.save(conversation);
+
+        // Create audit event for conversation creation
+        auditService.createAuditEvent(
+            Audit.AuditActionType.CONVERSATION_CREATED,
+            user,
+            "Conversation created with purpose: " + conversation.getPurpose(),
+            "Conversation",
+            savedConversation.getId()
+        );
+
+        return savedConversation;
     }
 
     public List<Conversation> getUserConversations(Long userId) {

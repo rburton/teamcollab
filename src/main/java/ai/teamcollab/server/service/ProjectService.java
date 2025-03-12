@@ -1,5 +1,6 @@
 package ai.teamcollab.server.service;
 
+import ai.teamcollab.server.domain.Audit;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Project;
 import ai.teamcollab.server.domain.User;
@@ -24,6 +25,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
@@ -42,6 +44,15 @@ public class ProjectService {
         project.getConversations().add(conversation);
 
         project = projectRepository.save(project);
+
+        // Create audit event for project creation
+        auditService.createAuditEvent(
+            Audit.AuditActionType.PROJECT_CREATED,
+            user,
+            "Project created: " + project.getName(),
+            "Project",
+            project.getId()
+        );
 
         return buildProjectResponse(project);
     }
