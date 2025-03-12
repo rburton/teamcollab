@@ -1,0 +1,1 @@
+- **Knowledge Base Selection**: All the user to attach documents for context

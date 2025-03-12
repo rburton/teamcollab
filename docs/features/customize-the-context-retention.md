@@ -1,0 +1,1 @@
+- **Context Retention**: Control how much conversation history the assistant remembers

@@ -45,39 +45,10 @@ The assistant row in TeamCollab provides a quick way to access and interact with
 
 ## Productivity Enhancements
 
-### 1. Context Controls
-- **Knowledge Base Selection**: Choose which company documents the assistant can access
-- **Context Reset**: Clear the conversation history to start fresh
-- **Context Retention**: Control how much conversation history the assistant remembers
-
-### 2. Workflow Integration
-- **Create Task**: Convert assistant suggestions into actionable tasks in project management tools
-- **Schedule Follow-up**: Set a reminder to continue the conversation later
-- **Add to Meeting**: Include the assistant in upcoming calendar meetings for note-taking or information
-
 ## Feedback and Improvement
-
-### 1. Assistant Training
-- **Thumbs Up/Down**: Provide simple feedback on responses
-- **Detailed Feedback**: Submit specific comments on what was helpful or could be improved
-- **Save Preferred Responses**: Mark responses as examples of ideal answers
-
-### 2. Analytics
-- **Usage Statistics**: View how often you interact with this assistant
-- **Response Quality Metrics**: Track the helpfulness of responses over time
-- **Comparison View**: Compare this assistant's performance with others
 
 ## Security and Privacy
 
-### 1. Access Controls
-- **Permission Settings**: Control who else can see or use this assistant
-- **Confidentiality Levels**: Set what types of company information this assistant can access
-- **Audit Log**: View a history of interactions with this assistant
-
-### 2. Data Management
-- **Delete History**: Remove conversation history with this assistant
-- **Export Personal Data**: Download all data related to interactions with this assistant
-- **Privacy Mode**: Enable temporary conversations that aren't saved
 
 ## Implementation Considerations
 
