@@ -53,8 +53,3 @@ When implementing these features, consider:
 - Clear visual feedback when actions are taken
 
 These features would significantly enhance the utility of the assistant row, making it not just a visual element but a powerful control center for AI-assisted collaboration.
-
-
-Allow for a user to change the tone of an assistant within a conversation. This would be saved on the ConversationAssistant class.
-
-Adjust between formal, casual, technical, or simplified communication styles.
