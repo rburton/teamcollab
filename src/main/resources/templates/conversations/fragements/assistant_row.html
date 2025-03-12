@@ -9,22 +9,29 @@
                 <h3 class="text-lg font-bold text-gray-800" th:text="${assistant.name}">John Doe</h3>
                 <p class="text-sm text-gray-500" th:text="${assistant.expertise}">Software Engineer</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <button th:data-assistant-id="${assistant.id}"
-                        th:data-conversation-id="${conversationId}"
-                        th:data-muted="${assistant.muted}"
-                        class="mute-toggle px-2 py-1 text-xs rounded-md"
-                        th:classappend="${assistant.muted} ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-red-500 hover:bg-red-600 text-white'"
-                        th:text="${assistant.muted} ? 'Unmute' : 'Mute'">
-                    Mute
+            <div class="relative" data-controller="assistant-menu">
+                <button data-action="click->assistant-menu#toggle" 
+                        class="px-2 py-1 text-xs rounded-md bg-gray-100 hover:bg-gray-300 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
                 </button>
-                <button th:data-assistant-id="${assistant.id}"
-                        th:data-conversation-id="${conversationId}"
-                        th:data-tone="${assistant.tone}"
-                        data-action="click->tone#openModal"
-                        class="tone-button px-2 py-1 text-xs rounded-md bg-blue-500 hover:bg-blue-600 text-white">
-                    Tone
-                </button>
+                <div data-assistant-menu-target="menu" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg z-10">
+                    <button th:data-assistant-id="${assistant.id}"
+                            th:data-conversation-id="${conversationId}"
+                            th:data-muted="${assistant.muted}"
+                            class="mute-toggle block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                            th:text="${assistant.muted} ? 'Unmute' : 'Mute'">
+                        Mute
+                    </button>
+                    <button th:data-assistant-id="${assistant.id}"
+                            th:data-conversation-id="${conversationId}"
+                            th:data-tone="${assistant.tone}"
+                            data-action="click->tone#openModal"
+                            class="tone-button block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        Tone
+                    </button>
+                </div>
             </div>
         </div>
         <th:block th:replace="~{conversations/fragements/assistant_status :: assistant_status(status='Ready')}"/>
