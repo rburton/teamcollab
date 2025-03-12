@@ -29,6 +29,8 @@ public class ProfileController {
     public String showProfileForm(@AuthenticationPrincipal LoginUserDetails userDetails, Model model) {
         User user = userService.getUserById(userDetails.getId());
         model.addAttribute("user", user);
+        // Add auth providers to the model
+        model.addAttribute("authProviders", user.getAuthProviders());
         return "profile/edit";
     }
 

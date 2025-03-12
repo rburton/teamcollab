@@ -82,7 +82,7 @@
                             <a href="/dashboard" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                 Cancel
                             </a>
-                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                 Update Information
                             </button>
                         </div>
@@ -107,11 +107,65 @@
 
                         <!-- Form Actions -->
                         <div class="flex justify-end space-x-3">
-                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                 Update Password
                             </button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Authentication Providers Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Connected Authentication Providers</h2>
+
+                    <div th:if="${#lists.isEmpty(authProviders)}" class="bg-gray-50 p-4 rounded-md">
+                        <p class="text-sm text-gray-700">You haven't connected any authentication providers yet.</p>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(authProviders)}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div th:each="provider : ${authProviders}" class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex items-center">
+                            <!-- Provider Icon -->
+                            <div class="flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center" 
+                                 th:class="${'flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center ' + 
+                                    (provider.providerName == 'GOOGLE' ? 'bg-red-100' : 
+                                    (provider.providerName == 'GITHUB' ? 'bg-gray-800' : 
+                                    (provider.providerName == 'FACEBOOK' ? 'bg-blue-100' : 
+                                    (provider.providerName == 'TWITTER' ? 'bg-blue-400' : 'bg-gray-100'))))}">
+                                <!-- Google Icon -->
+                                <i th:if="${provider.providerName == 'GOOGLE'}" class="fab fa-google text-red-500 text-xl"></i>
+                                <!-- GitHub Icon -->
+                                <i th:if="${provider.providerName == 'GITHUB'}" class="fab fa-github text-white text-xl"></i>
+                                <!-- Facebook Icon -->
+                                <i th:if="${provider.providerName == 'FACEBOOK'}" class="fab fa-facebook-f text-blue-600 text-xl"></i>
+                                <!-- Twitter Icon -->
+                                <i th:if="${provider.providerName == 'TWITTER'}" class="fab fa-twitter text-white text-xl"></i>
+                                <!-- Default Icon for other providers -->
+                                <i th:if="${provider.providerName != 'GOOGLE' and provider.providerName != 'GITHUB' and provider.providerName != 'FACEBOOK' and provider.providerName != 'TWITTER'}" 
+                                   class="fas fa-key text-gray-500 text-xl"></i>
+                            </div>
+
+                            <!-- Provider Info -->
+                            <div class="ml-4 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900" th:text="${provider.providerName}">Provider Name</h3>
+                                <p class="text-xs text-gray-500" th:text="${provider.providerEmail}">provider@example.com</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    Connected <span th:text="${#temporals.format(provider.createdAt, 'MMM d, yyyy')}">Jan 1, 2023</span>
+                                </p>
+                            </div>
+
+                            <!-- Provider Picture (if available) -->
+                            <div th:if="${provider.providerPictureUrl != null and !#strings.isEmpty(provider.providerPictureUrl)}" class="flex-shrink-0">
+                                <img th:src="${provider.providerPictureUrl}" alt="Profile Picture" class="h-10 w-10 rounded-full">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-500">
+                            These are the authentication providers you've used to sign in to TeamCollab. 
+                            You can use any of these providers to log in to your account.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

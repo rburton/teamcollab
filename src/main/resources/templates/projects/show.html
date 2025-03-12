@@ -97,7 +97,7 @@
                             <span th:text="${#lists.size(project.conversations)} + ' Conversations'">5 Conversations</span>
                         </span>
                     </div>
-                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105">
+                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105">
                         <i class="fas fa-plus mr-2"></i> New Conversation
                     </a>
                 </div>
@@ -173,7 +173,7 @@
                                 <i class="fas fa-user-circle text-gray-400 mr-1.5"></i>
                                 <span class="text-sm text-gray-500" th:text="${conversation.createdBy}">John Doe</span>
                             </div>
-                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-primary bg-primary/10 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-primary bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                                 <i class="fas fa-arrow-right mr-1.5"></i>
                                 View Conversation
                             </a>
@@ -187,7 +187,7 @@
                         </div>
                         <h3 class="mt-2 text-lg font-medium text-gray-900">No conversations yet</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by creating your first conversation for this project.</p>
-                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                             <i class="fas fa-plus mr-2"></i> Start New Conversation
                         </a>
                     </div>
@@ -255,7 +255,7 @@
                             Cancel
                         </a>
                         <button type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                             <i class="fas fa-plus mr-2"></i>
                             Start New Conversation
                         </button>
