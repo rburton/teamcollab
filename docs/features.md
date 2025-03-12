@@ -1,18 +1,15 @@
 # Company
-- Account Management
+- Add the ability to change the roles a user has in the system.
 
 # Admin
 - Cost by company
 - Show Conversation design
-- OAuth with Google
 
 # Project Template
 - Auto create projects by template
 - On new conversation—add assistants
-- Assistant Modal improvements
 - Add Assistant Bug
 - Conversation summary and Assistants replying
-
 - Add logic to limit how much money is spent a month by user.
 
 
@@ -33,7 +30,6 @@ The assistant row in TeamCollab provides a quick way to access and interact with
 - **Add to Conversation**: Quickly add the assistant to the current conversation
 - **Remove from Conversation**: Remove the assistant from the current conversation
 - **Pin/Favorite**: Mark frequently used assistants for quick access
-- **Mute Notifications**: Temporarily stop receiving updates from this assistant
 
 ### 2. Content Management
 - **Export Conversation**: Export the conversation with this assistant to various formats:
@@ -41,21 +37,11 @@ The assistant row in TeamCollab provides a quick way to access and interact with
   - PDF
   - Markdown
   - Plain text
-- **Save Snippets**: Save useful responses from the assistant for future reference
-- **Share Response**: Share a specific response via email, Slack, or other integrated platforms
-- **Copy to Clipboard**: Quick copy of assistant's last response
 
 ## Assistant Customization
 
 ### 1. Persona Management
-- **Adjust Expertise Level**: Toggle between beginner, intermediate, or expert responses
-- **Change Tone**: Adjust between formal, casual, technical, or simplified communication styles
 - **Modify Response Length**: Set preference for concise or detailed responses
-
-### 2. Visual Customization
-- **Custom Avatar**: Upload or select a custom avatar for the assistant
-- **Color Coding**: Assign colors to different assistants for quick visual identification
-- **Display Name**: Customize how the assistant is labeled in your interface
 
 ## Productivity Enhancements
 
