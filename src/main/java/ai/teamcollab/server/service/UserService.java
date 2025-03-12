@@ -50,7 +50,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public User registerNewUser(User user, String roleName) {
+    public User registerNewUser(User user, String... roleNames) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
@@ -67,10 +67,12 @@ public class UserService implements UserDetailsService {
         // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // Add default role
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalStateException("Role not found: " + roleName));
-        user.addRole(role);
+        // Add roles
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new IllegalStateException("Role not found: " + roleName));
+            user.addRole(role);
+        }
 
         User savedUser = userRepository.save(user);
 
@@ -78,7 +80,7 @@ public class UserService implements UserDetailsService {
         auditService.createAuditEvent(
             Audit.AuditActionType.USER_CREATED,
             savedUser,
-            "User registered with role: " + roleName,
+            "User registered with roles: " + String.join(", ", roleNames),
             "User",
             savedUser.getId()
         );

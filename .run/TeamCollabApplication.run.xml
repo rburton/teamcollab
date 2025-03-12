@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TeamCollabApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <option name="HIDE_BANNER" value="true" />
     <module name="server" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ai.teamcollab.server.TeamCollabApplication" />
     <extension name="net.ashald.envfile">
@@ -21,6 +22,15 @@
     </extension>
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/package.json" />
+        <command value="run" />
+        <scripts>
+          <script value="build" />
+        </scripts>
+        <node-interpreter value="project" />
+        <envs />
+      </option>
     </method>
   </configuration>
 </component>

@@ -53,7 +53,7 @@ public class AuthController {
             final var savedCompany = companyService.createCompany(company);
 
             user.setCompany(savedCompany);
-            final var savedUser = userService.registerNewUser(user, "USER");
+            final var savedUser = userService.registerNewUser(user, "USER", "ADMIN");
 
             companyService.addUserToCompany(savedCompany, savedUser);
 

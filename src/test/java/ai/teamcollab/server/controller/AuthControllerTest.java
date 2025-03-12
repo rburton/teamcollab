@@ -84,7 +84,7 @@ class AuthControllerTest {
                 System.out.println("[DEBUG_LOG] createCompany called with: " + arg);
                 return company;
             });
-        when(userService.registerNewUser(any(User.class), eq("USER")))
+        when(userService.registerNewUser(any(User.class), eq("USER"), eq("ADMIN")))
             .thenAnswer(invocation -> {
                 User arg = invocation.getArgument(0);
                 System.out.println("[DEBUG_LOG] registerNewUser called with: " + arg);
@@ -149,7 +149,7 @@ class AuthControllerTest {
                 ", Authenticated: " + initialAuth.isAuthenticated()
                 : "null"));
 
-        when(userService.registerNewUser(any(User.class), eq("USER")))
+        when(userService.registerNewUser(any(User.class), eq("USER"), eq("ADMIN")))
                 .thenAnswer(invocation -> {
                     User arg = invocation.getArgument(0);
                     System.out.println("[DEBUG_LOG] registerNewUser called with: " + arg);

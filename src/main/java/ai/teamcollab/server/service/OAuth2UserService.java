@@ -148,7 +148,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .build();
         user.setCompany(savedCompany);
 
-        final var savedUser = userService.registerNewUser(user, "USER");
+        final var savedUser = userService.registerNewUser(user, "USER", "ADMIN");
 
         companyService.addUserToCompany(savedCompany, savedUser);
         return savedUser;
