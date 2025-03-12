@@ -4,8 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
- * Represents an authentication provider for a user.
- * This entity is used to store information about external authentication providers
- * such as Google, Facebook, etc.
+ * Represents an authentication provider for a user. This entity is used to store information about external
+ * authentication providers such as Google, Facebook, etc.
  */
 @Entity(name = "auth_providers")
 @Getter
@@ -32,7 +32,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = "user")
 @Builder
-public class AuthProvider {
+public class AuthProvider implements Serializable {
 
     @Id
     @Column(name = "auth_provider_id")

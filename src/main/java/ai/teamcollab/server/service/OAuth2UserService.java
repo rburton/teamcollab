@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ai.teamcollab.server.security.UserOAuth2User;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -118,12 +119,22 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.save(user);
         }
 
-        final var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new DefaultOAuth2User(
+        // Create a DefaultOAuth2User with the OAuth2User attributes
+        final var defaultOAuth2User = new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 oAuth2User.getAttributes(),
                 "email");
+
+        // Create a UserOAuth2User that extends User and implements OAuth2User
+        final var userOAuth2User = new UserOAuth2User(defaultOAuth2User, user);
+
+        // Create an authentication token with the UserOAuth2User as the principal
+        // This ensures compatibility with code that expects a UsernamePasswordAuthenticationToken
+        // with a User entity as the principal, since UserOAuth2User extends User
+        final var authentication = new UsernamePasswordAuthenticationToken(userOAuth2User, null, userOAuth2User.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return userOAuth2User;
     }
 
     private User createNewUser(String email) {

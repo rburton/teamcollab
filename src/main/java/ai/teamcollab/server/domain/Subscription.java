@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "subscriptions")
 @ToString(exclude = {"company", "plan", "payments"})
 @EqualsAndHashCode(exclude = {"company", "plan", "payments"})
-public class Subscription {
+public class Subscription implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
