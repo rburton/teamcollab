@@ -3,6 +3,7 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.UserStats;
+import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.RoleService;
 import ai.teamcollab.server.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,12 @@ import org.springframework.security.web.csrf.DefaultCsrfToken;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CompanyAdminController.class)
@@ -40,6 +44,9 @@ class CompanyAdminControllerTest {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private CompanyService companyService;
 
     private User mockUser;
     private Company mockCompany;
@@ -58,10 +65,16 @@ class CompanyAdminControllerTest {
         }
 
         @Bean
+        public CompanyService companyService() {
+            return mock(CompanyService.class);
+        }
+
+        @Bean
         public CompanyAdminController companyAdminController(
                 UserService userService, 
-                RoleService roleService) {
-            return new CompanyAdminController(userService, roleService);
+                RoleService roleService,
+                CompanyService companyService) {
+            return new CompanyAdminController(userService, roleService, companyService);
         }
     }
 
@@ -101,6 +114,7 @@ class CompanyAdminControllerTest {
                 .build();
 
         when(userService.getUserStats(anyLong())).thenReturn(stats);
+        when(companyService.getCompanyById(anyLong())).thenReturn(mockCompany);
 
         // Create CSRF token
         CsrfToken csrfToken = new DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", "test-token");
@@ -111,7 +125,31 @@ class CompanyAdminControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("company/admin/dashboard"))
                 .andExpect(model().attributeExists("stats"))
-                .andExpect(model().attribute("stats", stats));
+                .andExpect(model().attribute("stats", stats))
+                .andExpect(model().attributeExists("company"))
+                .andExpect(model().attribute("company", mockCompany));
+    }
+
+    @Test
+    @WithMockCompanyUser(username = "admin", roles = {"ADMIN"}, companyId = 1L)
+    void updateCompanyName_WhenUserIsAdmin_UpdatesCompanyNameAndRedirects() throws Exception {
+        // Arrange
+        String newName = "Updated Company Name";
+        when(companyService.updateCompanyName(anyLong(), anyString())).thenReturn(mockCompany);
+
+        // Create CSRF token
+        CsrfToken csrfToken = new DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", "test-token");
+
+        // Act & Assert
+        mockMvc.perform(post("/company/admin/update-name")
+                .param("name", newName)
+                .sessionAttr("_csrf", csrfToken)
+                .param("_csrf", csrfToken.getToken()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/company/admin"))
+                .andExpect(flash().attributeExists("successMessage"));
+
+        verify(companyService).updateCompanyName(1L, newName);
     }
 
     @Test

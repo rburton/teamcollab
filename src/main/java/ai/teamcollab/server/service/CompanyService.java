@@ -57,4 +57,11 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
+    @Transactional
+    public Company updateCompanyName(Long companyId, String name) {
+        Company company = getCompanyById(companyId);
+        company.setName(name);
+        return companyRepository.save(company);
+    }
+
 }

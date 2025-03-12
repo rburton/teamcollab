@@ -7,6 +7,46 @@
 </head>
 <body>
 <div layout:fragment="content">
+    <!-- Company Name Section -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-medium leading-6 text-gray-900" th:text="#{admin.dashboard.company.name}">Company Name</h2>
+                    <p class="mt-1 text-xl text-gray-900" th:text="${company.name}">Company Name</p>
+                </div>
+                <button type="button" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                        onclick="document.getElementById('editCompanyNameModal').classList.remove('hidden')">
+                    <span th:text="#{admin.dashboard.company.name.edit}">Edit Company Name</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Company Name Modal -->
+    <div id="editCompanyNameModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 class="text-lg font-medium text-gray-900 mb-4" th:text="#{admin.dashboard.company.name.edit}">Edit Company Name</h3>
+            <form th:action="@{/company/admin/update-name}" method="post">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700" th:text="#{admin.dashboard.company.name}">Company Name</label>
+                    <input type="text" id="name" name="name" th:value="${company.name}" required
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            onclick="document.getElementById('editCompanyNameModal').classList.add('hidden')"
+                            th:text="#{common.button.cancel}">Cancel</button>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                            th:text="#{admin.dashboard.company.name.update}">Update Company Name</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             <h2 class="text-lg font-medium leading-6 text-gray-900" th:text="#{admin.dashboard.stats.title}">Company Statistics</h2>
