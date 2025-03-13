@@ -79,13 +79,12 @@ public class MetricsViewController {
     public String showConversationMetrics(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             var conversation = conversationService.findConversationById(id);
-            var messages = conversationService.findMessagesByConversation(id);
 
             // Count point-in-time summaries for this conversation
             long summaryCount = pointInTimeSummaryRepository.countByConversation(conversation);
 
             model.addAttribute("conversation", conversation);
-            model.addAttribute("messageCount", messages.size());
+            model.addAttribute("messageCount", conversation.getMessageCacheCounter());
             model.addAttribute("summaryCount", summaryCount);
             model.addAttribute("user", conversation.getUser());
             model.addAttribute("assistants", conversation.getAssistants());
