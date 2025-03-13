@@ -37,11 +37,9 @@ public class MetricCache {
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
-    @Column(name = "provider", nullable = false)
-    private String provider;
-
-    @Column(name = "model", nullable = false)
-    private String model;
+    @ManyToOne
+    @JoinColumn(name = "llm_model_id", nullable = false)
+    private LlmModel llmModel;
 
     @Column(name = "total_duration", nullable = false)
     private long totalDuration;

@@ -76,7 +76,7 @@ public class MessageProcessor {
 
                 // Get the AI model
                 final var chatModel = aiModelFactory.createModel(conversation);
-                final var modelId = aiModelFactory.getModelId(conversation);
+                final var llmModel = aiModelFactory.getActiveLlmModel(conversation);
 
                 // Call the AI model
                 final var aiResponse = chatModel.call(prompt);
@@ -93,8 +93,7 @@ public class MessageProcessor {
                         .duration(duration)
                         .inputTokens(usage.getPromptTokens())
                         .outputTokens(usage.getCompletionTokens())
-                        .provider("OpenAI")
-                        .model(modelId)
+                        .llmModel(llmModel)
                         .build();
 
                 recent.addMetrics(metrics);
@@ -175,36 +174,31 @@ public class MessageProcessor {
 
         // Calculate the total spending
         return metrics.stream()
-                .map(metric -> {
-                    final var model = llmModelRepository.findByModelId(metric.getModel())
-                            .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + metric.getModel()));
-                    return metric.getCost(model);
-                })
+                .map(Metrics::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
-     * Updates the metric cache for a conversation, provider, and model. If a cache entry doesn't exist for the given
+     * Updates the metric cache for a conversation and LLM model. If a cache entry doesn't exist for the given
      * combination, a new one is created.
      *
      * @param conversation the conversation
      * @param metrics      the metrics to add to the cache
      */
     private void updateMetricCache(Conversation conversation, Metrics metrics) {
-        if (conversation == null || metrics == null) {
-            log.warn("Cannot update metric cache: conversation or metrics is null");
+        if (conversation == null || metrics == null || metrics.getLlmModel() == null) {
+            log.warn("Cannot update metric cache: conversation, metrics, or llmModel is null");
             return;
         }
 
-        final var provider = metrics.getProvider();
-        final var model = metrics.getModel();
+        final var llmModel = metrics.getLlmModel();
 
-        log.debug("Updating metric cache for conversation {}, provider {}, model {}",
-                conversation.getId(), provider, model);
+        log.debug("Updating metric cache for conversation {}, llmModel {}",
+                conversation.getId(), llmModel.getModelId());
 
         // Try to find an existing cache entry
-        final var metricCacheOpt = metricCacheRepository.findByConversationAndProviderAndModel(
-                conversation.getId(), provider, model);
+        final var metricCacheOpt = metricCacheRepository.findByConversationAndLlmModel(
+                conversation.getId(), llmModel.getId());
 
         if (metricCacheOpt.isPresent()) {
             // Update existing cache using SQL to avoid race conditions
@@ -221,8 +215,7 @@ public class MessageProcessor {
             final var now = LocalDateTime.now();
             final var metricCache = MetricCache.builder()
                     .conversation(conversation)
-                    .provider(provider)
-                    .model(model)
+                    .llmModel(llmModel)
                     .totalDuration(metrics.getDuration())
                     .messageCount(1)
                     .totalInputTokens(metrics.getInputTokens())

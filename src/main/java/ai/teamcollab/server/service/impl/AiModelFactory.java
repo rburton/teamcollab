@@ -7,7 +7,6 @@ import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -36,25 +35,15 @@ public class AiModelFactory {
                 .map(Conversation::getUser)
                 .map(User::getCompany)
                 .map(Company::getLlmModel)
-                .filter(Strings::isNotBlank)
                 .orElse(currentSettings.getLlmModel());
 
-        final var llmProvider = Optional.ofNullable(conversation)
-                .map(Conversation::getUser)
-                .map(User::getCompany)
-                .map(Company::getLlmProvider)
-                .filter(Strings::isNotBlank)
-                .orElse(currentSettings.getLlmProvider());
-
-        final var model = llmModelRepository.findByModelId(llmModel)
-                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + llmModel));
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .apiKey(System.getenv("OPENAI_API_KEY"))
                         .build())
                 .defaultOptions(OpenAiChatOptions.builder()
-                        .model(model.getModelId())
-                        .temperature(model.getTemperature())
+                        .model(llmModel.getModelId())
+                        .temperature(llmModel.getTemperature())
                         .build())
                 .build();
     }
@@ -65,13 +54,12 @@ public class AiModelFactory {
      * @param conversation the conversation to get the model for
      * @return the LLM model ID
      */
-    public String getModelId(Conversation conversation) {
+    public LlmModel getActiveLlmModel(Conversation conversation) {
         final var currentSettings = systemSettingsService.getCurrentSettings();
         return Optional.ofNullable(conversation)
                 .map(Conversation::getUser)
                 .map(User::getCompany)
                 .map(Company::getLlmModel)
-                .filter(Strings::isNotBlank)
                 .orElse(currentSettings.getLlmModel());
     }
 

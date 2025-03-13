@@ -15,18 +15,16 @@ import java.util.Optional;
 public interface MetricCacheRepository extends JpaRepository<MetricCache, Long> {
 
     /**
-     * Finds a MetricCache by conversation ID, provider, and model.
+     * Finds a MetricCache by conversation ID and LLM model.
      *
      * @param conversationId the ID of the conversation
-     * @param provider the provider of the AI model
-     * @param model the specific AI model used
+     * @param llmModelId the ID of the LLM model
      * @return an Optional containing the MetricCache if found, or empty if not found
      */
-    @Query("SELECT mc FROM MetricCache mc WHERE mc.conversation.id = :conversationId AND mc.provider = :provider AND mc.model = :model")
-    Optional<MetricCache> findByConversationAndProviderAndModel(
+    @Query("SELECT mc FROM MetricCache mc WHERE mc.conversation.id = :conversationId AND mc.llmModel.id = :llmModelId")
+    Optional<MetricCache> findByConversationAndLlmModel(
             @Param("conversationId") Long conversationId,
-            @Param("provider") String provider,
-            @Param("model") String model);
+            @Param("llmModelId") Long llmModelId);
 
     /**
      * Updates the metrics in a MetricCache using SQL.

@@ -1,9 +1,34 @@
+CREATE TABLE llm_providers
+(
+    llm_provider_id BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL UNIQUE,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create LLM Model table
+CREATE TABLE llm_models
+(
+    llm_model_id             BIGSERIAL PRIMARY KEY,
+    name                     VARCHAR(255)   NOT NULL,
+    model_id                 VARCHAR(255)   NOT NULL,
+    label                    VARCHAR(255)   NOT NULL,
+    temperature              DOUBLE PRECISION,
+    input_price_per_million  DECIMAL(10, 6) NOT NULL,
+    output_price_per_million DECIMAL(10, 6) NOT NULL,
+    llm_provider_id          BIGINT         NOT NULL,
+    CONSTRAINT fk_llm_provider FOREIGN KEY (llm_provider_id) REFERENCES llm_providers (llm_provider_id) ON DELETE CASCADE
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_llm_models_provider_id ON llm_models (llm_provider_id);
+CREATE INDEX idx_llm_models_model_id ON llm_models (model_id);
+CREATE INDEX idx_llm_models_name ON llm_models (name);
+
 CREATE TABLE companies
 (
     company_id             BIGSERIAL PRIMARY KEY,
     name                   VARCHAR(255) NOT NULL,
-    llm_model              VARCHAR(255),
-    llm_provider           VARCHAR(255),
+    llm_model_id           BIGINT REFERENCES llm_models (llm_model_id),
     monthly_spending_limit DECIMAL(10, 2),
     stripe_customer_id     VARCHAR(255) UNIQUE, -- Links to Stripe Customer
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -153,8 +178,7 @@ CREATE TABLE metrics
     duration        BIGINT NOT NULL,
     input_tokens    INT    NOT NULL,
     output_tokens   INT    NOT NULL,
-    provider        VARCHAR(255),
-    model           VARCHAR(255),
+    llm_model_id    BIGINT REFERENCES llm_models (llm_model_id),
     additional_info TEXT,
     message_id      BIGINT UNIQUE,
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE
@@ -163,9 +187,8 @@ CREATE TABLE metrics
 CREATE TABLE system_settings
 (
     system_setting_id BIGINT PRIMARY KEY,
-    llm_model         VARCHAR(255) NOT NULL,
-    llm_provider      VARCHAR(255) NOT NULL,
-    created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    llm_model_id      BIGINT REFERENCES llm_models (llm_model_id),
+    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE plans
@@ -216,16 +239,15 @@ CREATE TABLE payments
 CREATE TABLE metric_cache
 (
     metric_cache_id     BIGSERIAL PRIMARY KEY,
-    conversation_id     BIGINT       NOT NULL REFERENCES conversations (conversation_id) ON DELETE CASCADE,
-    provider            VARCHAR(255) NOT NULL,
-    model               VARCHAR(255) NOT NULL,
-    total_duration      BIGINT       NOT NULL DEFAULT 0,
-    message_count       INT          NOT NULL DEFAULT 0,
-    total_input_tokens  INT          NOT NULL DEFAULT 0,
-    total_output_tokens INT          NOT NULL DEFAULT 0,
-    created_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uk_conversation_provider_model UNIQUE (conversation_id, provider, model)
+    conversation_id     BIGINT NOT NULL REFERENCES conversations (conversation_id) ON DELETE CASCADE,
+    llm_model_id        BIGINT REFERENCES llm_models (llm_model_id),
+    total_duration      BIGINT NOT NULL DEFAULT 0,
+    message_count       INT    NOT NULL DEFAULT 0,
+    total_input_tokens  INT    NOT NULL DEFAULT 0,
+    total_output_tokens INT    NOT NULL DEFAULT 0,
+    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_conversation_provider_model UNIQUE (conversation_id, llm_model_id)
 );
 
 -- Create indexes for better query performance

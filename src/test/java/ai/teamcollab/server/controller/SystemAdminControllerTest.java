@@ -95,8 +95,16 @@ class SystemAdminControllerTest {
         mockCompany.setId(1L);
         mockCompany.setName("Test Company");
 
+        LlmModel mockLlmModel = new LlmModel();
+        mockLlmModel.setId(1L);
+        mockLlmModel.setModelId("gpt-3.5-turbo");
+        mockLlmModel.setName("GPT-3.5 Turbo");
+
         mockSystemSettings = new SystemSettings();
-        mockSystemSettings.setLlmModel("gpt-3.5-turbo");
+        mockSystemSettings.setLlmModel(mockLlmModel);
+
+        when(llmModelRepository.findByModelId("gpt-3.5-turbo")).thenReturn(java.util.Optional.of(mockLlmModel));
+        when(llmModelRepository.findByModelId("gpt-4")).thenReturn(java.util.Optional.of(mockLlmModel));
     }
 
     @Test

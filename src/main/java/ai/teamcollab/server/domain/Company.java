@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
@@ -61,11 +63,9 @@ public class Company implements Serializable {
     @OneToMany(mappedBy = "company", cascade = ALL, orphanRemoval = true)
     private Set<Subscription> subscriptions = new HashSet<>();
 
-    @Column(name = "llm_model")
-    private String llmModel;
-
-    @Column(name = "llm_provider")
-    private String llmProvider;
+    @ManyToOne
+    @JoinColumn(name = "llm_model_id")
+    private LlmModel llmModel;
 
     @Positive(message = "Monthly price must be positive")
     @DecimalMin(value = "0.01", message = "Monthly price must be at least 0.01")

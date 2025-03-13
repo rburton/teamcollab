@@ -1,5 +1,6 @@
 package ai.teamcollab.server.service.impl;
 
+import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.repository.LlmModelRepository;
@@ -71,15 +72,16 @@ public class MetricsServiceImpl implements MetricsService {
                 .sum();
 
         // Find most used model
-        String mostUsedModel = allMetricCaches.stream()
+        final var mostUsedModel = allMetricCaches.stream()
                 .collect(java.util.stream.Collectors.groupingBy(
-                        MetricCache::getModel,
+                        MetricCache::getLlmModel,
                         java.util.stream.Collectors.summingInt(MetricCache::getMessageCount)
                 ))
                 .entrySet()
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
+                .map(LlmModel::getLabel)
                 .orElse("N/A");
 
         statistics.put("averageDuration", avgDuration);
@@ -122,8 +124,7 @@ public class MetricsServiceImpl implements MetricsService {
 
         return metrics.stream()
                 .map(metric -> {
-                    final var model = llmModelRepository.findByModelId(metric.getModel())
-                            .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + metric.getModel()));
+                    final var model = metric.getLlmModel();
                     final var cost = model.calculate(metric.getInputTokens(), metric.getOutputTokens());
                     return cost.setScale(5, java.math.RoundingMode.HALF_UP);
                 })

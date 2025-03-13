@@ -1,8 +1,10 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Company;
+import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.CompanyRepository;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.PlanDetailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +16,12 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final PlanDetailRepository planDetailRepository;
+    private final LlmModelRepository llmModelRepository;
 
-    public CompanyService(CompanyRepository companyRepository, PlanDetailRepository planDetailRepository) {
+    public CompanyService(CompanyRepository companyRepository, PlanDetailRepository planDetailRepository, LlmModelRepository llmModelRepository) {
         this.companyRepository = companyRepository;
         this.planDetailRepository = planDetailRepository;
+        this.llmModelRepository = llmModelRepository;
     }
 
     @Transactional
@@ -44,9 +48,22 @@ public class CompanyService {
     }
 
     @Transactional
-    public Company updateCompanyLlmModel(Long companyId, String llmModel) {
+    public Company updateCompanyLlmModel(Long companyId, String modelId) {
         Company company = getCompanyById(companyId);
-        company.setLlmModel(llmModel);
+
+        if (modelId == null || modelId.isEmpty()) {
+            company.setLlmModel(null);
+        } else {
+            try {
+                Long modelIdLong = Long.parseLong(modelId);
+                LlmModel llmModel = llmModelRepository.findById(modelIdLong)
+                        .orElseThrow(() -> new IllegalArgumentException("LLM model not found with id: " + modelId));
+                company.setLlmModel(llmModel);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid LLM model id: " + modelId);
+            }
+        }
+
         return companyRepository.save(company);
     }
 

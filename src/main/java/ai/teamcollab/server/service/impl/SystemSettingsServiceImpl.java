@@ -1,6 +1,8 @@
 package ai.teamcollab.server.service.impl;
 
+import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.SystemSettings;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.SystemSettingsRepository;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.NonNull;
@@ -14,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class SystemSettingsServiceImpl implements SystemSettingsService {
 
     private final SystemSettingsRepository systemSettingsRepository;
+    private final LlmModelRepository llmModelRepository;
 
     @Autowired
-    public SystemSettingsServiceImpl(SystemSettingsRepository systemSettingsRepository) {
+    public SystemSettingsServiceImpl(SystemSettingsRepository systemSettingsRepository, LlmModelRepository llmModelRepository) {
         this.systemSettingsRepository = systemSettingsRepository;
+        this.llmModelRepository = llmModelRepository;
     }
 
     @Override
@@ -27,7 +31,21 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
         return systemSettingsRepository.findCurrent()
                 .orElseGet(() -> {
                     log.info("No system settings found, creating default settings");
-                    return systemSettingsRepository.save(SystemSettings.builder().build());
+                    // Find the default LLM model (GPT-3.5-turbo from OpenAI)
+                    var defaultModel = llmModelRepository.findByModelId("gpt-3.5-turbo")
+                            .orElseGet(() -> {
+                                log.warn("Default model 'gpt-3.5-turbo' not found, using first available model");
+                                var models = llmModelRepository.findAll();
+                                var iterator = models.iterator();
+                                if (!iterator.hasNext()) {
+                                    throw new IllegalStateException("No LLM models found in the database");
+                                }
+                                return iterator.next();
+                            });
+
+                    return systemSettingsRepository.save(SystemSettings.builder()
+                            .llmModel(defaultModel)
+                            .build());
                 });
     }
 
@@ -38,7 +56,7 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
 
         var current = getCurrentSettings();
         current.setLlmModel(settings.getLlmModel());
-        
+
         return systemSettingsRepository.save(current);
     }
 }

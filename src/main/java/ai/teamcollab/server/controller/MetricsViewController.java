@@ -1,10 +1,10 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.LlmModel;
-import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.repository.CompanyRepository;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -109,10 +109,10 @@ public class MetricsViewController {
 
             // Calculate costs based on each model's tokens
             var inputTokensCost = metricCaches.stream()
-                    .map(cache -> calculateInputTokensCost(cache.getModel(), cache.getTotalInputTokens()))
+                    .map(cache -> calculateInputTokensCost(cache.getLlmModel(), cache.getTotalInputTokens()))
                     .reduce(ZERO, BigDecimal::add);
             var outputTokensCost = metricCaches.stream()
-                    .map(cache -> calculateOutputTokensCost(cache.getModel(), cache.getTotalOutputTokens()))
+                    .map(cache -> calculateOutputTokensCost(cache.getLlmModel(), cache.getTotalOutputTokens()))
                     .reduce(ZERO, BigDecimal::add);
 
             var totalCost = inputTokensCost.add(outputTokensCost);
@@ -184,17 +184,13 @@ public class MetricsViewController {
     }
 
     // Package-private for testing
-    BigDecimal calculateInputTokensCost(String model, int tokens) {
-        return llmModelRepository.findByModelId(model)
-                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + model))
-                .calculate(tokens, 0);
+    BigDecimal calculateInputTokensCost(LlmModel model, int tokens) {
+        return model.calculate(tokens, 0);
     }
 
     // Package-private for testing
-    BigDecimal calculateOutputTokensCost(String model, int tokens) {
-        return llmModelRepository.findByModelId(model)
-                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + model))
-                .calculate(0, tokens);
+    BigDecimal calculateOutputTokensCost(LlmModel model, int tokens) {
+        return model.calculate(0, tokens);
     }
 
 }

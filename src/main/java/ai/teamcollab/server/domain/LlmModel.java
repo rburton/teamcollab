@@ -21,14 +21,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.text.NumberFormat.getCurrencyInstance;
 import static java.util.Locale.US;
 
 /**
- * Represents a Language Learning Model (LLM) such as GPT-4, Gemini, etc.
- * Each model belongs to a provider and has specific pricing and configuration.
+ * Represents a Language Learning Model (LLM) such as GPT-4, Gemini, etc. Each model belongs to a provider and has
+ * specific pricing and configuration.
  */
 @Entity(name = "llm_models")
 @Getter
@@ -69,7 +69,7 @@ public class LlmModel implements Serializable {
     private BigDecimal outputPricePerMillion;
 
     @NotNull
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "llm_provider_id", nullable = false)
     private LlmProvider provider;
 
@@ -79,7 +79,7 @@ public class LlmModel implements Serializable {
     /**
      * Calculates the cost for the given number of input and output tokens.
      *
-     * @param inputTokens the number of input tokens
+     * @param inputTokens  the number of input tokens
      * @param outputTokens the number of output tokens
      * @return the calculated cost
      * @throws IllegalArgumentException if token counts are negative
@@ -124,7 +124,7 @@ public class LlmModel implements Serializable {
      * @return the dropdown display string
      */
     public String getDropdown() {
-        return modelId + " " + format(inputPricePerMillion.add(outputPricePerMillion)) + 
-               " (in: " + format(inputPricePerMillion) + " out: " + format(outputPricePerMillion) + ")";
+        return provider.getLabel() + " " + modelId + " " + format(inputPricePerMillion.add(outputPricePerMillion)) +
+                " (in: " + format(inputPricePerMillion) + " out: " + format(outputPricePerMillion) + ")";
     }
 }

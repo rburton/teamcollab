@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -42,11 +43,9 @@ public class Metrics {
     @Column(name = "output_tokens")
     private int outputTokens;
 
-    @Column(name = "provider")
-    private String provider;
-
-    @Column(name = "model")
-    private String model;
+    @ManyToOne
+    @JoinColumn(name = "llm_model_id")
+    private LlmModel llmModel;
 
     @Column(name = "additional_info")
     private String additionalInfo;
@@ -55,8 +54,11 @@ public class Metrics {
     @JoinColumn(name = "message_id", nullable = false)
     private Message message;
 
-    public BigDecimal getCost(LlmModel model) {
-        final var cost = model.calculate(inputTokens, outputTokens);
+    public BigDecimal getCost() {
+        if (llmModel == null) {
+            return BigDecimal.ZERO;
+        }
+        final var cost = llmModel.calculate(inputTokens, outputTokens);
         return cost.setScale(5, HALF_UP);
     }
 }

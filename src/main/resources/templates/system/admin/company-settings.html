@@ -50,7 +50,7 @@
                         <p class="mt-1 text-sm text-gray-500">If not specified, the system default will be used.</p>
                         <p class="mt-3 text-sm text-gray-700">
                             <span class="font-medium">System Default:</span>
-                            <span th:text="${systemSettings.llmModel}"></span>
+                            <span th:text="${systemSettings.llmModel.name}"></span>
                         </p>
                     </div>
 
@@ -63,9 +63,9 @@
                                             class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                         <option value="">Use System Default</option>
                                         <option th:each="model : ${models}"
-                                                th:value="${model.getModelId()}"
+                                                th:value="${model.getId()}"
                                                 th:text="${model.getDropdown()}"
-                                                th:selected="${company.llmModel != null && company.llmModel == model.getModelId()}">
+                                                th:selected="${company.llmModel != null && company.llmModel.id == model.getId()}">
                                         </option>
                                     </select>
                                 </div>
