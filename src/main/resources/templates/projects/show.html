@@ -29,7 +29,8 @@
                          fill="currentColor" aria-hidden="true">
                         <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z"/>
                     </svg>
-                    <a href="/projects" class="ml-4 text-sm font-medium text-gray-500 hover:text-primary transition-colors duration-200">Projects</a>
+                    <a href="/projects"
+                       class="ml-4 text-sm font-medium text-gray-500 hover:text-primary transition-colors duration-200">Projects</a>
                 </div>
             </li>
             <li class="flex">
@@ -51,16 +52,16 @@
             <!-- Project header top section -->
             <div class="relative">
                 <!-- Decorative header background -->
-                <div class="absolute inset-0 h-24 bg-primary/90"></div>
+                <div class="absolute inset-0 h-24 bg-gray-100"></div>
 
                 <!-- Project title and icon section -->
-                <div class="relative pt-12 px-6 pb-4">
+                <div class="relative pt-12 px-6 pb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md gap-6 rounded-lg mb-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-white rounded-full p-3 shadow-md transform transition-transform duration-300 hover:scale-105">
                                 <i class="fas fa-project-diagram text-2xl text-primary"></i>
                             </div>
-                            <h2 class="ml-4 text-2xl font-bold text-white tracking-tight" th:text="${project.name}">
+                            <h2 class="ml-4 text-2xl font-bold text-black tracking-tight" th:text="${project.name}">
                                 Job Postings
                             </h2>
                         </div>
@@ -84,7 +85,8 @@
                 <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Overview</h3>
                     <p class="text-gray-700 text-base leading-relaxed" th:text="${project.overview}">
-                        Workcation is a property rental website. Etiam ullamcorper massa viverra consequat, consectetur id nulla
+                        Workcation is a property rental website. Etiam ullamcorper massa viverra consequat, consectetur
+                        id nulla
                         tempus. Fringilla egestas justo massa purus sagittis malesuada.
                     </p>
                 </div>
@@ -97,7 +99,8 @@
                             <span th:text="${#lists.size(project.conversations)} + ' Conversations'">5 Conversations</span>
                         </span>
                     </div>
-                    <a href="#new-conversation" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105">
+                    <a href="#new-conversation"
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105">
                         <i class="fas fa-plus mr-2"></i> New Conversation
                     </a>
                 </div>
@@ -108,12 +111,14 @@
     <!-- Alert messages -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div th:if="${errorMessage}"
-             class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+             class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md mb-6 flex items-center"
+             role="alert">
             <i class="fas fa-exclamation-circle text-red-500 mr-3 text-lg"></i>
             <span class="block sm:inline" th:text="${errorMessage}"></span>
         </div>
         <div th:if="${successMessage}"
-             class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+             class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md mb-6 flex items-center"
+             role="alert">
             <i class="fas fa-check-circle text-green-500 mr-3 text-lg"></i>
             <span class="block sm:inline" th:text="${successMessage}"></span>
         </div>
@@ -124,20 +129,23 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <!-- Section Header with Search -->
-            <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex flex-wrap items-center justify-between">
+            <div class="border-b border-gray-200 bg-gray-50 px-6 py-4 flex-wrap  bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 p-4 shadow-md flex justify-between items-center gap-6 rounded-lg mb-4">
                 <div class="flex items-center">
-                    <i class="fas fa-comments text-primary mr-3 text-xl"></i>
-                    <h3 class="text-lg font-medium text-gray-900">Project Conversations</h3>
-                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary/90" th:text="${#lists.size(project.conversations)}">5</span>
+                    <i class="fas fa-comments text-white mr-3 text-xl"></i>
+                    <h3 class="text-lg font-medium text-white">Project Conversations</h3>
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-white"
+                          th:text="${#lists.size(project.conversations)}">5</span>
                 </div>
 
                 <!-- Search Box -->
                 <div class="mt-2 sm:mt-0 w-full sm:w-auto">
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+                            <i class="fas fa-search text-white"></i>
                         </div>
-                        <input type="text" id="conversation-search" class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search conversations...">
+                        <input type="text" id="conversation-search"
+                               class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md text-white"
+                               placeholder="Search conversations...">
                     </div>
                 </div>
             </div>
@@ -146,14 +154,16 @@
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="conversations-container">
                     <!-- Conversation Cards -->
-                    <div th:each="conversation : ${project.conversations}" class="conversation-card bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
+                    <div th:each="conversation : ${project.conversations}"
+                         class="conversation-card bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
                         <div class="p-5 flex-grow">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-center mb-3">
                                     <div class="flex-shrink-0 bg-primary/10 rounded-full p-2">
                                         <i class="fas fa-comments text-primary"></i>
                                     </div>
-                                    <h4 class="ml-3 text-lg font-semibold text-gray-900 line-clamp-1" th:text="${conversation.purpose}">Conversation Purpose</h4>
+                                    <h4 class="ml-3 text-lg font-semibold text-gray-900 line-clamp-1"
+                                        th:text="${conversation.purpose}">Conversation Purpose</h4>
                                 </div>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     <i class="fas fa-circle text-xs mr-1"></i>
@@ -173,7 +183,8 @@
                                 <i class="fas fa-user-circle text-gray-400 mr-1.5"></i>
                                 <span class="text-sm text-gray-500" th:text="${conversation.createdBy}">John Doe</span>
                             </div>
-                            <a th:href="@{/conversations/{id}(id=${conversation.id})}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-primary bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                            <a th:href="@{/conversations/{id}(id=${conversation.id})}"
+                               class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                                 <i class="fas fa-arrow-right mr-1.5"></i>
                                 View Conversation
                             </a>
@@ -181,13 +192,16 @@
                     </div>
 
                     <!-- Empty State -->
-                    <div th:if="${#lists.isEmpty(project.conversations)}" class="col-span-full flex flex-col items-center justify-center py-12 px-4 text-center">
+                    <div th:if="${#lists.isEmpty(project.conversations)}"
+                         class="col-span-full flex flex-col items-center justify-center py-12 px-4 text-center">
                         <div class="bg-gray-100 rounded-full p-4 mb-4">
                             <i class="fas fa-comments text-3xl text-gray-400"></i>
                         </div>
                         <h3 class="mt-2 text-lg font-medium text-gray-900">No conversations yet</h3>
-                        <p class="mt-1 text-sm text-gray-500">Get started by creating your first conversation for this project.</p>
-                        <a href="#new-conversation" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+                        <p class="mt-1 text-sm text-gray-500">Get started by creating your first conversation for this
+                            project.</p>
+                        <a href="#new-conversation"
+                           class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                             <i class="fas fa-plus mr-2"></i> Start New Conversation
                         </a>
                     </div>
@@ -217,7 +231,8 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-blue-700">
-                                Create a new conversation to discuss specific aspects of this project. Be clear about the purpose to help team members understand the context.
+                                Create a new conversation to discuss specific aspects of this project. Be clear about
+                                the purpose to help team members understand the context.
                             </p>
                         </div>
                     </div>
@@ -229,22 +244,18 @@
                       class="space-y-6">
 
                     <div>
-                        <label for="purpose" class="block text-sm font-medium text-gray-700 mb-1">Conversation Purpose</label>
+                        <label for="purpose" class="block text-sm font-medium text-gray-700 mb-1">Conversation
+                            Purpose</label>
                         <div class="relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-comment-alt text-gray-400"></i>
-                            </div>
-                            <textarea id="purpose"
-                                      name="purpose"
-                                      th:field="*{purpose}"
-                                      required
-                                      class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-colors duration-200"
-                                      placeholder="What would you like to discuss about this project? Be specific to help others understand the context."
-                                      rows="4"></textarea>
+                            <textarea required id="purpose" name="purpose" th:field="*{purpose}" rows="4"
+                                      class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 shadow-sm transition-all duration-200 hover:outline-gray-400"
+                                      placeholder="What would you like to discuss about this project? Be specific to help others understand the context."></textarea>
                         </div>
-                        <p class="mt-1 text-xs text-gray-500">Clearly describe the purpose of this conversation (e.g., "Discuss project timeline and milestones")</p>
+                        <p class="mt-1 text-xs text-gray-500">Clearly describe the purpose of this conversation (e.g.,
+                            "Discuss project timeline and milestones")</p>
 
-                        <div th:if="${#fields.hasErrors('purpose')}" class="mt-2 text-sm text-red-600 flex items-center">
+                        <div th:if="${#fields.hasErrors('purpose')}"
+                             class="mt-2 text-sm text-red-600 flex items-center">
                             <i class="fas fa-exclamation-circle mr-1.5"></i>
                             <span th:errors="*{purpose}"></span>
                         </div>
@@ -267,51 +278,51 @@
 
     <!-- JavaScript for Search Functionality -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('conversation-search');
-        const conversationCards = document.querySelectorAll('.conversation-card');
-        const conversationsContainer = document.getElementById('conversations-container');
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('conversation-search');
+            const conversationCards = document.querySelectorAll('.conversation-card');
+            const conversationsContainer = document.getElementById('conversations-container');
 
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase().trim();
 
-            let visibleCount = 0;
-            conversationCards.forEach(card => {
-                const purpose = card.querySelector('h4').textContent.toLowerCase();
-                if (purpose.includes(searchTerm)) {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+                let visibleCount = 0;
+                conversationCards.forEach(card => {
+                    const purpose = card.querySelector('h4').textContent.toLowerCase();
+                    if (purpose.includes(searchTerm)) {
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
 
-            // Show empty state if no results
-            if (visibleCount === 0 && conversationCards.length > 0) {
-                // Check if we already have a no-results element
-                let noResults = document.getElementById('no-search-results');
-                if (!noResults) {
-                    noResults = document.createElement('div');
-                    noResults.id = 'no-search-results';
-                    noResults.className = 'col-span-full flex flex-col items-center justify-center py-12 px-4 text-center';
-                    noResults.innerHTML = `
+                // Show empty state if no results
+                if (visibleCount === 0 && conversationCards.length > 0) {
+                    // Check if we already have a no-results element
+                    let noResults = document.getElementById('no-search-results');
+                    if (!noResults) {
+                        noResults = document.createElement('div');
+                        noResults.id = 'no-search-results';
+                        noResults.className = 'col-span-full flex flex-col items-center justify-center py-12 px-4 text-center';
+                        noResults.innerHTML = `
                         <div class="bg-gray-100 rounded-full p-4 mb-4">
                             <i class="fas fa-search text-3xl text-gray-400"></i>
                         </div>
                         <h3 class="mt-2 text-lg font-medium text-gray-900">No matching conversations</h3>
                         <p class="mt-1 text-sm text-gray-500">Try adjusting your search terms.</p>
                     `;
-                    conversationsContainer.appendChild(noResults);
+                        conversationsContainer.appendChild(noResults);
+                    }
+                    noResults.style.display = '';
+                } else {
+                    const noResults = document.getElementById('no-search-results');
+                    if (noResults) {
+                        noResults.style.display = 'none';
+                    }
                 }
-                noResults.style.display = '';
-            } else {
-                const noResults = document.getElementById('no-search-results');
-                if (noResults) {
-                    noResults.style.display = 'none';
-                }
-            }
+            });
         });
-    });
     </script>
 
 </div>
