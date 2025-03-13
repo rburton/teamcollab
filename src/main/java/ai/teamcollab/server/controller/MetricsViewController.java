@@ -2,9 +2,9 @@ package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.GptModel;
 import ai.teamcollab.server.domain.LoginUserDetails;
-import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.repository.CompanyRepository;
+import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.repository.UserRepository;
 import ai.teamcollab.server.service.ConversationService;
@@ -41,13 +41,14 @@ public class MetricsViewController {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
+    private final MetricCacheRepository metricCacheRepository;
 
 
     @GetMapping
     public String index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Model model, 
+            Model model,
             RedirectAttributes redirectAttributes) {
         try {
             final var pageable = PageRequest.of(page, size);
@@ -89,32 +90,28 @@ public class MetricsViewController {
             model.addAttribute("user", conversation.getUser());
             model.addAttribute("assistants", conversation.getAssistants());
 
-            // Aggregate metrics
-            var totalDuration = messages.stream()
-                    .map(Message::getMetrics)
-                    .filter(Objects::nonNull)
-                    .mapToLong(Metrics::getDuration)
+            // Get metrics from MetricCache
+            var metricCaches = metricCacheRepository.findByConversationId(id);
+
+            log.debug("Found {} metric cache entries for conversation {}", metricCaches.size(), id);
+
+            // Aggregate metrics from MetricCache
+            var totalDuration = metricCaches.stream()
+                    .mapToLong(MetricCache::getTotalDuration)
                     .sum();
-            var totalInputTokens = messages.stream()
-                    .map(Message::getMetrics)
-                    .filter(Objects::nonNull)
-                    .mapToInt(Metrics::getInputTokens)
+            var totalInputTokens = metricCaches.stream()
+                    .mapToInt(MetricCache::getTotalInputTokens)
                     .sum();
-            var totalOutputTokens = messages.stream()
-                    .map(Message::getMetrics)
-                    .filter(Objects::nonNull)
-                    .mapToInt(Metrics::getOutputTokens)
+            var totalOutputTokens = metricCaches.stream()
+                    .mapToInt(MetricCache::getTotalOutputTokens)
                     .sum();
 
-            var inputTokensCost = messages.stream()
-                    .map(Message::getMetrics)
-                    .filter(Objects::nonNull)
-                    .map(message -> calculateInputTokensCost(message.getModel(), message.getInputTokens()))
+            // Calculate costs based on each model's tokens
+            var inputTokensCost = metricCaches.stream()
+                    .map(cache -> calculateInputTokensCost(cache.getModel(), cache.getTotalInputTokens()))
                     .reduce(ZERO, BigDecimal::add);
-            var outputTokensCost = messages.stream()
-                    .map(Message::getMetrics)
-                    .filter(Objects::nonNull)
-                    .map(message -> calculateOutputTokensCost(message.getModel(), message.getOutputTokens()))
+            var outputTokensCost = metricCaches.stream()
+                    .map(cache -> calculateOutputTokensCost(cache.getModel(), cache.getTotalOutputTokens()))
                     .reduce(ZERO, BigDecimal::add);
 
             var totalCost = inputTokensCost.add(outputTokensCost);

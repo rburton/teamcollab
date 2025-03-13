@@ -1,6 +1,8 @@
 package ai.teamcollab.server.service.impl;
 
+import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.MetricsService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.Map;
 public class MetricsServiceImpl implements MetricsService {
 
     private final MetricsRepository metricsRepository;
+    private final MetricCacheRepository metricCacheRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,36 +43,36 @@ public class MetricsServiceImpl implements MetricsService {
     @Override
     @Transactional(readOnly = true)
     public Map<String, Object> getMetricsStatistics() {
-        log.debug("Calculating metrics statistics");
+        log.debug("Calculating metrics statistics using MetricCache");
 
-        List<Metrics> allMetrics = metricsRepository.findAll();
+        List<MetricCache> allMetricCaches = metricCacheRepository.findAll();
         Map<String, Object> statistics = new HashMap<>();
 
-        if (allMetrics.isEmpty()) {
+        if (allMetricCaches.isEmpty()) {
             return statistics;
         }
 
         // Calculate average duration
-        double avgDuration = allMetrics.stream()
-                .mapToLong(Metrics::getDuration)
-                .average()
-                .orElse(0.0);
-
-        // Calculate total tokens
-        int totalInputTokens = allMetrics.stream()
-                .mapToInt(Metrics::getInputTokens)
+        double avgDuration = allMetricCaches.stream()
+                .mapToLong(MetricCache::getTotalDuration)
+                .sum() / (double) allMetricCaches.stream()
+                .mapToInt(MetricCache::getMessageCount)
                 .sum();
 
-        int totalOutputTokens = allMetrics.stream()
-                .mapToInt(Metrics::getOutputTokens)
+        // Calculate total tokens
+        int totalInputTokens = allMetricCaches.stream()
+                .mapToInt(MetricCache::getTotalInputTokens)
+                .sum();
+
+        int totalOutputTokens = allMetricCaches.stream()
+                .mapToInt(MetricCache::getTotalOutputTokens)
                 .sum();
 
         // Find most used model
-        String mostUsedModel = allMetrics.stream()
-                .map(Metrics::getModel)
+        String mostUsedModel = allMetricCaches.stream()
                 .collect(java.util.stream.Collectors.groupingBy(
-                        model -> model,
-                        java.util.stream.Collectors.counting()
+                        MetricCache::getModel,
+                        java.util.stream.Collectors.summingInt(MetricCache::getMessageCount)
                 ))
                 .entrySet()
                 .stream()

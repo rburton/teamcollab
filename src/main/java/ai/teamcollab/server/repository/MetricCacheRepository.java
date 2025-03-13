@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -51,4 +52,13 @@ public interface MetricCacheRepository extends JpaRepository<MetricCache, Long> 
             @Param("duration") long duration,
             @Param("inputTokens") int inputTokens,
             @Param("outputTokens") int outputTokens);
+
+    /**
+     * Finds all MetricCache entries for a specific conversation.
+     *
+     * @param conversationId the ID of the conversation
+     * @return a list of MetricCache entries for the conversation
+     */
+    @Query("SELECT mc FROM MetricCache mc WHERE mc.conversation.id = :conversationId")
+    List<MetricCache> findByConversationId(@Param("conversationId") Long conversationId);
 }
