@@ -3,8 +3,10 @@ package ai.teamcollab.server.controller;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.CreateUserDTO;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.RoleService;
+import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class CompanyAdminController {
     private final UserService userService;
     private final RoleService roleService;
     private final CompanyService companyService;
+    private final SystemSettingsService systemSettingsService;
+    private final LlmModelRepository llmModelRepository;
 
     @GetMapping("")
     public String dashboard(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
@@ -148,6 +152,32 @@ public class CompanyAdminController {
         }
 
         return "redirect:/company/admin/users";
+    }
+
+    @GetMapping("/settings")
+    public String showSettings(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+        final var company = companyService.getCompanyById(loginUserDetails.getCompanyId());
+        model.addAttribute("company", company);
+        model.addAttribute("systemSettings", systemSettingsService.getCurrentSettings());
+        model.addAttribute("models", llmModelRepository.findAll());
+        return "company/admin/settings";
+    }
+
+    @PostMapping("/settings/llm-model")
+    public String updateLlmModel(
+            @RequestParam(required = false) String llmModel,
+            @AuthenticationPrincipal LoginUserDetails loginUserDetails,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            companyService.updateCompanyLlmModel(loginUserDetails.getCompanyId(), llmModel);
+            redirectAttributes.addFlashAttribute("successMessage", 
+                    llmModel == null ? "Company LLM model reset to system default" : "Company LLM model updated successfully");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/company/admin/settings";
     }
 
 }

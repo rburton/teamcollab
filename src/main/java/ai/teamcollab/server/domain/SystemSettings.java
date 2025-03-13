@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static ai.teamcollab.server.domain.Provider.OPENAI;
+// import static ai.teamcollab.server.domain.Provider.OPENAI;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -31,12 +31,12 @@ public class SystemSettings {
     @NotBlank
     @Column(name = "llm_model", nullable = false)
     @Builder.Default
-    private String llmModel = OPENAI.findModelById("gpt-3.5-turbo").getId();
+    private String llmModel = "gpt-3.5-turbo";
 
     @NotBlank
     @Column(name = "llm_provider", nullable = false)
     @Builder.Default
-    private String llmProvider = OPENAI.getLabel();
+    private String llmProvider = "openai";
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -2,6 +2,7 @@ package ai.teamcollab.server.service.impl;
 
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.MetricsService;
@@ -25,6 +26,7 @@ public class MetricsServiceImpl implements MetricsService {
 
     private final MetricsRepository metricsRepository;
     private final MetricCacheRepository metricCacheRepository;
+    private final LlmModelRepository llmModelRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -119,7 +121,12 @@ public class MetricsServiceImpl implements MetricsService {
         List<Metrics> metrics = metricsRepository.findByCompanyAndDateRange(companyId, startDate, endDate);
 
         return metrics.stream()
-                .map(Metrics::getCost)
+                .map(metric -> {
+                    final var model = llmModelRepository.findByModelId(metric.getModel())
+                            .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + metric.getModel()));
+                    final var cost = model.calculate(metric.getInputTokens(), metric.getOutputTokens());
+                    return cost.setScale(5, java.math.RoundingMode.HALF_UP);
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

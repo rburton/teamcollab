@@ -100,4 +100,5 @@ public enum GptModel {
         // Return total cost
         return inputCost.add(outputCost);
     }
+
 }

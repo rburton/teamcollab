@@ -1,6 +1,7 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.SystemSettings;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ public class SystemController {
 
     private final SystemSettingsService systemSettingsService;
     private final CompanyService companyService;
+    private final LlmModelRepository llmModelRepository;
 
     @GetMapping("/companies")
     public String listCompanies(Model model) {
@@ -42,7 +44,9 @@ public class SystemController {
     public String showSettings(Model model) {
         log.debug("Showing system settings page");
         final var settings = systemSettingsService.getCurrentSettings();
+        final var models = llmModelRepository.findAll();
         model.addAttribute("settings", settings);
+        model.addAttribute("models", models);
         return "system/settings";
     }
 

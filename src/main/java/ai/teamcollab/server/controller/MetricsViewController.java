@@ -1,6 +1,7 @@
 package ai.teamcollab.server.controller;
 
-import ai.teamcollab.server.domain.GptModel;
+import ai.teamcollab.server.domain.LlmModel;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.repository.CompanyRepository;
@@ -42,6 +43,7 @@ public class MetricsViewController {
     private final UserRepository userRepository;
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MetricCacheRepository metricCacheRepository;
+    private final LlmModelRepository llmModelRepository;
 
 
     @GetMapping
@@ -183,12 +185,16 @@ public class MetricsViewController {
 
     // Package-private for testing
     BigDecimal calculateInputTokensCost(String model, int tokens) {
-        return GptModel.fromId(model).calculate(tokens, 0);
+        return llmModelRepository.findByModelId(model)
+                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + model))
+                .calculate(tokens, 0);
     }
 
     // Package-private for testing
     BigDecimal calculateOutputTokensCost(String model, int tokens) {
-        return GptModel.fromId(model).calculate(0, tokens);
+        return llmModelRepository.findByModelId(model)
+                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + model))
+                .calculate(0, tokens);
     }
 
 }

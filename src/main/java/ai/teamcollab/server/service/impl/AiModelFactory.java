@@ -2,8 +2,9 @@ package ai.teamcollab.server.service.impl;
 
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
-import ai.teamcollab.server.domain.GptModel;
+import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.User;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AiModelFactory {
     private final SystemSettingsService systemSettingsService;
+    private final LlmModelRepository llmModelRepository;
 
     /**
      * Creates an OpenAI chat model configured based on the conversation and system settings.
@@ -44,13 +46,14 @@ public class AiModelFactory {
                 .filter(Strings::isNotBlank)
                 .orElse(currentSettings.getLlmProvider());
 
-        final var model = GptModel.fromId(llmModel);
+        final var model = llmModelRepository.findByModelId(llmModel)
+                .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + llmModel));
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .apiKey(System.getenv("OPENAI_API_KEY"))
                         .build())
                 .defaultOptions(OpenAiChatOptions.builder()
-                        .model(model.getId())
+                        .model(model.getModelId())
                         .temperature(model.getTemperature())
                         .build())
                 .build();

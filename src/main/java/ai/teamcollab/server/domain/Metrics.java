@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.math.RoundingMode.HALF_UP;
-
 @Getter
 @Setter
 @Entity
@@ -56,8 +55,8 @@ public class Metrics {
     @JoinColumn(name = "message_id", nullable = false)
     private Message message;
 
-    public BigDecimal getCost() {
-        final var cost = GptModel.fromId(model).calculate(inputTokens, outputTokens);
+    public BigDecimal getCost(LlmModel model) {
+        final var cost = model.calculate(inputTokens, outputTokens);
         return cost.setScale(5, HALF_UP);
     }
 }

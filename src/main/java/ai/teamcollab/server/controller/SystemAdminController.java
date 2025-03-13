@@ -1,5 +1,6 @@
 package ai.teamcollab.server.controller;
 
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +24,14 @@ public class SystemAdminController {
 
     private final CompanyService companyService;
     private final SystemSettingsService systemSettingsService;
+    private final LlmModelRepository llmModelRepository;
 
     @GetMapping("/companies/{companyId}/settings")
     public String showCompanySettings(@PathVariable Long companyId, Model model) {
         try {
             model.addAttribute("company", companyService.getCompanyById(companyId));
             model.addAttribute("systemSettings", systemSettingsService.getCurrentSettings());
+            model.addAttribute("models", llmModelRepository.findAll());
             return "system/admin/company-settings";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());

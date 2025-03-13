@@ -16,7 +16,9 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -52,4 +54,36 @@ public class LlmProvider implements Serializable {
     @Builder.Default
     @OneToMany(mappedBy = "provider", cascade = ALL, fetch = LAZY)
     private Set<LlmModel> models = new HashSet<>();
+
+    /**
+     * Finds a model by its ID.
+     *
+     * @param modelId the ID of the model to find
+     * @return the model with the given ID
+     * @throws java.util.NoSuchElementException if no model with the given ID is found
+     */
+    public LlmModel findModelById(String modelId) {
+        return models.stream()
+                .filter(model -> model.getModelId().equalsIgnoreCase(modelId))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    /**
+     * Gets all models for this provider.
+     *
+     * @return a list of models for this provider
+     */
+    public List<LlmModel> getModels() {
+        return new ArrayList<>(models);
+    }
+
+    /**
+     * Gets the label for this provider.
+     *
+     * @return the label for this provider
+     */
+    public String getLabel() {
+        return name;
+    }
 }

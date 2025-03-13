@@ -7,6 +7,7 @@ import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.exception.MonthlyLimitExceededException;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
@@ -38,13 +39,14 @@ public class MessageProcessor {
     private final PromptBuilder promptBuilder;
     private final MetricsRepository metricsRepository;
     private final MetricCacheRepository metricCacheRepository;
+    private final LlmModelRepository llmModelRepository;
 
     /**
      * Processes a message and returns a response.
      *
      * @param conversation the conversation
-     * @param recent the recent message to process
-     * @param chatContext the chat context
+     * @param recent       the recent message to process
+     * @param chatContext  the chat context
      * @return a CompletableFuture containing the message response
      */
     public CompletableFuture<MessageResponse> process(Conversation conversation, Message recent, ChatContext chatContext) {
@@ -173,16 +175,20 @@ public class MessageProcessor {
 
         // Calculate the total spending
         return metrics.stream()
-                .map(Metrics::getCost)
+                .map(metric -> {
+                    final var model = llmModelRepository.findByModelId(metric.getModel())
+                            .orElseThrow(() -> new IllegalArgumentException("No model found with ID: " + metric.getModel()));
+                    return metric.getCost(model);
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
-     * Updates the metric cache for a conversation, provider, and model.
-     * If a cache entry doesn't exist for the given combination, a new one is created.
+     * Updates the metric cache for a conversation, provider, and model. If a cache entry doesn't exist for the given
+     * combination, a new one is created.
      *
      * @param conversation the conversation
-     * @param metrics the metrics to add to the cache
+     * @param metrics      the metrics to add to the cache
      */
     private void updateMetricCache(Conversation conversation, Metrics metrics) {
         if (conversation == null || metrics == null) {
@@ -193,7 +199,7 @@ public class MessageProcessor {
         final var provider = metrics.getProvider();
         final var model = metrics.getModel();
 
-        log.debug("Updating metric cache for conversation {}, provider {}, model {}", 
+        log.debug("Updating metric cache for conversation {}, provider {}, model {}",
                 conversation.getId(), provider, model);
 
         // Try to find an existing cache entry

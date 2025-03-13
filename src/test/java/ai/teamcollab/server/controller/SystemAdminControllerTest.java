@@ -1,7 +1,9 @@
 package ai.teamcollab.server.controller;
 
 import ai.teamcollab.server.domain.Company;
+import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.SystemSettings;
+import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.CompanyService;
 import ai.teamcollab.server.service.SystemSettingsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,9 @@ class SystemAdminControllerTest {
     @Autowired
     private SystemSettingsService systemSettingsService;
 
+    @Autowired
+    private LlmModelRepository llmModelRepository;
+
     private Company mockCompany;
     private SystemSettings mockSystemSettings;
 
@@ -57,10 +62,16 @@ class SystemAdminControllerTest {
         }
 
         @Bean
+        public LlmModelRepository llmModelRepository() {
+            return mock(LlmModelRepository.class);
+        }
+
+        @Bean
         public SystemAdminController systemAdminController(
                 CompanyService companyService,
-                SystemSettingsService systemSettingsService) {
-            return new SystemAdminController(companyService, systemSettingsService);
+                SystemSettingsService systemSettingsService,
+                LlmModelRepository llmModelRepository) {
+            return new SystemAdminController(companyService, systemSettingsService, llmModelRepository);
         }
     }
 

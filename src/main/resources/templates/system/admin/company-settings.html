@@ -62,10 +62,10 @@
                                     <select id="llmModel" name="llmModel"
                                             class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                         <option value="">Use System Default</option>
-                                        <option th:each="model : ${T(ai.teamcollab.server.domain.GptModel).values()}"
-                                                th:value="${model.getId()}"
+                                        <option th:each="model : ${models}"
+                                                th:value="${model.getModelId()}"
                                                 th:text="${model.getDropdown()}"
-                                                th:selected="${company.llmModel != null && company.llmModel == model.getId()}">
+                                                th:selected="${company.llmModel != null && company.llmModel == model.getModelId()}">
                                         </option>
                                     </select>
                                 </div>
