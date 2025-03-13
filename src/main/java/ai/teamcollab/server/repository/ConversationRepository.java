@@ -1,10 +1,12 @@
 package ai.teamcollab.server.repository;
 
 import ai.teamcollab.server.domain.Conversation;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,4 +23,15 @@ public interface ConversationRepository extends CrudRepository<Conversation, Lon
      */
     @Query("SELECT c FROM Conversation c LEFT JOIN FETCH c.conversationAssistants ca LEFT JOIN FETCH ca.assistant WHERE c.id = :id")
     Optional<Conversation> findByIdWithAssistant(@Param("id") Long id);
+
+    /**
+     * Increments the message cache counter for a conversation in a thread-safe manner.
+     * 
+     * @param id the ID of the conversation
+     * @return the number of rows affected (should be 1 if successful)
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE Conversation c SET c.messageCacheCounter = c.messageCacheCounter + 1 WHERE c.id = :id")
+    int incrementMessageCacheCounter(@Param("id") Long id);
 }

@@ -51,6 +51,15 @@ public class MessageService {
         message.setCreatedAt(LocalDateTime.now());
 
         final var savedMessage = messageRepository.save(message);
+
+        // Increment the message cache counter in a thread-safe manner
+        int updated = conversationRepository.incrementMessageCacheCounter(conversationId);
+        if (updated != 1) {
+            log.warn("Failed to increment message cache counter for conversation {}", conversationId);
+        } else {
+            log.debug("Incremented message cache counter for conversation {}", conversationId);
+        }
+
         log.debug("Successfully created message {} in conversation {}", savedMessage.getId(), conversationId);
 
         return savedMessage;

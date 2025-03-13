@@ -30,7 +30,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"messages", "assistants"})
+@ToString(exclude = {"messages", "assistants", "metricCaches"})
 public class Conversation {
 
     @Id
@@ -57,8 +57,14 @@ public class Conversation {
     @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
     private Set<ConversationAssistant> conversationAssistants = new HashSet<>();
 
+    @OneToMany(mappedBy = "conversation", cascade = ALL, orphanRemoval = true)
+    private Set<MetricCache> metricCaches = new HashSet<>();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "message_cache_counter")
+    private Long messageCacheCounter = 0L;
 
     public Conversation(String purpose, User createdBy) {
         this.purpose = purpose;

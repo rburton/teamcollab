@@ -3,10 +3,12 @@ package ai.teamcollab.server.service.impl;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
+import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.exception.MonthlyLimitExceededException;
 import ai.teamcollab.server.repository.MessageRepository;
+import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
@@ -35,6 +37,7 @@ public class MessageProcessor {
     private final AiModelFactory aiModelFactory;
     private final PromptBuilder promptBuilder;
     private final MetricsRepository metricsRepository;
+    private final MetricCacheRepository metricCacheRepository;
 
     /**
      * Processes a message and returns a response.
@@ -72,7 +75,7 @@ public class MessageProcessor {
                 // Get the AI model
                 final var chatModel = aiModelFactory.createModel(conversation);
                 final var modelId = aiModelFactory.getModelId(conversation);
-                
+
                 // Call the AI model
                 final var aiResponse = chatModel.call(prompt);
                 final var assistantMessage = aiResponse.getResult().getOutput();
@@ -94,6 +97,9 @@ public class MessageProcessor {
 
                 recent.addMetrics(metrics);
                 messageRepository.save(recent);
+
+                // Update the metric cache for this conversation, provider, and model
+                updateMetricCache(conversation, metrics);
 
                 log.debug("Received response from OpenAI: {}", response);
 
@@ -169,6 +175,58 @@ public class MessageProcessor {
         return metrics.stream()
                 .map(Metrics::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Updates the metric cache for a conversation, provider, and model.
+     * If a cache entry doesn't exist for the given combination, a new one is created.
+     *
+     * @param conversation the conversation
+     * @param metrics the metrics to add to the cache
+     */
+    private void updateMetricCache(Conversation conversation, Metrics metrics) {
+        if (conversation == null || metrics == null) {
+            log.warn("Cannot update metric cache: conversation or metrics is null");
+            return;
+        }
+
+        final var provider = metrics.getProvider();
+        final var model = metrics.getModel();
+
+        log.debug("Updating metric cache for conversation {}, provider {}, model {}", 
+                conversation.getId(), provider, model);
+
+        // Try to find an existing cache entry
+        final var metricCacheOpt = metricCacheRepository.findByConversationAndProviderAndModel(
+                conversation.getId(), provider, model);
+
+        if (metricCacheOpt.isPresent()) {
+            // Update existing cache using SQL to avoid race conditions
+            final var metricCache = metricCacheOpt.get();
+            final var rowsUpdated = metricCacheRepository.incrementMetricsById(
+                    metricCache.getId(),
+                    metrics.getDuration(),
+                    metrics.getInputTokens(),
+                    metrics.getOutputTokens()
+            );
+            log.debug("Updated existing metric cache: {}, rows affected: {}", metricCache.getId(), rowsUpdated);
+        } else {
+            // Create new cache
+            final var now = LocalDateTime.now();
+            final var metricCache = MetricCache.builder()
+                    .conversation(conversation)
+                    .provider(provider)
+                    .model(model)
+                    .totalDuration(metrics.getDuration())
+                    .messageCount(1)
+                    .totalInputTokens(metrics.getInputTokens())
+                    .totalOutputTokens(metrics.getOutputTokens())
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
+            metricCacheRepository.save(metricCache);
+            log.debug("Created new metric cache: {}", metricCache.getId());
+        }
     }
 
 }

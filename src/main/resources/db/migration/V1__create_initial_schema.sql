@@ -71,12 +71,13 @@ CREATE TABLE projects
 
 CREATE TABLE conversations
 (
-    conversation_id BIGSERIAL PRIMARY KEY,
-    purpose         VARCHAR(1000) NOT NULL,
-    project_id      BIGINT        NOT NULL REFERENCES projects (project_id),
-    user_id         BIGINT        NOT NULL REFERENCES users (user_id),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    conversation_id       BIGSERIAL PRIMARY KEY,
+    purpose               VARCHAR(1000)       NOT NULL,
+    project_id            BIGINT              NOT NULL REFERENCES projects (project_id),
+    user_id               BIGINT              NOT NULL REFERENCES users (user_id),
+    message_cache_counter BIGINT    DEFAULT 0 NOT NULL,
+    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_conversations_project_by ON projects (project_id);
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
@@ -208,6 +209,21 @@ CREATE TABLE payments
     stripe_payment_status    VARCHAR(50)    NOT NULL,
     created_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE metric_cache
+(
+    metric_cache_id  BIGSERIAL PRIMARY KEY,
+    conversation_id  BIGINT NOT NULL REFERENCES conversations (conversation_id) ON DELETE CASCADE,
+    provider         VARCHAR(255) NOT NULL,
+    model            VARCHAR(255) NOT NULL,
+    total_duration   BIGINT NOT NULL DEFAULT 0,
+    message_count    INT NOT NULL DEFAULT 0,
+    total_input_tokens INT NOT NULL DEFAULT 0,
+    total_output_tokens INT NOT NULL DEFAULT 0,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_conversation_provider_model UNIQUE (conversation_id, provider, model)
 );
 
 -- Create indexes for better query performance
