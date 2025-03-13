@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+import static ai.teamcollab.server.domain.Provider.GEMINI;
 import static ai.teamcollab.server.domain.Provider.OPENAI;
 import static java.text.NumberFormat.getCurrencyInstance;
 import static java.util.Locale.US;
@@ -26,7 +27,12 @@ public enum GptModel {
     GPT_3_5_TURBO_INSTRUCT(OPENAI, "gpt-3.5-turbo-instruct", 0.7, 1.50, 2.00),
     GPT_4(OPENAI, "gpt-4", 0.7, 30.00, 60.00),
     GPT_4_TURBO(OPENAI, "gpt-4-turbo", 0.7, 30.00, 60.00),
-    GPT_4_32K(OPENAI, "gpt-4-32k", 0.7, 60.00, 120.00);
+    GPT_4_32K(OPENAI, "gpt-4-32k", 0.7, 60.00, 120.00),
+    GEMINI_2_0_FLASH(GEMINI, "gemini-2.0-flash", null, 0.15, 0.60),
+    GEMINI_2_0_FLASH_LITE(GEMINI, "gemini-2.0-flash-lite", null, 0.15, 0.60),
+    GEMINI_1_5_FLASH(GEMINI, "gemini-1.5-flash", null, 0.075, 0.30),
+    GEMINI_1_5_PRO(GEMINI, "gemini-1.5-pro", null, 0.3125, 1.25),
+    ;
 
     private final BigDecimal MILLION = new BigDecimal("1000000");         // Price is per 1K tokens
     private final BigDecimal TOKEN_DIVISOR = new BigDecimal("1000");         // Price is per 1K tokens

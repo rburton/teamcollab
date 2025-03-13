@@ -35,7 +35,7 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
     @Transactional
     public SystemSettings updateSettings(@NonNull SystemSettings settings) {
         log.debug("Updating system settings: {}", settings);
-        
+
         var current = getCurrentSettings();
         current.setLlmModel(settings.getLlmModel());
         
