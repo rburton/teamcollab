@@ -64,6 +64,9 @@ public class Company implements Serializable {
     @Column(name = "llm_model")
     private String llmModel;
 
+    @Column(name = "llm_provider")
+    private String llmProvider;
+
     @Positive(message = "Monthly price must be positive")
     @DecimalMin(value = "0.01", message = "Monthly price must be at least 0.01")
     @Digits(integer = 10, fraction = 2, message = "Monthly price must have at most 10 digits and 2 decimal places")

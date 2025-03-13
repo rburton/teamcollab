@@ -3,6 +3,7 @@ CREATE TABLE companies
     company_id             BIGSERIAL PRIMARY KEY,
     name                   VARCHAR(255) NOT NULL,
     llm_model              VARCHAR(255),
+    llm_provider           VARCHAR(255),
     monthly_spending_limit DECIMAL(10, 2),
     stripe_customer_id     VARCHAR(255) UNIQUE, -- Links to Stripe Customer
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -163,6 +164,7 @@ CREATE TABLE system_settings
 (
     system_setting_id BIGINT PRIMARY KEY,
     llm_model         VARCHAR(255) NOT NULL,
+    llm_provider      VARCHAR(255) NOT NULL,
     created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -213,16 +215,16 @@ CREATE TABLE payments
 
 CREATE TABLE metric_cache
 (
-    metric_cache_id  BIGSERIAL PRIMARY KEY,
-    conversation_id  BIGINT NOT NULL REFERENCES conversations (conversation_id) ON DELETE CASCADE,
-    provider         VARCHAR(255) NOT NULL,
-    model            VARCHAR(255) NOT NULL,
-    total_duration   BIGINT NOT NULL DEFAULT 0,
-    message_count    INT NOT NULL DEFAULT 0,
-    total_input_tokens INT NOT NULL DEFAULT 0,
-    total_output_tokens INT NOT NULL DEFAULT 0,
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    metric_cache_id     BIGSERIAL PRIMARY KEY,
+    conversation_id     BIGINT       NOT NULL REFERENCES conversations (conversation_id) ON DELETE CASCADE,
+    provider            VARCHAR(255) NOT NULL,
+    model               VARCHAR(255) NOT NULL,
+    total_duration      BIGINT       NOT NULL DEFAULT 0,
+    message_count       INT          NOT NULL DEFAULT 0,
+    total_input_tokens  INT          NOT NULL DEFAULT 0,
+    total_output_tokens INT          NOT NULL DEFAULT 0,
+    created_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uk_conversation_provider_model UNIQUE (conversation_id, provider, model)
 );
 

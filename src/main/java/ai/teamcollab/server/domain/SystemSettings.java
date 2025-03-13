@@ -10,10 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
 
+import static ai.teamcollab.server.domain.Provider.OPENAI;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -28,11 +28,15 @@ public class SystemSettings {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @NonNull
     @NotBlank
     @Column(name = "llm_model", nullable = false)
     @Builder.Default
-    private String llmModel = "gpt-3.5-turbo";
+    private String llmModel = OPENAI.findModelById("gpt-3.5-turbo").getId();
+
+    @NotBlank
+    @Column(name = "llm_provider", nullable = false)
+    @Builder.Default
+    private String llmProvider = OPENAI.getLabel();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AiModelFactory {
     private final SystemSettingsService systemSettingsService;
-    
+
     /**
      * Creates an OpenAI chat model configured based on the conversation and system settings.
      *
@@ -37,6 +37,13 @@ public class AiModelFactory {
                 .filter(Strings::isNotBlank)
                 .orElse(currentSettings.getLlmModel());
 
+        final var llmProvider = Optional.ofNullable(conversation)
+                .map(Conversation::getUser)
+                .map(User::getCompany)
+                .map(Company::getLlmProvider)
+                .filter(Strings::isNotBlank)
+                .orElse(currentSettings.getLlmProvider());
+
         final var model = GptModel.fromId(llmModel);
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
@@ -48,7 +55,7 @@ public class AiModelFactory {
                         .build())
                 .build();
     }
-    
+
     /**
      * Gets the LLM model ID for a conversation.
      *
@@ -64,4 +71,5 @@ public class AiModelFactory {
                 .filter(Strings::isNotBlank)
                 .orElse(currentSettings.getLlmModel());
     }
+
 }

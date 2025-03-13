@@ -1,6 +1,6 @@
 -- Insert default settings
-INSERT INTO system_settings (system_setting_id, llm_model)
-VALUES (1, 'gpt-3.5-turbo')
+INSERT INTO system_settings (system_setting_id, llm_model, llm_provider)
+VALUES (1, 'gpt-3.5-turbo', 'openai')
 ;
 
 INSERT INTO assistants (name, expertise_areas, expertise_prompt)
@@ -42,8 +42,7 @@ VALUES (1, NOW(), NULL, 1.00),
 
 -- Insert the existing tones from the enum
 INSERT INTO assistant_tone (name, display_name, prompt)
-VALUES
-    ('FORMAL', 'Formal', 'Communicate in a professional and structured manner.'),
-    ('CASUAL', 'Casual', 'Communicate in a friendly and conversational style.'),
-    ('TECHNICAL', 'Technical', 'Communicate with detailed and specialized terminology.'),
-    ('SIMPLIFIED', 'Simplified', 'Communicate in a clear and easy to understand manner.');
+VALUES ('FORMAL', 'Formal', 'Communicate in a professional and structured manner.'),
+       ('CASUAL', 'Casual', 'Communicate in a friendly and conversational style.'),
+       ('TECHNICAL', 'Technical', 'Communicate with detailed and specialized terminology.'),
+       ('SIMPLIFIED', 'Simplified', 'Communicate in a clear and easy to understand manner.');

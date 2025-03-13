@@ -58,7 +58,7 @@ public class MessageProcessor {
 
         final var start = now();
 
-        final var company = Optional.ofNullable(conversation)
+        final var company = Optional.of(conversation)
                 .map(Conversation::getUser)
                 .map(User::getCompany)
                 .orElse(null);
