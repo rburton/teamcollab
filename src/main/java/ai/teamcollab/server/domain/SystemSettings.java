@@ -36,6 +36,10 @@ public class SystemSettings implements Serializable {
     @JoinColumn(name = "llm_model_id", nullable = false)
     private LlmModel llmModel;
 
+    @ManyToOne
+    @JoinColumn(name = "summary_llm_model_id", nullable = false)
+    private LlmModel summaryLlmModel;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
