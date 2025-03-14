@@ -59,8 +59,14 @@ public class LlmModel implements Serializable {
     @Column(name = "label", nullable = false)
     private String label;
 
+    @Column(name = "overview")
+    private String overview;
+
     @Column(name = "temperature")
     private Double temperature;
+
+    @Column(name = "context_size")
+    private long contextSize;
 
     @NotNull
     @Column(name = "input_price_per_million", nullable = false)

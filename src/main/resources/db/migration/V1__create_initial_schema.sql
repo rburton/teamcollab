@@ -13,6 +13,8 @@ CREATE TABLE llm_models
     model_id                 VARCHAR(255)   NOT NULL,
     label                    VARCHAR(255)   NOT NULL,
     temperature              DOUBLE PRECISION,
+    overview                 TEXT,
+    context_size             BIGINT         NOT NULL DEFAULT 0,
     input_price_per_million  DECIMAL(10, 6) NOT NULL,
     output_price_per_million DECIMAL(10, 6) NOT NULL,
     llm_provider_id          BIGINT         NOT NULL,
