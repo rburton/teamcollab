@@ -5,6 +5,7 @@ import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.exception.EmptyConversationException;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
+import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.domain.ChatContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,11 @@ import static java.util.Objects.requireNonNull;
 @Component
 @RequiredArgsConstructor
 public class SummaryGenerator {
-    public static final int SUMMARY_BATCH_SIZE = 10;
-
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MessageRepository messageRepository;
     private final AiModelFactory aiModelFactory;
     private final PromptBuilder promptBuilder;
+    private final SystemSettingsService systemSettingsService;
 
     /**
      * Generates a point-in-time summary for a conversation.
@@ -56,20 +56,25 @@ public class SummaryGenerator {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
+                int messageCount = 0;
                 if (existingSummary.isPresent()) {
                     final var lastSummaryMessage = existingSummary.get().getLatestMessage();
-
-                    final var messageCount = messageRepository.countMessagesAfter(
+                    messageCount = messageRepository.countMessagesAfter(
                             conversation.getId(),
                             lastSummaryMessage.getId()
                     );
-
-                    // If less than 10 messages have been added since the last summary, return the existing summary
-                    if (messageCount < SUMMARY_BATCH_SIZE) {
-                        log.debug("Using existing summary as only {} messages have been added since last summary", messageCount);
-                        return existingSummary.get();
-                    }
                 }
+                // Get the summary batch size from system settings
+                final var currentSettings = systemSettingsService.getCurrentSettings();
+                final var summaryBatchSize = currentSettings.getSummaryBatchSize();
+
+                // If fewer messages have been added than the batch size, return the existing summary
+                if (messageCount < summaryBatchSize) {
+                    log.debug("Using existing summary as only {} messages have been added since last summary (batch size: {})",
+                            messageCount, summaryBatchSize);
+                    return existingSummary.get();
+                }
+
 
                 log.debug("Generating new point-in-time summary");
 

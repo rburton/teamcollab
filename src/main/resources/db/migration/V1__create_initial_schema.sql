@@ -160,8 +160,8 @@ CREATE TABLE messages
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_messages_deleted ON messages(deleted);
-CREATE INDEX idx_messages_conversation_deleted ON messages(conversation_id, deleted);
+CREATE INDEX idx_messages_deleted ON messages (deleted);
+CREATE INDEX idx_messages_conversation_deleted ON messages (conversation_id, deleted);
 
 CREATE TABLE bookmarks
 (
@@ -192,9 +192,10 @@ CREATE TABLE metrics
 
 CREATE TABLE system_settings
 (
-    system_setting_id BIGINT PRIMARY KEY,
-    llm_model_id      BIGINT REFERENCES llm_models (llm_model_id),
-    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    system_setting_id  BIGINT PRIMARY KEY,
+    llm_model_id       BIGINT REFERENCES llm_models (llm_model_id),
+    summary_batch_size INT       NOT NULL DEFAULT 10,
+    created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE plans

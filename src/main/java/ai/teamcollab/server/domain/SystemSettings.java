@@ -38,4 +38,7 @@ public class SystemSettings implements Serializable {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "summary_batch_size")
+    private int summaryBatchSize = 10;
 }

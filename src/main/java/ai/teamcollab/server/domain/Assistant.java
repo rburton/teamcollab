@@ -16,7 +16,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -33,7 +32,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString
 public class Assistant implements Serializable {
 
     private static final long serialVersionUID = 1L;

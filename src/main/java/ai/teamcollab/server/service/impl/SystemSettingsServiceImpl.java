@@ -56,6 +56,7 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
 
         var current = getCurrentSettings();
         current.setLlmModel(settings.getLlmModel());
+        current.setSummaryBatchSize(settings.getSummaryBatchSize());
 
         return systemSettingsRepository.save(current);
     }
