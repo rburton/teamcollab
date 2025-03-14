@@ -56,13 +56,15 @@ public class SummaryGenerator {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                int messageCount = 0;
+                long messageCount = 0;
                 if (existingSummary.isPresent()) {
                     final var lastSummaryMessage = existingSummary.get().getLatestMessage();
                     messageCount = messageRepository.countMessagesAfter(
                             conversation.getId(),
                             lastSummaryMessage.getId()
                     );
+                } else {
+                    messageCount = conversation.getMessageCacheCounter();
                 }
                 // Get the summary batch size from system settings
                 final var currentSettings = systemSettingsService.getCurrentSettings();
@@ -82,7 +84,7 @@ public class SummaryGenerator {
                 final var topicSummariesPrompt = promptBuilder.buildTopicSummariesPrompt(chatContext);
                 final var assistantSummariesPrompt = promptBuilder.buildAssistantSummariesPrompt(conversation, chatContext);
 
-                final var chatModel = aiModelFactory.createModel(conversation);
+                final var chatModel = aiModelFactory.createSummaryModel();
 
                 final var topicsAndKeyPoints = callAndGetResponse(chatModel, topicsPrompt);
                 final var topicSummaries = callAndGetResponse(chatModel, topicSummariesPrompt);

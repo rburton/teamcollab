@@ -27,7 +27,7 @@
                         <div class="mt-5 md:mt-0 md:col-span-2">
                             <div class="grid grid-cols-6 gap-6">
                                 <div class="col-span-6 sm:col-span-3">
-                                    <label for="llmModel" class="block text-sm font-medium text-gray-700">Model</label>
+                                    <label for="llmModel" class="block text-sm font-medium text-gray-700">Chat Model</label>
                                     <select id="llmModel" name="llmModel" th:field="*{llmModel}"
                                             class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                         <option th:each="model : ${models}"
@@ -35,6 +35,19 @@
                                                 th:text="${model.getDropdown()}">
                                         </option>
                                     </select>
+                                    <p class="mt-1 text-sm text-gray-500">Model used for regular chat interactions</p>
+                                </div>
+
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="summaryLlmModel" class="block text-sm font-medium text-gray-700">Summary Model</label>
+                                    <select id="summaryLlmModel" name="summaryLlmModel" th:field="*{summaryLlmModel}"
+                                            class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        <option th:each="model : ${models}"
+                                                th:value="${model.getId()}"
+                                                th:text="${model.getDropdown()}">
+                                        </option>
+                                    </select>
+                                    <p class="mt-1 text-sm text-gray-500">Model used specifically for generating conversation summaries</p>
                                 </div>
 
                                 <div class="col-span-6 sm:col-span-3">

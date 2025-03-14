@@ -45,6 +45,7 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
 
                     return systemSettingsRepository.save(SystemSettings.builder()
                             .llmModel(defaultModel)
+                            .summaryLlmModel(defaultModel) // Use the same model for summaries by default
                             .build());
                 });
     }
@@ -56,6 +57,7 @@ public class SystemSettingsServiceImpl implements SystemSettingsService {
 
         var current = getCurrentSettings();
         current.setLlmModel(settings.getLlmModel());
+        current.setSummaryLlmModel(settings.getSummaryLlmModel());
         current.setSummaryBatchSize(settings.getSummaryBatchSize());
 
         return systemSettingsRepository.save(current);

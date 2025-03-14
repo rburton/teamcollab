@@ -40,9 +40,33 @@ public class AiModelFactory {
                 .map(Company::getLlmModel)
                 .orElse(currentSettings.getLlmModel());
 
+        return createChatModelFromLlmModel(llmModel);
+    }
+
+    /**
+     * Creates an OpenAI chat model specifically for generating summaries.
+     * Uses the summaryLlmModel from SystemSettings.
+     *
+     * @return a configured OpenAiChatModel for summaries
+     */
+    public ChatModel createSummaryModel() {
+        final var currentSettings = systemSettingsService.getCurrentSettings();
+        final var summaryLlmModel = currentSettings.getSummaryLlmModel();
+
+        log.debug("Creating summary model using: {}", summaryLlmModel.getName());
+        return createChatModelFromLlmModel(summaryLlmModel);
+    }
+
+    /**
+     * Helper method to create a ChatModel from an LlmModel.
+     *
+     * @param llmModel the LLM model to use
+     * @return a configured ChatModel
+     */
+    private ChatModel createChatModelFromLlmModel(LlmModel llmModel) {
         final var provider = llmModel.getProvider();
         if (provider.isOpenAi()) {
-            log.info("Using OpenAPI Client");
+            log.info("Using OpenAPI Client with model: {}", llmModel.getModelId());
             return OpenAiChatModel.builder()
                     .openAiApi(OpenAiApi.builder()
                             .apiKey(getenv("OPENAI_API_KEY"))
@@ -53,7 +77,7 @@ public class AiModelFactory {
                             .build())
                     .build();
         }
-        log.info("Using Gemini Client");
+        log.info("Using Gemini Client with model: {}", llmModel.getModelId());
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .apiKey(getenv("GEMINI_FLASH_2_0_KEY"))
