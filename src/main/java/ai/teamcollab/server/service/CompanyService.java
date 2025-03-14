@@ -49,7 +49,7 @@ public class CompanyService {
 
     @Transactional
     public Company updateCompanyLlmModel(Long companyId, String modelId) {
-        Company company = getCompanyById(companyId);
+        final var company = getCompanyById(companyId);
 
         if (modelId == null || modelId.isEmpty()) {
             company.setLlmModel(null);
@@ -69,14 +69,14 @@ public class CompanyService {
 
     @Transactional
     public Company updateCompanyMonthlySpendingLimit(Long companyId, BigDecimal monthlySpendingLimit) {
-        Company company = getCompanyById(companyId);
+        final var company = getCompanyById(companyId);
         company.setMonthlySpendingLimit(monthlySpendingLimit);
         return companyRepository.save(company);
     }
 
     @Transactional
     public Company updateCompanyName(Long companyId, String name) {
-        Company company = getCompanyById(companyId);
+        final var company = getCompanyById(companyId);
         company.setName(name);
         return companyRepository.save(company);
     }

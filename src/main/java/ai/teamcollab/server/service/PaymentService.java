@@ -1,7 +1,6 @@
 package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Payment;
-import ai.teamcollab.server.domain.Subscription;
 import ai.teamcollab.server.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,29 +23,29 @@ public class PaymentService {
     @Transactional
     public Payment createPayment(Long subscriptionId, BigDecimal amount, String stripePaymentIntentId) {
         log.info("Creating payment for subscription: {} with amount: {}", subscriptionId, amount);
-        
-        Subscription subscription = subscriptionService.findById(subscriptionId);
-        
+
+        final var subscription = subscriptionService.findById(subscriptionId);
+
         var payment = Payment.builder()
-            .subscription(subscription)
-            .amount(amount)
-            .paymentDate(LocalDate.now())
-            .stripePaymentIntentId(stripePaymentIntentId)
-            .stripePaymentStatus("pending")
-            .build();
-        
+                .subscription(subscription)
+                .amount(amount)
+                .paymentDate(LocalDate.now())
+                .stripePaymentIntentId(stripePaymentIntentId)
+                .stripePaymentStatus("pending")
+                .build();
+
         return paymentRepository.save(payment);
     }
 
     @Transactional
     public Payment updatePaymentStatus(String stripePaymentIntentId, String status) {
         log.info("Updating payment status for payment intent: {} to: {}", stripePaymentIntentId, status);
-        
+
         var payment = paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
-            .orElseThrow(() -> new EntityNotFoundException("Payment not found with intent ID: " + stripePaymentIntentId));
-            
+                .orElseThrow(() -> new EntityNotFoundException("Payment not found with intent ID: " + stripePaymentIntentId));
+
         payment.setStripePaymentStatus(status);
-        
+
         return paymentRepository.save(payment);
     }
 
@@ -57,14 +56,14 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public List<Payment> getSubscriptionPaymentsBetweenDates(
-        Long subscriptionId, 
-        LocalDate startDate, 
-        LocalDate endDate
+            Long subscriptionId,
+            LocalDate startDate,
+            LocalDate endDate
     ) {
         return paymentRepository.findBySubscriptionIdAndPaymentDateBetween(
-            subscriptionId, 
-            startDate, 
-            endDate
+                subscriptionId,
+                startDate,
+                endDate
         );
     }
 

@@ -171,7 +171,7 @@ public class CompanyAdminController {
 
         try {
             companyService.updateCompanyLlmModel(loginUserDetails.getCompanyId(), llmModel);
-            redirectAttributes.addFlashAttribute("successMessage", 
+            redirectAttributes.addFlashAttribute("successMessage",
                     llmModel == null ? "Company LLM model reset to system default" : "Company LLM model updated successfully");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

@@ -66,44 +66,44 @@ public class AssistantToneService {
     /**
      * Create a new assistant tone.
      *
-     * @param name the name of the tone
+     * @param name        the name of the tone
      * @param displayName the display name of the tone
-     * @param prompt the prompt for the tone
+     * @param prompt      the prompt for the tone
      * @return the created tone
      */
     public AssistantTone createTone(String name, String displayName, String prompt) {
         log.debug("Creating new assistant tone: {}", name);
-        
-        AssistantTone tone = AssistantTone.builder()
+
+        final var tone = AssistantTone.builder()
                 .name(name)
                 .displayName(displayName)
                 .prompt(prompt)
                 .createdTime(LocalDateTime.now())
                 .updatedTime(LocalDateTime.now())
                 .build();
-        
+
         return assistantToneRepository.save(tone);
     }
 
     /**
      * Update an existing assistant tone.
      *
-     * @param id the ID of the tone to update
+     * @param id          the ID of the tone to update
      * @param displayName the new display name
-     * @param prompt the new prompt
+     * @param prompt      the new prompt
      * @return the updated tone
      * @throws IllegalArgumentException if no tone is found with the given ID
      */
     public AssistantTone updateTone(Long id, String displayName, String prompt) {
         log.debug("Updating assistant tone with ID: {}", id);
-        
-        AssistantTone tone = assistantToneRepository.findById(id)
+
+        final var tone = assistantToneRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No tone found with ID: " + id));
-        
+
         tone.setDisplayName(displayName);
         tone.setPrompt(prompt);
         tone.setUpdatedTime(LocalDateTime.now());
-        
+
         return assistantToneRepository.save(tone);
     }
 
@@ -115,17 +115,17 @@ public class AssistantToneService {
      */
     public void deleteTone(Long id) {
         log.debug("Deleting assistant tone with ID: {}", id);
-        
-        AssistantTone tone = assistantToneRepository.findById(id)
+
+        final var tone = assistantToneRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No tone found with ID: " + id));
-        
+
         tone.setDeletedTime(LocalDateTime.now());
         assistantToneRepository.save(tone);
     }
 
     /**
-     * Get an assistant tone by name, creating it if it doesn't exist.
-     * This is a compatibility method to ease transition from enum to entity.
+     * Get an assistant tone by name, creating it if it doesn't exist. This is a compatibility method to ease transition
+     * from enum to entity.
      *
      * @param name the name of the tone
      * @return the found or created tone
@@ -138,8 +138,8 @@ public class AssistantToneService {
     }
 
     /**
-     * Find an assistant tone by name, throwing an exception if not found.
-     * This is a compatibility method to ease transition from enum to entity.
+     * Find an assistant tone by name, throwing an exception if not found. This is a compatibility method to ease
+     * transition from enum to entity.
      *
      * @param name the name of the tone
      * @return the found tone

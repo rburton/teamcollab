@@ -35,13 +35,13 @@ public class PlanService {
     @Transactional(readOnly = true)
     public Plan getPlanById(Long planId) {
         return planRepository.findById(planId)
-            .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
+                .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
     }
 
     @Transactional(readOnly = true)
     public Plan getPlanByIdWithDetails(Long planId) {
         return planRepository.findByIdWithDetails(planId)
-            .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
+                .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + planId));
     }
 
     @Transactional
@@ -49,9 +49,9 @@ public class PlanService {
         log.info("Creating new plan with name: {}", name);
 
         var plan = Plan.builder()
-            .name(name)
-            .description(description)
-            .build();
+                .name(name)
+                .description(description)
+                .build();
 
         return planRepository.save(plan);
     }
@@ -63,10 +63,10 @@ public class PlanService {
         var plan = getPlanById(planId);
 
         var planDetail = PlanDetail.builder()
-            .plan(plan)
-            .effectiveDate(effectiveDate)
-            .monthlyPrice(monthlyPrice)
-            .build();
+                .plan(plan)
+                .effectiveDate(effectiveDate)
+                .monthlyPrice(monthlyPrice)
+                .build();
 
         return planDetailRepository.save(planDetail);
     }
@@ -74,7 +74,7 @@ public class PlanService {
     @Transactional(readOnly = true)
     public BigDecimal getCurrentPrice(Long planId) {
         return planDetailRepository.findActivePriceForPlan(planId, LocalDate.now())
-            .map(PlanDetail::getMonthlyPrice)
-            .orElseThrow(() -> new EntityNotFoundException("No active price found for plan: " + planId));
+                .map(PlanDetail::getMonthlyPrice)
+                .orElseThrow(() -> new EntityNotFoundException("No active price found for plan: " + planId));
     }
 }

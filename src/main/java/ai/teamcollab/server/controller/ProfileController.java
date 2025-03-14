@@ -27,7 +27,7 @@ public class ProfileController {
 
     @GetMapping
     public String showProfileForm(@AuthenticationPrincipal LoginUserDetails userDetails, Model model) {
-        User user = userService.getUserById(userDetails.getId());
+        final var user = userService.getUserById(userDetails.getId());
         model.addAttribute("user", user);
         // Add auth providers to the model
         model.addAttribute("authProviders", user.getAuthProviders());
@@ -36,9 +36,9 @@ public class ProfileController {
 
     @PostMapping("/basic-info")
     public String updateBasicInfo(@AuthenticationPrincipal LoginUserDetails userDetails,
-                               @Valid @ModelAttribute("user") User user,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
+                                  @Valid @ModelAttribute("user") User user,
+                                  BindingResult bindingResult,
+                                  RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             return "profile/edit";
@@ -47,9 +47,9 @@ public class ProfileController {
         try {
             // Update username and email
             userService.updateUserBasicInfo(
-                userDetails.getId(),
-                user.getUsername(),
-                user.getEmail()
+                    userDetails.getId(),
+                    user.getUsername(),
+                    user.getEmail()
             );
 
             redirectAttributes.addFlashAttribute("successMessage", "Profile information updated successfully");
@@ -62,15 +62,15 @@ public class ProfileController {
 
     @PostMapping("/password")
     public String updatePassword(@AuthenticationPrincipal LoginUserDetails userDetails,
-                               @RequestParam(required = false) String password,
-                               RedirectAttributes redirectAttributes) {
+                                 @RequestParam(required = false) String password,
+                                 RedirectAttributes redirectAttributes) {
 
         try {
             // Update password
             if (password != null && !password.isEmpty()) {
                 userService.updateUserPassword(
-                    userDetails.getId(),
-                    password
+                        userDetails.getId(),
+                        password
                 );
                 redirectAttributes.addFlashAttribute("successMessage", "Password updated successfully");
             } else {
@@ -89,9 +89,9 @@ public class ProfileController {
     @Deprecated
     @PostMapping
     public String updateProfile(@AuthenticationPrincipal LoginUserDetails userDetails,
-                               @Valid @ModelAttribute("user") User user,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
+                                @Valid @ModelAttribute("user") User user,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             return "profile/edit";
@@ -100,10 +100,10 @@ public class ProfileController {
         try {
             // Only update username, email, and password
             userService.updateUserProfile(
-                userDetails.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword()
+                    userDetails.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPassword()
             );
 
             redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully");

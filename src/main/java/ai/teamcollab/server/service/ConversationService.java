@@ -64,7 +64,7 @@ public class ConversationService {
         conversation.setUser(user);
         conversation.setCreatedAt(java.time.LocalDateTime.now());
 
-        Conversation savedConversation = conversationRepository.save(conversation);
+        final var savedConversation = conversationRepository.save(conversation);
 
         // Create audit event for conversation creation
         auditService.createAuditEvent(
@@ -133,9 +133,7 @@ public class ConversationService {
                     .orElseThrow();
             final var chatContext = buildChatContext(conversation, sessionId);
 
-//            if (false) {
             chatService.generatePointInTimeSummary(conversation, chatContext);
-//            }
 
             return chatService.process(conversation, message, chatContext)
                     .thenAccept(response -> {

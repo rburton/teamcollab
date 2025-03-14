@@ -22,9 +22,9 @@ public class AssistantService {
     private final ConversationRepository conversationRepository;
     private final AssistantToneService assistantToneService;
 
-    public AssistantService(AssistantRepository assistantRepository, 
-                           ConversationRepository conversationRepository,
-                           AssistantToneService assistantToneService) {
+    public AssistantService(AssistantRepository assistantRepository,
+                            ConversationRepository conversationRepository,
+                            AssistantToneService assistantToneService) {
         this.assistantRepository = assistantRepository;
         this.conversationRepository = conversationRepository;
         this.assistantToneService = assistantToneService;
@@ -32,7 +32,7 @@ public class AssistantService {
 
     public Assistant createAssistant(String name, String expertise, String description, Company company) {
         log.debug("Creating new assistant: {} with company ID: {}", name, company.getId());
-        Assistant assistant = Assistant.builder()
+        final var assistant = Assistant.builder()
                 .name(name)
                 .expertise(expertise)
                 .expertisePrompt(description)
@@ -52,7 +52,7 @@ public class AssistantService {
     public Assistant updateAssistant(Long id, String name, String expertiseAreas) {
         log.debug("Updating assistant with ID: {}", id);
 
-        Assistant assistant = assistantRepository.findById(id)
+        final var assistant = assistantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + id));
 
         assistant.setName(name);
@@ -80,7 +80,7 @@ public class AssistantService {
     public void removeFromConversation(Long assistantId, Long conversationId) {
         log.debug("Removing assistant {} from conversation {}", assistantId, conversationId);
 
-        Assistant assistant = assistantRepository.findById(assistantId)
+        final var assistant = assistantRepository.findById(assistantId)
                 .orElseThrow(() -> new IllegalArgumentException("Assistant not found with ID: " + assistantId));
 
 
@@ -163,10 +163,9 @@ public class AssistantService {
     }
 
     /**
-     * Set the default tone for new conversation assistants.
-     * This is used when adding an assistant to a conversation.
+     * Set the default tone for new conversation assistants. This is used when adding an assistant to a conversation.
      *
-     * @param assistant the assistant
+     * @param assistant    the assistant
      * @param conversation the conversation
      */
     public void setDefaultTone(Assistant assistant, Conversation conversation) {

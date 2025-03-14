@@ -4,6 +4,7 @@ import ai.teamcollab.server.domain.Message;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,7 @@ public class MessageService {
     }
 
     @Transactional
-    public Message createMessage(Message message, Long conversationId, User user) {
-        requireNonNull(message, "Message cannot be null");
-        requireNonNull(user, "User cannot be null");
-
+    public Message createMessage(@NonNull Message message, Long conversationId, @NonNull User user) {
         log.debug("Creating message for conversation {} by user {}", conversationId, user.getId());
 
         final var conversation = conversationRepository.findById(conversationId)
@@ -69,13 +67,11 @@ public class MessageService {
      * Returns a collection of message IDs that have been bookmarked by the specified user.
      *
      * @param messageIds the collection of message IDs to check
-     * @param userId the ID of the user
+     * @param userId     the ID of the user
      * @return a collection of message IDs that have been bookmarked by the user
      */
     @Transactional(readOnly = true)
-    public Set<Long> getBookmarkedMessageIds(Collection<Long> messageIds, Long userId) {
-        requireNonNull(messageIds, "Message IDs cannot be null");
-        requireNonNull(userId, "User ID cannot be null");
+    public Set<Long> getBookmarkedMessageIds(@NonNull Collection<Long> messageIds, @NonNull Long userId) {
 
         log.debug("Checking bookmarked messages for user {} among {} message IDs", userId, messageIds.size());
 

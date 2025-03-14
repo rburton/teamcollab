@@ -1,6 +1,5 @@
 package ai.teamcollab.server.service;
 
-import ai.teamcollab.server.domain.Audit;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.Role;
 import ai.teamcollab.server.domain.User;
@@ -19,6 +18,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ai.teamcollab.server.domain.Audit.AuditActionType.ACCOUNT_DISABLED;
+import static ai.teamcollab.server.domain.Audit.AuditActionType.ACCOUNT_ENABLED;
+import static ai.teamcollab.server.domain.Audit.AuditActionType.EMAIL_CHANGED;
+import static ai.teamcollab.server.domain.Audit.AuditActionType.PASSWORD_CHANGED;
+import static ai.teamcollab.server.domain.Audit.AuditActionType.ROLES_CHANGED;
+import static ai.teamcollab.server.domain.Audit.AuditActionType.USER_CREATED;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -31,10 +36,10 @@ public class UserService implements UserDetailsService {
     private final AuditService auditService;
 
     public UserService(UserRepository userRepository,
-                      RoleRepository roleRepository,
-                      CompanyRepository companyRepository,
-                      PasswordEncoder passwordEncoder,
-                      AuditService auditService) {
+                       RoleRepository roleRepository,
+                       CompanyRepository companyRepository,
+                       PasswordEncoder passwordEncoder,
+                       AuditService auditService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.companyRepository = companyRepository;
@@ -74,15 +79,15 @@ public class UserService implements UserDetailsService {
             user.addRole(role);
         }
 
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for user creation
         auditService.createAuditEvent(
-            Audit.AuditActionType.USER_CREATED,
-            savedUser,
-            "User registered with roles: " + String.join(", ", roleNames),
-            "User",
-            savedUser.getId()
+                USER_CREATED,
+                savedUser,
+                "User registered with roles: " + String.join(", ", roleNames),
+                "User",
+                savedUser.getId()
         );
 
         return savedUser;
@@ -109,29 +114,29 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User updateUserRoles(Long userId, Set<String> roleNames) {
-        User user = userRepository.findById(userId)
+        final var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         // Get the old roles for audit details
-        Set<String> oldRoleNames = user.getRoles().stream()
+        final var oldRoleNames = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toSet());
 
-        Set<Role> roles = roleNames.stream()
+        final var roles = roleNames.stream()
                 .map(name -> roleRepository.findByName(name)
                         .orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
                 .collect(Collectors.toSet());
 
         user.setRoles(roles);
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for role change
         auditService.createAuditEvent(
-            Audit.AuditActionType.ROLES_CHANGED,
-            savedUser,
-            "User roles changed from " + oldRoleNames + " to " + roleNames,
-            "User",
-            savedUser.getId()
+                ROLES_CHANGED,
+                savedUser,
+                "User roles changed from " + oldRoleNames + " to " + roleNames,
+                "User",
+                savedUser.getId()
         );
 
         return savedUser;
@@ -139,24 +144,22 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User toggleUserStatus(Long userId) {
-        User user = userRepository.findById(userId)
+        final var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
-        boolean newStatus = !user.isEnabled();
+        final var newStatus = !user.isEnabled();
         user.setEnabled(newStatus);
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for account status change
-        Audit.AuditActionType actionType = newStatus ? 
-            Audit.AuditActionType.ACCOUNT_ENABLED : 
-            Audit.AuditActionType.ACCOUNT_DISABLED;
+        final var actionType = newStatus ? ACCOUNT_ENABLED : ACCOUNT_DISABLED;
 
         auditService.createAuditEvent(
-            actionType,
-            savedUser,
-            "User account " + (newStatus ? "enabled" : "disabled"),
-            "User",
-            savedUser.getId()
+                actionType,
+                savedUser,
+                "User account " + (newStatus ? "enabled" : "disabled"),
+                "User",
+                savedUser.getId()
         );
 
         return savedUser;
@@ -178,7 +181,7 @@ public class UserService implements UserDetailsService {
         user.setCompany(company);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        Set<Role> roles = roleNames.stream()
+        final var roles = roleNames.stream()
                 .map(name -> roleRepository.findByName(name)
                         .orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
                 .collect(Collectors.toSet());
@@ -192,15 +195,15 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for user creation
         auditService.createAuditEvent(
-            Audit.AuditActionType.USER_CREATED,
-            savedUser,
-            "User created for company: " + company.getName() + " with roles: " + roleNames,
-            "User",
-            savedUser.getId()
+                USER_CREATED,
+                savedUser,
+                "User created for company: " + company.getName() + " with roles: " + roleNames,
+                "User",
+                savedUser.getId()
         );
 
         return savedUser;
@@ -208,12 +211,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User updateUserBasicInfo(Long userId, String username, String email) {
-        User user = userRepository.findById(userId)
+        final var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         // Store old values for audit
-        String oldUsername = user.getUsername();
-        String oldEmail = user.getEmail();
+        final var oldUsername = user.getUsername();
+        final var oldEmail = user.getEmail();
         boolean usernameChanged = !oldUsername.equals(username);
         boolean emailChanged = !oldEmail.equals(email);
 
@@ -230,16 +233,16 @@ public class UserService implements UserDetailsService {
         user.setUsername(username);
         user.setEmail(email);
 
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for email change if email was changed
         if (emailChanged) {
             auditService.createAuditEvent(
-                Audit.AuditActionType.EMAIL_CHANGED,
-                savedUser,
-                "User email changed from " + oldEmail + " to " + email,
-                "User",
-                savedUser.getId()
+                    EMAIL_CHANGED,
+                    savedUser,
+                    "User email changed from " + oldEmail + " to " + email,
+                    "User",
+                    savedUser.getId()
             );
         }
 
@@ -248,7 +251,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User updateUserPassword(Long userId, String password) {
-        User user = userRepository.findById(userId)
+        final var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         // Only update password if it's provided
@@ -258,15 +261,15 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Password cannot be empty");
         }
 
-        User savedUser = userRepository.save(user);
+        final var savedUser = userRepository.save(user);
 
         // Create audit event for password change
         auditService.createAuditEvent(
-            Audit.AuditActionType.PASSWORD_CHANGED,
-            savedUser,
-            "User password changed",
-            "User",
-            savedUser.getId()
+                PASSWORD_CHANGED,
+                savedUser,
+                "User password changed",
+                "User",
+                savedUser.getId()
         );
 
         return savedUser;
@@ -278,7 +281,7 @@ public class UserService implements UserDetailsService {
     @Deprecated
     @Transactional
     public User updateUserProfile(Long userId, String username, String email, String password) {
-        User user = updateUserBasicInfo(userId, username, email);
+        var user = updateUserBasicInfo(userId, username, email);
 
         // Only update password if it's provided
         if (password != null && !password.isEmpty()) {

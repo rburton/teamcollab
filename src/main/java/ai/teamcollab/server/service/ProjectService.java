@@ -3,7 +3,6 @@ package ai.teamcollab.server.service;
 import ai.teamcollab.server.domain.Audit;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Project;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.dto.ProjectCreateRequest;
 import ai.teamcollab.server.dto.ProjectResponse;
 import ai.teamcollab.server.dto.ProjectResponse.ConversationResponse;
@@ -29,17 +28,17 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        final var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        Project project = new Project();
+        var project = new Project();
         project.setName(request.getName());
         project.setOverview(request.getOverview());
         project.setCreatedAt(LocalDateTime.now());
         project.setCompany(user.getCompany());
 
-        Conversation conversation = new Conversation(request.getPurpose(), user);
+        final var conversation = new Conversation(request.getPurpose(), user);
         conversation.setProject(project);
         project.getConversations().add(conversation);
 
@@ -47,18 +46,18 @@ public class ProjectService {
 
         // Create audit event for project creation
         auditService.createAuditEvent(
-            Audit.AuditActionType.PROJECT_CREATED,
-            user,
-            "Project created: " + project.getName(),
-            "Project",
-            project.getId()
+                Audit.AuditActionType.PROJECT_CREATED,
+                user,
+                "Project created: " + project.getName(),
+                "Project",
+                project.getId()
         );
 
         return buildProjectResponse(project);
     }
 
     private ProjectResponse buildProjectResponse(Project project) {
-        Conversation conversation = project.getConversations().iterator().next();
+        final var conversation = project.getConversations().iterator().next();
 
         return ProjectResponse.builder()
                 .id(project.getId())
@@ -89,7 +88,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectResponse getProjectById(Long projectId, Long companyId) {
-        Project project = projectRepository.findById(projectId)
+        final var project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         if (!project.getCompany().getId().equals(companyId)) {
@@ -101,7 +100,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public Project getProjectEntityById(Long projectId, Long companyId) {
-        Project project = projectRepository.findById(projectId)
+        final var project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         if (!project.getCompany().getId().equals(companyId)) {

@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 @Slf4j
 @Controller
 @RequestMapping("/system/assistant-tones")
@@ -29,7 +27,7 @@ public class AssistantToneController {
     @GetMapping
     public String listTones(Model model) {
         log.debug("Showing assistant tones list page");
-        List<AssistantTone> tones = assistantToneService.findAll();
+        final var tones = assistantToneService.findAll();
         model.addAttribute("tones", tones);
         return "system/assistant-tones/index";
     }
@@ -64,16 +62,16 @@ public class AssistantToneController {
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
         log.debug("Showing edit assistant tone form for ID: {}", id);
-        
-        AssistantTone tone = assistantToneService.findById(id)
+
+        final var tone = assistantToneService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid assistant tone ID: " + id));
-        
+
         model.addAttribute("tone", tone);
         return "system/assistant-tones/edit";
     }
 
     @PostMapping("/{id}/update")
-    public String updateTone(@PathVariable Long id, @Valid @ModelAttribute("tone") AssistantTone tone, 
+    public String updateTone(@PathVariable Long id, @Valid @ModelAttribute("tone") AssistantTone tone,
                              BindingResult result, Model model) {
         log.debug("Updating assistant tone with ID: {}", id);
 

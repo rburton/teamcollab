@@ -127,7 +127,7 @@ public class AssistantController {
     @DeleteMapping("/{id}/conversations/{conversationId}")
     public String removeFromConversation(@PathVariable Long id, @PathVariable Long conversationId, @AuthenticationPrincipal LoginUserDetails loginUserDetails, RedirectAttributes redirectAttributes) {
         try {
-            Assistant assistant = assistantService.findById(id).orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
+            final var assistant = assistantService.findById(id).orElseThrow(() -> new IllegalArgumentException("Assistant not found"));
 
             final var company = loginUserDetails.getUser().getCompany();
             if (company.doesntOwns(assistant)) {

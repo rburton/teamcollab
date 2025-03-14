@@ -2,7 +2,6 @@ package ai.teamcollab.server.service;
 
 import ai.teamcollab.server.domain.Bookmark;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.repository.BookmarkRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -35,16 +34,16 @@ public class BookmarkService {
 
     @Transactional
     public Bookmark bookmarkMessage(Long userId, Long messageId) {
-        User user = userRepository.findById(userId)
+        final var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Message message = messageRepository.findById(messageId)
+        final var message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
         if (bookmarkRepository.existsByUserIdAndMessageId(userId, messageId)) {
             throw new IllegalArgumentException("Message already bookmarked");
         }
 
-        Bookmark bookmark = new Bookmark(user, message);
+        final var bookmark = new Bookmark(user, message);
         return bookmarkRepository.save(bookmark);
     }
 
