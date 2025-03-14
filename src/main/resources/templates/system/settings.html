@@ -57,6 +57,43 @@
                 </div>
             </form>
         </div>
+
+        <!-- LLM Models Table -->
+        <div class="mt-8">
+            <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+                <div class="md:grid md:grid-cols-1 md:gap-6">
+                    <div class="md:col-span-1">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">LLM Models</h3>
+                        <p class="mt-1 text-sm text-gray-500">Available Language Learning Models and their specifications.</p>
+                    </div>
+
+                    <div class="mt-5 md:mt-0 md:col-span-1">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Overview</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Input Cost</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Output Cost</th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Context Size</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr th:each="model : ${models}">
+                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6" th:text="${model.getName()}">Model Name</td>
+                                        <td class="px-3 py-4 text-sm text-gray-500" th:text="${model.getOverview()}">Model Overview</td>
+                                        <td class="px-3 py-4 text-sm text-gray-500" th:text="${model.format(model.getInputPricePerMillion())} + ' per million tokens'">Input Cost</td>
+                                        <td class="px-3 py-4 text-sm text-gray-500" th:text="${model.format(model.getOutputPricePerMillion())} + ' per million tokens'">Output Cost</td>
+                                        <td class="px-3 py-4 text-sm text-gray-500" th:text="${model.getContextSize()} + ' tokens'">Context Size</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>
