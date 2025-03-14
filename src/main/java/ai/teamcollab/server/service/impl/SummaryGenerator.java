@@ -1,6 +1,7 @@
 package ai.teamcollab.server.service.impl;
 
 import ai.teamcollab.server.domain.Conversation;
+import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.exception.EmptyConversationException;
 import ai.teamcollab.server.repository.MessageRepository;
@@ -13,8 +14,10 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
+import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -24,6 +27,12 @@ import static java.util.Objects.requireNonNull;
 @Component
 @RequiredArgsConstructor
 public class SummaryGenerator {
+
+    /**
+     * Record to hold the response text and token usage from an AI model call.
+     */
+    private record AiResponse(String text, int promptTokens, int completionTokens) {
+    }
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MessageRepository messageRepository;
     private final AiModelFactory aiModelFactory;
@@ -80,24 +89,50 @@ public class SummaryGenerator {
 
                 log.debug("Generating new point-in-time summary");
 
+                final var start = now();
+
                 final var topicsPrompt = promptBuilder.buildTopicsPrompt(chatContext);
                 final var topicSummariesPrompt = promptBuilder.buildTopicSummariesPrompt(chatContext);
                 final var assistantSummariesPrompt = promptBuilder.buildAssistantSummariesPrompt(conversation, chatContext);
 
                 final var chatModel = aiModelFactory.createSummaryModel();
+                final var llmModel = aiModelFactory.getActiveLlmModel(conversation);
 
-                final var topicsAndKeyPoints = callAndGetResponse(chatModel, topicsPrompt);
-                final var topicSummaries = callAndGetResponse(chatModel, topicSummariesPrompt);
-                final var assistantSummaries = callAndGetResponse(chatModel, assistantSummariesPrompt);
+                final var topicsResponse = callAndGetResponse(chatModel, topicsPrompt);
+                final var topicSummariesResponse = callAndGetResponse(chatModel, topicSummariesPrompt);
+                final var assistantSummariesResponse = callAndGetResponse(chatModel, assistantSummariesPrompt);
+
+                final var end = now();
+                final var duration = Duration.between(start, end).toMillis();
 
                 // Create and save the summary
                 final var summary = PointInTimeSummary.create(
                         conversation,
                         latestMessage,
-                        topicsAndKeyPoints,
-                        topicSummaries,
-                        assistantSummaries
+                        topicsResponse.text(),
+                        topicSummariesResponse.text(),
+                        assistantSummariesResponse.text()
                 );
+
+                // Calculate total tokens
+                final var totalInputTokens = topicsResponse.promptTokens() + 
+                        topicSummariesResponse.promptTokens() + 
+                        assistantSummariesResponse.promptTokens();
+                final var totalOutputTokens = topicsResponse.completionTokens() + 
+                        topicSummariesResponse.completionTokens() + 
+                        assistantSummariesResponse.completionTokens();
+
+                // Create metrics
+                final var metrics = Metrics.builder()
+                        .duration(duration)
+                        .inputTokens(totalInputTokens)
+                        .outputTokens(totalOutputTokens)
+                        .llmModel(llmModel)
+                        .additionalInfo("Summary generation")
+                        .build();
+
+                // Associate metrics with summary
+                summary.addMetrics(metrics);
 
                 return pointInTimeSummaryRepository.save(summary);
 
@@ -115,16 +150,23 @@ public class SummaryGenerator {
     }
 
     /**
-     * Calls the AI model with a prompt and returns the response text.
+     * Calls the AI model with a prompt and returns the response text and token usage.
      *
      * @param chatModel the AI model to call
      * @param prompt    the prompt to send
-     * @return the response text
+     * @return an AiResponse containing the response text and token usage
      */
-    private static String callAndGetResponse(ChatModel chatModel, Prompt prompt) {
+    private static AiResponse callAndGetResponse(ChatModel chatModel, Prompt prompt) {
         var aiResponse = chatModel.call(prompt);
         var result = aiResponse.getResult();
         var output = result.getOutput();
-        return output.getText();
+        var metadata = aiResponse.getMetadata();
+        var usage = metadata.getUsage();
+
+        return new AiResponse(
+                output.getText(),
+                usage.getPromptTokens(),
+                usage.getCompletionTokens()
+        );
     }
 }

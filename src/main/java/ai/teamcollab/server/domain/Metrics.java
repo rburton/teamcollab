@@ -52,8 +52,12 @@ public class Metrics implements java.io.Serializable {
     private String additionalInfo;
 
     @OneToOne
-    @JoinColumn(name = "message_id", nullable = false)
+    @JoinColumn(name = "message_id")
     private Message message;
+
+    @OneToOne
+    @JoinColumn(name = "summary_id")
+    private PointInTimeSummary pointInTimeSummary;
 
     public BigDecimal getCost() {
         if (llmModel == null) {

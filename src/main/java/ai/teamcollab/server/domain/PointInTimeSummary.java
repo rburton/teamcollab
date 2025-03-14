@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
@@ -60,6 +62,19 @@ public class PointInTimeSummary implements java.io.Serializable {
     @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @OneToOne(mappedBy = "pointInTimeSummary", cascade = ALL, orphanRemoval = true)
+    private Metrics metrics;
+
+    /**
+     * Adds metrics to this summary and establishes the bidirectional relationship.
+     *
+     * @param metrics the metrics to add
+     */
+    public void addMetrics(Metrics metrics) {
+        this.metrics = metrics;
+        metrics.setPointInTimeSummary(this);
+    }
 
     /**
      * Creates a new point-in-time summary with the current timestamp.
