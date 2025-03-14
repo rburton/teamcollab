@@ -4,9 +4,10 @@ import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.User;
-import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.service.SystemSettingsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -14,14 +15,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static java.lang.System.getenv;
+
 /**
  * Factory for creating AI models with appropriate configuration.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AiModelFactory {
     private final SystemSettingsService systemSettingsService;
-    private final LlmModelRepository llmModelRepository;
 
     /**
      * Creates an OpenAI chat model configured based on the conversation and system settings.
@@ -29,7 +32,7 @@ public class AiModelFactory {
      * @param conversation the conversation to create the model for
      * @return a configured OpenAiChatModel
      */
-    public OpenAiChatModel createModel(Conversation conversation) {
+    public ChatModel createModel(Conversation conversation) {
         final var currentSettings = systemSettingsService.getCurrentSettings();
         final var llmModel = Optional.ofNullable(conversation)
                 .map(Conversation::getUser)
@@ -37,9 +40,25 @@ public class AiModelFactory {
                 .map(Company::getLlmModel)
                 .orElse(currentSettings.getLlmModel());
 
+        final var provider = llmModel.getProvider();
+        if (provider.isOpenAi()) {
+            log.info("Using OpenAPI Client");
+            return OpenAiChatModel.builder()
+                    .openAiApi(OpenAiApi.builder()
+                            .apiKey(getenv("OPENAI_API_KEY"))
+                            .build())
+                    .defaultOptions(OpenAiChatOptions.builder()
+                            .model(llmModel.getModelId())
+                            .temperature(llmModel.getTemperature())
+                            .build())
+                    .build();
+        }
+        log.info("Using Gemini Client");
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
-                        .apiKey(System.getenv("OPENAI_API_KEY"))
+                        .apiKey(getenv("GEMINI_FLASH_2_0_KEY"))
+                        .baseUrl(getenv("GEMINI_URL"))
+                        .completionsPath(getenv("GEMINI_COMPLETIONS_PATH"))
                         .build())
                 .defaultOptions(OpenAiChatOptions.builder()
                         .model(llmModel.getModelId())

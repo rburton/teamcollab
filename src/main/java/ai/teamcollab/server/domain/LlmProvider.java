@@ -26,8 +26,8 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
- * Represents a Language Learning Model (LLM) provider such as OpenAI, Gemini, etc.
- * Each provider can have multiple LLM models.
+ * Represents a Language Learning Model (LLM) provider such as OpenAI, Gemini, etc. Each provider can have multiple LLM
+ * models.
  */
 @Entity(name = "llm_providers")
 @Getter
@@ -38,6 +38,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @ToString(exclude = "models")
 @Builder
 public class LlmProvider implements Serializable {
+
+    public static final String OPEN_AI = "OpenAI";
+    public static final String GEMINI = "Gemini";
 
     @Id
     @Column(name = "llm_provider_id")
@@ -54,6 +57,14 @@ public class LlmProvider implements Serializable {
     @Builder.Default
     @OneToMany(mappedBy = "provider", cascade = ALL, fetch = LAZY)
     private Set<LlmModel> models = new HashSet<>();
+
+    public boolean isOpenAi() {
+        return OPEN_AI.equalsIgnoreCase(name);
+    }
+
+    public boolean isGemini() {
+        return GEMINI.equalsIgnoreCase(name);
+    }
 
     /**
      * Finds a model by its ID.

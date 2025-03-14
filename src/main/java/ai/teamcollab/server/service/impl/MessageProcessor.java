@@ -7,7 +7,6 @@ import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.exception.MonthlyLimitExceededException;
-import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
@@ -39,7 +38,6 @@ public class MessageProcessor {
     private final PromptBuilder promptBuilder;
     private final MetricsRepository metricsRepository;
     private final MetricCacheRepository metricCacheRepository;
-    private final LlmModelRepository llmModelRepository;
 
     /**
      * Processes a message and returns a response.

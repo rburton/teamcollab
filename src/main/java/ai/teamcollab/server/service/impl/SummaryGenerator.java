@@ -8,8 +8,8 @@ import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,17 +24,17 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor
 public class SummaryGenerator {
     public static final int SUMMARY_BATCH_SIZE = 10;
-    
+
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MessageRepository messageRepository;
     private final AiModelFactory aiModelFactory;
     private final PromptBuilder promptBuilder;
-    
+
     /**
      * Generates a point-in-time summary for a conversation.
      *
      * @param conversation the conversation to summarize
-     * @param chatContext the chat context
+     * @param chatContext  the chat context
      * @return a CompletableFuture containing the generated PointInTimeSummary
      */
     public CompletableFuture<PointInTimeSummary> generateSummary(Conversation conversation, ChatContext chatContext) {
@@ -56,11 +56,9 @@ public class SummaryGenerator {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                // If we have an existing summary, check if we need a new one
                 if (existingSummary.isPresent()) {
                     final var lastSummaryMessage = existingSummary.get().getLatestMessage();
 
-                    // Count messages created after the last summary message
                     final var messageCount = messageRepository.countMessagesAfter(
                             conversation.getId(),
                             lastSummaryMessage.getId()
@@ -75,15 +73,12 @@ public class SummaryGenerator {
 
                 log.debug("Generating new point-in-time summary");
 
-                // Create prompts for each part of the summary
                 final var topicsPrompt = promptBuilder.buildTopicsPrompt(chatContext);
                 final var topicSummariesPrompt = promptBuilder.buildTopicSummariesPrompt(chatContext);
                 final var assistantSummariesPrompt = promptBuilder.buildAssistantSummariesPrompt(conversation, chatContext);
 
-                // Get the AI model
                 final var chatModel = aiModelFactory.createModel(conversation);
 
-                // Generate each part of the summary
                 final var topicsAndKeyPoints = callAndGetResponse(chatModel, topicsPrompt);
                 final var topicSummaries = callAndGetResponse(chatModel, topicSummariesPrompt);
                 final var assistantSummaries = callAndGetResponse(chatModel, assistantSummariesPrompt);
@@ -111,15 +106,15 @@ public class SummaryGenerator {
             }
         });
     }
-    
+
     /**
      * Calls the AI model with a prompt and returns the response text.
      *
      * @param chatModel the AI model to call
-     * @param prompt the prompt to send
+     * @param prompt    the prompt to send
      * @return the response text
      */
-    private static String callAndGetResponse(OpenAiChatModel chatModel, Prompt prompt) {
+    private static String callAndGetResponse(ChatModel chatModel, Prompt prompt) {
         var aiResponse = chatModel.call(prompt);
         var result = aiResponse.getResult();
         var output = result.getOutput();
