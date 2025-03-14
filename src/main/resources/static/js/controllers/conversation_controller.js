@@ -11,6 +11,17 @@ export default class extends Controller {
         this.stompClient.debug = () => {
         };
 
+        // Set up MutationObserver to detect DOM changes in the chat container
+        this.chatObserver = new MutationObserver((mutations) => {
+            this.scrollToBottom();
+        });
+
+        // Start observing the chat container for DOM changes
+        this.chatObserver.observe(this.chatTarget, {
+            childList: true,  // Watch for changes to the direct children
+            subtree: true     // Watch for changes to the entire subtree
+        });
+
         this.buttonTarget.addEventListener('click', (e) => {
             const payload = JSON.stringify({
                 'conversation_id': this.element.dataset.conversationChatIdValue,
@@ -40,7 +51,7 @@ export default class extends Controller {
                     } else {
                         Turbo.renderStreamMessage(response.payload);
                     }
-                    this.scrollToBottom();
+                    // We don't need to call scrollToBottom here anymore as the MutationObserver will handle it
                 }
             });
 
@@ -87,6 +98,11 @@ export default class extends Controller {
         if (this.stompClient !== null) {
             this.stompClient.disconnect();
             console.log('Disconnected');
+        }
+
+        // Clean up the MutationObserver when the controller is disconnected
+        if (this.chatObserver) {
+            this.chatObserver.disconnect();
         }
     }
 
