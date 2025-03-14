@@ -3,6 +3,7 @@ package ai.teamcollab.server.service;
 import ai.teamcollab.server.domain.Audit;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
+import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.repository.ConversationRepository;
 import ai.teamcollab.server.repository.MessageRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -174,14 +176,59 @@ public class ConversationService {
 
     public List<Message> findMessagesByConversation(Long conversationId) {
         log.debug("Fetching messages for conversation {}", conversationId);
-        final var messages = messageRepository.findTop10ByConversationIdOrderByCreatedAtDesc(conversationId);
+        final var messages = messageRepository.findTop10ByConversationIdAndDeletedFalseOrderByCreatedAtDesc(conversationId);
         reverse(messages);
         return messages;
     }
 
     public List<Message> getUserMessages(Long userId) {
         log.debug("Fetching messages for user {}", userId);
-        return messageRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return messageRepository.findByUserIdAndDeletedFalseOrderByCreatedAtDesc(userId);
     }
 
+    /**
+     * Resets a conversation by soft deleting all messages and generating a point-in-time summary.
+     *
+     * @param conversationId the ID of the conversation to reset
+     * @param userId the ID of the user performing the reset
+     * @return the generated point-in-time summary
+     * @throws IllegalArgumentException if the conversation is not found or the user is not authorized
+     */
+    @Transactional
+    public CompletableFuture<PointInTimeSummary> resetConversation(Long conversationId, Long userId) {
+        log.debug("Resetting conversation {} for user {}", conversationId, userId);
+
+        // Find the conversation
+        final var conversation = findConversationByIdWithAssistant(conversationId);
+
+        // Check if the user is authorized to reset the conversation
+        final var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        if (!user.equals(conversation.getUser())) {
+            log.warn("Unauthorized attempt to reset conversation {} by user {}", conversationId, userId);
+            throw new IllegalArgumentException("User is not authorized to reset this conversation");
+        }
+
+        // Build chat context before deleting messages
+        final var chatContext = buildChatContext(conversation, userId.toString());
+
+        // Generate a point-in-time summary before deleting messages
+        final var summaryFuture = chatService.generatePointInTimeSummary(conversation, chatContext);
+
+        // Soft delete all messages in the conversation
+        final var deletedCount = messageService.softDeleteAllMessagesInConversation(conversationId);
+        log.debug("Soft deleted {} messages in conversation {}", deletedCount, conversationId);
+
+        // Create audit event for conversation reset
+        auditService.createAuditEvent(
+            Audit.AuditActionType.CONVERSATION_RESET,
+            user,
+            "Conversation reset with " + deletedCount + " messages soft deleted",
+            "Conversation",
+            conversationId
+        );
+
+        return summaryFuture;
+    }
 }

@@ -152,11 +152,17 @@ CREATE TABLE messages
     assistant_id    BIGINT,
     user_id         BIGINT,
     content         TEXT      NOT NULL,
+    deleted         BOOLEAN   NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at      TIMESTAMP,
     CONSTRAINT fk_assistant FOREIGN KEY (assistant_id) REFERENCES assistants (assistant_id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_messages_deleted ON messages(deleted);
+CREATE INDEX idx_messages_conversation_deleted ON messages(conversation_id, deleted);
+
 CREATE TABLE bookmarks
 (
     bookmark_id BIGSERIAL PRIMARY KEY,

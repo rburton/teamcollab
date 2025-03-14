@@ -195,4 +195,47 @@ public class ConversationController {
         }
     }
 
+    /**
+     * Resets a conversation by soft deleting all messages and generating a point-in-time summary.
+     *
+     * @param conversationId the ID of the conversation to reset
+     * @param user the authenticated user
+     * @param redirectAttributes for flash messages
+     * @param accept the Accept header to determine the response format
+     * @return the appropriate view
+     */
+    @PostMapping("/{conversationId}/reset")
+    public String resetConversation(
+            @PathVariable Long conversationId,
+            @NonNull @AuthenticationPrincipal LoginUserDetails user,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader("Accept") String accept) {
+
+        log.debug("Resetting conversation {} for user {}", conversationId, user.getId());
+
+        try {
+            // Reset the conversation and get the summary
+            final var summaryFuture = conversationService.resetConversation(conversationId, user.getId());
+
+            // Wait for the summary to be generated
+            final var summary = summaryFuture.join();
+
+            redirectAttributes.addFlashAttribute("successMessage", "Conversation reset successfully!");
+            redirectAttributes.addFlashAttribute("summary", summary);
+
+            if (accept.contains("turbo")) {
+                return "redirect:/conversations/" + conversationId;
+            }
+
+            return "redirect:/conversations/" + conversationId;
+        } catch (IllegalArgumentException e) {
+            log.error("Bad request while resetting conversation", e);
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/conversations/" + conversationId;
+        } catch (Exception e) {
+            log.error("Error resetting conversation", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while resetting the conversation");
+            return "redirect:/conversations/" + conversationId;
+        }
+    }
 }

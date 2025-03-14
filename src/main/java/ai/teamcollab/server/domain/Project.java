@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"conversations"})
-public class Project {
+public class Project implements Serializable {
 
     @Id
     @Column(name = "project_id")

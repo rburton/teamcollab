@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
- * Represents a point-in-time summary of a conversation.
- * Contains information about topics discussed, key points, and summaries for each assistant.
+ * Represents a point-in-time summary of a conversation. Contains information about topics discussed, key points, and
+ * summaries for each assistant.
  */
 @Getter
 @Setter
@@ -30,7 +30,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class PointInTimeSummary {
+public class PointInTimeSummary implements java.io.Serializable {
 
     @Id
     @Column(name = "summary_id")
@@ -65,8 +65,8 @@ public class PointInTimeSummary {
      * Creates a new point-in-time summary with the current timestamp.
      */
     public static PointInTimeSummary create(Conversation conversation, Message latestMessage,
-                                           String topicsAndKeyPoints, String topicSummaries,
-                                           String assistantSummaries) {
+                                            String topicsAndKeyPoints, String topicSummaries,
+                                            String assistantSummaries) {
         return PointInTimeSummary.builder()
                 .conversation(conversation)
                 .latestMessage(latestMessage)

@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.math.RoundingMode.HALF_UP;
+
 @Getter
 @Setter
 @Entity
@@ -27,7 +28,7 @@ import static java.math.RoundingMode.HALF_UP;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Metrics {
+public class Metrics implements java.io.Serializable {
 
     @Id
     @Column(name = "metric_id")

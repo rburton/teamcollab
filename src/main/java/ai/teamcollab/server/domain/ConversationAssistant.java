@@ -17,8 +17,8 @@ import lombok.Setter;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
- * Represents the relationship between a conversation and an assistant,
- * including additional attributes like muted status.
+ * Represents the relationship between a conversation and an assistant, including additional attributes like muted
+ * status.
  */
 @Entity
 @Table(name = "conversation_assistant")
@@ -28,7 +28,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"conversation", "assistant"})
-public class ConversationAssistant {
+public class ConversationAssistant implements java.io.Serializable {
 
     @Id
     @Column(name = "id")

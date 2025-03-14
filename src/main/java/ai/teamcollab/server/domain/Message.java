@@ -29,7 +29,7 @@ import static java.util.Objects.isNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Message {
+public class Message implements java.io.Serializable {
 
     @Id
     @Column(name = "message_id")
@@ -53,6 +53,12 @@ public class Message {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "deleted")
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToOne(mappedBy = "message", cascade = ALL, orphanRemoval = true)
     private Metrics metrics;

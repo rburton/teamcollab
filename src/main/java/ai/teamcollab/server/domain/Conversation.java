@@ -31,7 +31,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"messages", "assistants", "metricCaches"})
-public class Conversation {
+public class Conversation implements java.io.Serializable {
 
     @Id
     @Column(name = "conversation_id")

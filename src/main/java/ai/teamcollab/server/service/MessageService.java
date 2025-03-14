@@ -85,4 +85,21 @@ public class MessageService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Soft deletes all messages in a conversation.
+     *
+     * @param conversationId the ID of the conversation
+     * @return the number of messages that were soft deleted
+     */
+    @Transactional
+    public int softDeleteAllMessagesInConversation(@NonNull Long conversationId) {
+        log.debug("Soft deleting all messages in conversation {}", conversationId);
+
+        final var deletedAt = LocalDateTime.now();
+        final var deletedCount = messageRepository.softDeleteAllByConversationId(conversationId, deletedAt);
+
+        log.debug("Soft deleted {} messages in conversation {}", deletedCount, conversationId);
+
+        return deletedCount;
+    }
 }
