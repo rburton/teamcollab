@@ -1,1 +1,0 @@
-Clear the conversation history to start fresh
