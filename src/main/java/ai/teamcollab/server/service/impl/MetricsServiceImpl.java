@@ -3,7 +3,6 @@ package ai.teamcollab.server.service.impl;
 import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
-import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.MetricsService;
@@ -27,7 +26,6 @@ public class MetricsServiceImpl implements MetricsService {
 
     private final MetricsRepository metricsRepository;
     private final MetricCacheRepository metricCacheRepository;
-    private final LlmModelRepository llmModelRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,7 +38,7 @@ public class MetricsServiceImpl implements MetricsService {
     @Transactional(readOnly = true)
     public Page<Metrics> getMetricsPaginated(Pageable pageable) {
         log.debug("Fetching paginated metrics with pageable: {}", pageable);
-        return metricsRepository.findAllOrderByMessageCreatedAtDesc(pageable);
+        return metricsRepository.findAllCreatedAtDesc(pageable);
     }
 
     @Override

@@ -98,7 +98,7 @@ public class MessageProcessor {
                 messageRepository.save(recent);
 
                 // Update the metric cache for this conversation, provider, and model
-                updateMetricCache(conversation, metrics);
+                metricCacheRepository.updateMetricCache(conversation, metrics);
 
                 log.debug("Received response from OpenAI: {}", response);
 
@@ -183,47 +183,5 @@ public class MessageProcessor {
      * @param conversation the conversation
      * @param metrics      the metrics to add to the cache
      */
-    private void updateMetricCache(Conversation conversation, Metrics metrics) {
-        if (conversation == null || metrics == null || metrics.getLlmModel() == null) {
-            log.warn("Cannot update metric cache: conversation, metrics, or llmModel is null");
-            return;
-        }
-
-        final var llmModel = metrics.getLlmModel();
-
-        log.debug("Updating metric cache for conversation {}, llmModel {}",
-                conversation.getId(), llmModel.getModelId());
-
-        // Try to find an existing cache entry
-        final var metricCacheOpt = metricCacheRepository.findByConversationAndLlmModel(
-                conversation.getId(), llmModel.getId());
-
-        if (metricCacheOpt.isPresent()) {
-            // Update existing cache using SQL to avoid race conditions
-            final var metricCache = metricCacheOpt.get();
-            final var rowsUpdated = metricCacheRepository.incrementMetricsById(
-                    metricCache.getId(),
-                    metrics.getDuration(),
-                    metrics.getInputTokens(),
-                    metrics.getOutputTokens()
-            );
-            log.debug("Updated existing metric cache: {}, rows affected: {}", metricCache.getId(), rowsUpdated);
-        } else {
-            // Create new cache
-            final var now = LocalDateTime.now();
-            final var metricCache = MetricCache.builder()
-                    .conversation(conversation)
-                    .llmModel(llmModel)
-                    .totalDuration(metrics.getDuration())
-                    .messageCount(1)
-                    .totalInputTokens(metrics.getInputTokens())
-                    .totalOutputTokens(metrics.getOutputTokens())
-                    .createdAt(now)
-                    .updatedAt(now)
-                    .build();
-            metricCacheRepository.save(metricCache);
-            log.debug("Created new metric cache: {}", metricCache.getId());
-        }
-    }
 
 }

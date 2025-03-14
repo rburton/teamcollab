@@ -5,6 +5,7 @@ import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.exception.EmptyConversationException;
 import ai.teamcollab.server.repository.MessageRepository;
+import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.service.SystemSettingsService;
 import ai.teamcollab.server.service.domain.ChatContext;
@@ -33,8 +34,10 @@ public class SummaryGenerator {
      */
     private record AiResponse(String text, int promptTokens, int completionTokens) {
     }
+
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MessageRepository messageRepository;
+    private final MetricCacheRepository metricCacheRepository;
     private final AiModelFactory aiModelFactory;
     private final PromptBuilder promptBuilder;
     private final SystemSettingsService systemSettingsService;
@@ -115,25 +118,25 @@ public class SummaryGenerator {
                 );
 
                 // Calculate total tokens
-                final var totalInputTokens = topicsResponse.promptTokens() + 
-                        topicSummariesResponse.promptTokens() + 
+                final var totalInputTokens = topicsResponse.promptTokens() +
+                        topicSummariesResponse.promptTokens() +
                         assistantSummariesResponse.promptTokens();
-                final var totalOutputTokens = topicsResponse.completionTokens() + 
-                        topicSummariesResponse.completionTokens() + 
+                final var totalOutputTokens = topicsResponse.completionTokens() +
+                        topicSummariesResponse.completionTokens() +
                         assistantSummariesResponse.completionTokens();
-
+                final var summaryLlmModel = currentSettings.getSummaryLlmModel();
                 // Create metrics
                 final var metrics = Metrics.builder()
                         .duration(duration)
                         .inputTokens(totalInputTokens)
                         .outputTokens(totalOutputTokens)
-                        .llmModel(llmModel)
+                        .llmModel(summaryLlmModel)
                         .additionalInfo("Summary generation")
                         .build();
 
                 // Associate metrics with summary
                 summary.addMetrics(metrics);
-
+                metricCacheRepository.updateMetricCache(conversation, metrics);
                 return pointInTimeSummaryRepository.save(summary);
 
             } catch (EmptyConversationException e) {

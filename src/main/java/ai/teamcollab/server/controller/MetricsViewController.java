@@ -4,7 +4,6 @@ import ai.teamcollab.server.domain.LlmModel;
 import ai.teamcollab.server.domain.LoginUserDetails;
 import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.repository.CompanyRepository;
-import ai.teamcollab.server.repository.LlmModelRepository;
 import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.PointInTimeSummaryRepository;
 import ai.teamcollab.server.repository.UserRepository;
@@ -43,7 +42,6 @@ public class MetricsViewController {
     private final UserRepository userRepository;
     private final PointInTimeSummaryRepository pointInTimeSummaryRepository;
     private final MetricCacheRepository metricCacheRepository;
-    private final LlmModelRepository llmModelRepository;
 
 
     @GetMapping

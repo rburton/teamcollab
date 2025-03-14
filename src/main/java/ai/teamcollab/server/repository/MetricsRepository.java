@@ -29,6 +29,14 @@ public interface MetricsRepository extends JpaRepository<Metrics, Long> {
     Page<Metrics> findAllOrderByMessageCreatedAtDesc(Pageable pageable);
 
     /**
+     * Finds metrics ordered by message creation date in descending order with pagination
+     * @param pageable pagination information
+     * @return Page of metrics
+     */
+    @Query("SELECT m FROM Metrics m ORDER BY m.id DESC")
+    Page<Metrics> findAllCreatedAtDesc(Pageable pageable);
+
+    /**
      * Finds all metrics for a specific company within a date range
      * @param companyId the ID of the company
      * @param startDate the start date (inclusive)
