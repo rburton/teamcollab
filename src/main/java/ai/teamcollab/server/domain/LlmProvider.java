@@ -39,6 +39,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder
 public class LlmProvider implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String OPEN_AI = "OpenAI";
     public static final String GEMINI = "Gemini";
 

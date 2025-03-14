@@ -21,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +38,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"roles", "authProviders"})
 @Builder
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "user_id")

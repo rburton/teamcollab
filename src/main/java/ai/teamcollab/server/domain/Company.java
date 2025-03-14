@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -38,7 +39,10 @@ import static java.util.Objects.isNull;
 @AllArgsConstructor
 @Table(name = "companies")
 @EqualsAndHashCode(of = "id")
+@ToString
 public class Company implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "company_id")

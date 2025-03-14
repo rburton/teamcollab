@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -23,7 +24,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "system_settings")
-public class SystemSettings {
+public class SystemSettings implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "system_setting_id")
     @GeneratedValue(strategy = IDENTITY)

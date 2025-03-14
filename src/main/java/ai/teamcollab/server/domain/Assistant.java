@@ -16,7 +16,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,7 +33,10 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Assistant {
+@ToString
+public class Assistant implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "assistant_id")

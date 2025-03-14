@@ -40,6 +40,8 @@ import static java.util.Locale.US;
 @Builder
 public class LlmModel implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "llm_model_id")
     @GeneratedValue(strategy = IDENTITY)
