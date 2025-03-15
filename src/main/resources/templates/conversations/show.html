@@ -83,6 +83,13 @@
                     <i class="fas fa-chart-line mr-2"></i> View Metrics
                 </a>
             </div>
+            <!-- Privacy toggle button - only visible to the owner -->
+            <form th:if="${isOwner}" th:action="@{/conversations/{id}/toggle-privacy(id=${conversation.id})}" method="post" data-turbo="true" class="inline mr-2">
+                <button type="submit" th:class="${conversation.isPrivate ? 'text-white hover:text-gray-100 bg-green-500 hover:bg-green-600 px-3 py-1 rounded-md transition-colors' : 'text-white hover:text-gray-100 bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md transition-colors'}">
+                    <i th:class="${conversation.isPrivate ? 'fas fa-lock mr-2' : 'fas fa-lock-open mr-2'}"></i>
+                    <span th:text="${conversation.isPrivate ? 'Make Public' : 'Make Private'}"></span>
+                </button>
+            </form>
             <form th:action="@{/conversations/{id}/reset(id=${conversation.id})}" method="post" data-turbo="true" class="inline">
                 <button type="submit" class="text-white hover:text-gray-100 bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition-colors">
                     <i class="fas fa-trash-alt mr-2"></i> Reset Conversation

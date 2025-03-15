@@ -16,6 +16,15 @@ public interface ConversationRepository extends CrudRepository<Conversation, Lon
     List<Conversation> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     /**
+     * Finds all conversations that are either owned by the specified user or are not private.
+     * 
+     * @param userId the ID of the user
+     * @return a list of conversations that are either owned by the user or are not private
+     */
+    @Query("SELECT c FROM Conversation c WHERE c.user.id = :userId OR c.isPrivate = false ORDER BY c.createdAt DESC")
+    List<Conversation> findByUserIdOrIsPrivateFalseOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+    /**
      * Finds a conversation by ID and eagerly fetches its assistants.
      * 
      * @param id the ID of the conversation to find

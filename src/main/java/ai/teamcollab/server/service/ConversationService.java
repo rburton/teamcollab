@@ -80,7 +80,28 @@ public class ConversationService {
         return savedConversation;
     }
 
+    /**
+     * Gets conversations for a user, including all conversations owned by the user
+     * and all non-private conversations created by other users.
+     *
+     * @param userId the ID of the user
+     * @return a list of conversations accessible to the user
+     * @throws IllegalArgumentException if no user is found with the given ID
+     */
     public List<Conversation> getUserConversations(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        return conversationRepository.findByUserIdOrIsPrivateFalseOrderByCreatedAtDesc(userId);
+    }
+
+    /**
+     * Gets only the conversations owned by a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of conversations owned by the user
+     * @throws IllegalArgumentException if no user is found with the given ID
+     */
+    public List<Conversation> getUserOwnedConversations(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         return conversationRepository.findByUserIdOrderByCreatedAtDesc(userId);
@@ -230,5 +251,61 @@ public class ConversationService {
         );
 
         return summaryFuture;
+    }
+
+    /**
+     * Sets the privacy status of a conversation.
+     *
+     * @param conversationId the ID of the conversation
+     * @param userId the ID of the user attempting to change the privacy status
+     * @param isPrivate true to make the conversation private, false to make it public
+     * @return the updated conversation
+     * @throws IllegalArgumentException if the conversation is not found or the user is not authorized
+     */
+    @Transactional
+    public Conversation setConversationPrivacy(Long conversationId, Long userId, boolean isPrivate) {
+        log.debug("Setting privacy for conversation {} to {} by user {}", conversationId, isPrivate, userId);
+
+        // Find the conversation
+        final var conversation = findConversationById(conversationId);
+
+        // Check if the user is authorized to change the privacy status
+        final var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        if (!user.equals(conversation.getUser())) {
+            log.warn("Unauthorized attempt to change privacy of conversation {} by user {}", conversationId, userId);
+            throw new IllegalArgumentException("User is not authorized to change the privacy of this conversation");
+        }
+
+        // Set the privacy status
+        conversation.setPrivate(isPrivate);
+
+        // Save the conversation
+        final var savedConversation = conversationRepository.save(conversation);
+
+        // Create audit event for privacy change
+        auditService.createAuditEvent(
+            isPrivate ? Audit.AuditActionType.CONVERSATION_MADE_PRIVATE : Audit.AuditActionType.CONVERSATION_MADE_PUBLIC,
+            user,
+            "Conversation privacy changed to " + (isPrivate ? "private" : "public"),
+            "Conversation",
+            conversationId
+        );
+
+        return savedConversation;
+    }
+
+    /**
+     * Checks if a user can access a conversation.
+     * A user can access a conversation if they own it or if it's not private.
+     *
+     * @param conversationId the ID of the conversation
+     * @param userId the ID of the user
+     * @return true if the user can access the conversation, false otherwise
+     */
+    public boolean canUserAccessConversation(Long conversationId, Long userId) {
+        final var conversation = findConversationById(conversationId);
+        return conversation.getUser().getId().equals(userId) || !conversation.isPrivate();
     }
 }

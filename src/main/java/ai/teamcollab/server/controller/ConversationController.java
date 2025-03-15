@@ -84,13 +84,18 @@ public class ConversationController {
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, @NonNull @AuthenticationPrincipal LoginUserDetails user, @NonNull Model model) {
         final var conversation = conversationService.findConversationByIdWithAssistant(id);
-        if (!user.getId().equals(conversation.getUser().getId())) {
+
+        // Check if the user can access the conversation
+        // User can access if they own the conversation or if it's not private
+        if (!conversationService.canUserAccessConversation(id, user.getId())) {
             throw new IllegalArgumentException("Access denied");
         }
 
         model.addAttribute("conversation", conversation);
         model.addAttribute("conversationId", conversation.getId());
         model.addAttribute("assistants", AssistantView.from(conversation.getConversationAssistants()));
+        // Add a flag to indicate if the user is the owner of the conversation
+        model.addAttribute("isOwner", user.getId().equals(conversation.getUser().getId()));
 
         return "conversations/show";
     }
@@ -235,6 +240,58 @@ public class ConversationController {
         } catch (Exception e) {
             log.error("Error resetting conversation", e);
             redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while resetting the conversation");
+            return "redirect:/conversations/" + conversationId;
+        }
+    }
+
+    /**
+     * Toggles the privacy status of a conversation.
+     *
+     * @param conversationId the ID of the conversation
+     * @param user the authenticated user
+     * @param redirectAttributes for flash messages
+     * @param accept the Accept header to determine the response format
+     * @return the appropriate view
+     */
+    @PostMapping("/{conversationId}/toggle-privacy")
+    public String togglePrivacy(
+            @PathVariable Long conversationId,
+            @NonNull @AuthenticationPrincipal LoginUserDetails user,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader("Accept") String accept) {
+
+        log.debug("Toggling privacy for conversation {} by user {}", conversationId, user.getId());
+
+        try {
+            // Get the current conversation
+            final var conversation = conversationService.findConversationById(conversationId);
+
+            // Toggle the privacy status
+            final var isCurrentlyPrivate = conversation.isPrivate();
+            final var updatedConversation = conversationService.setConversationPrivacy(
+                    conversationId, 
+                    user.getId(), 
+                    !isCurrentlyPrivate
+            );
+
+            final var statusMessage = updatedConversation.isPrivate() 
+                    ? "Conversation marked as private. Only you can view it." 
+                    : "Conversation marked as public. All users can view it.";
+
+            redirectAttributes.addFlashAttribute("successMessage", statusMessage);
+
+            if (accept.contains("turbo")) {
+                return "redirect:/conversations/" + conversationId;
+            }
+
+            return "redirect:/conversations/" + conversationId;
+        } catch (IllegalArgumentException e) {
+            log.error("Bad request while toggling conversation privacy", e);
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/conversations/" + conversationId;
+        } catch (Exception e) {
+            log.error("Error toggling conversation privacy", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while changing the conversation privacy");
             return "redirect:/conversations/" + conversationId;
         }
     }

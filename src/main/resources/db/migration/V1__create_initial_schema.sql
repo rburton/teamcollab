@@ -100,16 +100,18 @@ CREATE TABLE projects
 CREATE TABLE conversations
 (
     conversation_id       BIGSERIAL PRIMARY KEY,
-    purpose               VARCHAR(1000)       NOT NULL,
-    project_id            BIGINT              NOT NULL REFERENCES projects (project_id),
-    user_id               BIGINT              NOT NULL REFERENCES users (user_id),
-    message_cache_counter BIGINT    DEFAULT 0 NOT NULL,
-    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    purpose               VARCHAR(1000) NOT NULL,
+    project_id            BIGINT        NOT NULL REFERENCES projects (project_id),
+    user_id               BIGINT        NOT NULL REFERENCES users (user_id),
+    message_cache_counter BIGINT                 DEFAULT 0 NOT NULL,
+    is_private            BOOLEAN       NOT NULL DEFAULT FALSE,
+    created_at            TIMESTAMP              DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP              DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_conversations_project_by ON projects (project_id);
 CREATE INDEX idx_conversations_created_by ON conversations (user_id);
 CREATE INDEX idx_conversations_created_at ON conversations (created_at DESC);
+CREATE INDEX idx_conversations_is_private ON conversations (is_private);
 
 CREATE TABLE assistants
 (

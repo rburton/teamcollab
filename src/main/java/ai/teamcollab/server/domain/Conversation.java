@@ -66,6 +66,9 @@ public class Conversation implements java.io.Serializable {
     @Column(name = "message_cache_counter")
     private Long messageCacheCounter = 0L;
 
+    @Column(name = "is_private")
+    private boolean isPrivate = false;
+
     public Conversation(String purpose, User createdBy) {
         this.purpose = purpose;
         this.user = createdBy;
