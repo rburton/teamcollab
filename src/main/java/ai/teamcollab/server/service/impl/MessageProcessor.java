@@ -3,7 +3,6 @@ package ai.teamcollab.server.service.impl;
 import ai.teamcollab.server.domain.Company;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.domain.MetricCache;
 import ai.teamcollab.server.domain.Metrics;
 import ai.teamcollab.server.domain.User;
 import ai.teamcollab.server.exception.MonthlyLimitExceededException;
@@ -12,6 +11,7 @@ import ai.teamcollab.server.repository.MetricCacheRepository;
 import ai.teamcollab.server.repository.MetricsRepository;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.time.Instant.now;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Responsible for processing chat messages.
@@ -47,10 +46,8 @@ public class MessageProcessor {
      * @param chatContext  the chat context
      * @return a CompletableFuture containing the message response
      */
-    public CompletableFuture<MessageResponse> process(Conversation conversation, Message recent, ChatContext chatContext) {
-        requireNonNull(conversation, "Conversation cannot be null");
-        requireNonNull(recent, "Message cannot be null");
-        requireNonNull(chatContext, "ChatContext cannot be null");
+    public CompletableFuture<MessageResponse> process(@NonNull Conversation conversation, @NonNull Message recent,
+                                                      @NonNull ChatContext chatContext) {
 
         log.debug("Asynchronously processing message for conversation: {}, message: {}", conversation.getId(), recent.getId());
         log.debug("Using chat context - Purpose: {}, Project Overview: {}, History Size: {}",
@@ -61,7 +58,7 @@ public class MessageProcessor {
         final var company = Optional.of(conversation)
                 .map(Conversation::getUser)
                 .map(User::getCompany)
-                .orElse(null);
+                .orElseThrow();
 
         // Check if the company has exceeded its monthly spending limit
         checkMonthlySpendingLimit(company);
