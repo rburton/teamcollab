@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.math.RoundingMode.HALF_UP;
@@ -58,6 +59,9 @@ public class Metrics implements java.io.Serializable {
     @OneToOne
     @JoinColumn(name = "summary_id")
     private PointInTimeSummary pointInTimeSummary;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     public BigDecimal getCost() {
         if (llmModel == null) {

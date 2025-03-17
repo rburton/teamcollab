@@ -51,6 +51,18 @@
                                 </div>
 
                                 <div class="col-span-6 sm:col-span-3">
+                                    <label for="assistantInteractionLlmModel" class="block text-sm font-medium text-gray-700">Assistant Interaction Model</label>
+                                    <select id="assistantInteractionLlmModel" name="assistantInteractionLlmModel" th:field="*{assistantInteractionLlmModel}"
+                                            class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        <option th:each="model : ${models}"
+                                                th:value="${model.getId()}"
+                                                th:text="${model.getDropdown()}">
+                                        </option>
+                                    </select>
+                                    <p class="mt-1 text-sm text-gray-500">Model used for determining which assistants should respond to messages</p>
+                                </div>
+
+                                <div class="col-span-6 sm:col-span-3">
                                     <label for="summaryBatchSize" class="block text-sm font-medium text-gray-700">Summary Batch Size</label>
                                     <input type="number" id="summaryBatchSize" name="summaryBatchSize" th:field="*{summaryBatchSize}" min="1" max="100"
                                            class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 px-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />

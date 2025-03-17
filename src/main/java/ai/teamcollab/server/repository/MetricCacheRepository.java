@@ -63,6 +63,7 @@ public interface MetricCacheRepository extends JpaRepository<MetricCache, Long> 
     @Query("SELECT mc FROM MetricCache mc WHERE mc.conversation.id = :conversationId")
     List<MetricCache> findByConversationId(@Param("conversationId") Long conversationId);
 
+    @Transactional
     default void updateMetricCache(Conversation conversation, Metrics metrics) {
         if (conversation == null || metrics == null || metrics.getLlmModel() == null) {
             return;
@@ -77,7 +78,7 @@ public interface MetricCacheRepository extends JpaRepository<MetricCache, Long> 
         if (metricCacheOpt.isPresent()) {
             // Update existing cache using SQL to avoid race conditions
             final var metricCache = metricCacheOpt.get();
-            final var rowsUpdated = this.incrementMetricsById(
+            this.incrementMetricsById(
                     metricCache.getId(),
                     metrics.getDuration(),
                     metrics.getInputTokens(),

@@ -120,4 +120,14 @@ public class AiModelFactory {
                 .orElse(currentSettings.getLlmModel());
     }
 
+    /**
+     * Gets the LLM model used for assistant interaction decisions.
+     *
+     * @return the LLM model for assistant interaction decisions
+     */
+    public LlmModel getAssistantInteractionLlmModel() {
+        final var currentSettings = systemSettingsService.getCurrentSettings();
+        return currentSettings.getAssistantInteractionLlmModel();
+    }
+
 }

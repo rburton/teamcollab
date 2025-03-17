@@ -212,6 +212,7 @@ CREATE TABLE metrics
     additional_info TEXT,
     message_id      BIGINT UNIQUE,
     summary_id      BIGINT UNIQUE,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE,
     CONSTRAINT fk_summary FOREIGN KEY (summary_id) REFERENCES point_in_time_summaries (summary_id) ON DELETE CASCADE
 );

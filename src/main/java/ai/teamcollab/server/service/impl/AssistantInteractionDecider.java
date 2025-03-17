@@ -3,7 +3,9 @@ package ai.teamcollab.server.service.impl;
 import ai.teamcollab.server.domain.Assistant;
 import ai.teamcollab.server.domain.Conversation;
 import ai.teamcollab.server.domain.Message;
-import ai.teamcollab.server.service.SystemSettingsService;
+import ai.teamcollab.server.domain.Metrics;
+import ai.teamcollab.server.repository.MetricCacheRepository;
+import ai.teamcollab.server.repository.MetricsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +17,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +27,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
+import static java.time.Instant.now;
 
 /**
  * Decides which assistants should respond to a message based on content analysis. Uses LLM to determine if assistants
@@ -34,8 +38,9 @@ import static java.lang.Boolean.TRUE;
 @RequiredArgsConstructor
 public class AssistantInteractionDecider {
     private final AiModelFactory aiModelFactory;
-    private final SystemSettingsService systemSettingsService;
     private final ObjectMapper objectMapper;
+    private final MetricCacheRepository metricCacheRepository;
+    private final MetricsRepository metricsRepository;
 
     /**
      * Determines which assistants should respond to a message.
@@ -52,26 +57,43 @@ public class AssistantInteractionDecider {
         }
 
         try {
+            // Record start time
+            final var start = now();
+
             // Build the prompt for the LLM
             final var prompt = buildPrompt(message, activeAssistants);
 
             // Get the LLM model specifically for assistant interaction decisions
             var chatModel = aiModelFactory.createAssistantInteractionModel();
+            var llmModel = aiModelFactory.getAssistantInteractionLlmModel();
 
             // Call the LLM
             var response = chatModel.call(prompt);
             var result = response.getResult().getOutput().getText();
 
+            // Record end time and calculate duration
+            final var end = now();
+            final var duration = Duration.between(start, end).toMillis();
+
             log.debug("LLM response for assistant interaction decision: {}", result);
+
+            // Create metrics
+            final var metadata = response.getMetadata();
+            final var usage = metadata.getUsage();
+
+            final var metrics = Metrics.builder().duration(duration).inputTokens(usage.getPromptTokens()).outputTokens(usage.getCompletionTokens()).llmModel(llmModel).additionalInfo("Assistant interaction decision").build();
+
+            metricsRepository.save(metrics);
+
+            // Update the metric cache
+            metricCacheRepository.updateMetricCache(conversation, metrics);
 
             // Parse the response to get the list of assistants that should respond
             return parseResponse(result, activeAssistants);
         } catch (Exception e) {
             log.error("Error deciding which assistants should respond: {}", e.getMessage(), e);
             // In case of error, return all active assistants to ensure the conversation continues
-            return activeAssistants.stream()
-                    .map(Assistant::getId)
-                    .toList();
+            return activeAssistants.stream().map(Assistant::getId).toList();
         }
     }
 
@@ -90,11 +112,11 @@ public class AssistantInteractionDecider {
         final var systemPrompt = """
                 You are an expert at analyzing messages and determining which assistants should respond.
                 Analyze the user message and determine which assistants should respond based on the following criteria:
-
-                1. If an assistant is mentioned by name
-                2. If the message contains a question related to an assistant's expertise
-                3. If the message contains a question directed to everyone in the chat
-
+                
+                1. If an assistant is mentioned by name.
+                2. If the message contains a question related to an assistant's expertise. It MUST be a question, NOT a statement
+                3. If the message contains a question directed to everyone in the chat.
+                
                 Respond with a JSON array of objects with the following structure:
                 [
                   {
@@ -103,7 +125,7 @@ public class AssistantInteractionDecider {
                   },
                   ...
                 ]
-
+                
                 Only include assistants that should respond (triggered=true) in your response.
                 """;
 
@@ -115,10 +137,7 @@ public class AssistantInteractionDecider {
         userPrompt.append("Available assistants:\n");
 
         for (var assistant : activeAssistants) {
-            userPrompt.append("- ID: ").append(assistant.getId())
-                    .append(", Name: ").append(assistant.getName())
-                    .append(", Expertise: ").append(assistant.getExpertise())
-                    .append("\n");
+            userPrompt.append("- ID: ").append(assistant.getId()).append(", Name: ").append(assistant.getName()).append(", Expertise: ").append(assistant.getExpertise()).append("\n");
         }
 
         messages.add(new UserMessage(userPrompt.toString()));
@@ -139,25 +158,20 @@ public class AssistantInteractionDecider {
             String jsonResponse = extractJsonArray(response);
 
             // Parse the JSON response
-            List<Map<String, Object>> assistantResponses = objectMapper.readValue(
-                    jsonResponse, new TypeReference<List<Map<String, Object>>>() {
-                    });
+            List<Map<String, Object>> assistantResponses = objectMapper.readValue(jsonResponse, new TypeReference<List<Map<String, Object>>>() {
+            });
 
             // Extract assistant IDs where triggered is true
-            return assistantResponses.stream()
-                    .filter(map -> TRUE.equals(map.get("triggered")))
-                    .map(map -> {
-                        // Handle different types of ID representation (Long, Integer, String)
-                        final var idObj = map.get("assistantId");
-                        if (idObj instanceof Number) {
-                            return ((Number) idObj).longValue();
-                        } else if (idObj instanceof String) {
-                            return Long.parseLong((String) idObj);
-                        }
-                        return null;
-                    })
-                    .filter(Objects::nonNull)
-                    .toList();
+            return assistantResponses.stream().filter(map -> TRUE.equals(map.get("triggered"))).map(map -> {
+                // Handle different types of ID representation (Long, Integer, String)
+                final var idObj = map.get("assistantId");
+                if (idObj instanceof Number) {
+                    return ((Number) idObj).longValue();
+                } else if (idObj instanceof String) {
+                    return Long.parseLong((String) idObj);
+                }
+                return null;
+            }).filter(Objects::nonNull).toList();
         } catch (JsonProcessingException e) {
             log.error("Error parsing LLM response: {}", e.getMessage(), e);
             // In case of parsing error, return all active assistants
