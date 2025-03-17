@@ -95,4 +95,16 @@ INSERT INTO system_settings (system_setting_id, llm_model_id, summary_llm_model_
 SELECT 1, llm_model_id, llm_model_id, llm_model_id
   FROM llm_models
  WHERE model_id = 'gpt-3.5-turbo'
- LIMIT 1
+ LIMIT 1;
+
+UPDATE system_settings
+   SET summary_llm_model_id = (SELECT llm_model_id FROM llm_models WHERE model_id = 'gpt-4o-mini' LIMIT 1)
+ WHERE system_setting_id = 1;
+
+UPDATE system_settings
+   SET assistant_interaction_llm_model_id = (SELECT llm_model_id
+                                               FROM llm_models
+                                              WHERE model_id = 'gemini-1.5-flash'
+                                              LIMIT 1)
+ WHERE system_setting_id = 1;
+
