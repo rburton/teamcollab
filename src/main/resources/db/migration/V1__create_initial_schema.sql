@@ -205,14 +205,14 @@ CREATE INDEX idx_summaries_is_active ON point_in_time_summaries (is_active);
 CREATE TABLE metrics
 (
     metric_id       BIGSERIAL PRIMARY KEY,
-    duration        BIGINT NOT NULL,
-    input_tokens    INT    NOT NULL,
-    output_tokens   INT    NOT NULL,
+    duration        BIGINT    NOT NULL,
+    input_tokens    INT       NOT NULL,
+    output_tokens   INT       NOT NULL,
     llm_model_id    BIGINT REFERENCES llm_models (llm_model_id),
     additional_info TEXT,
     message_id      BIGINT UNIQUE,
     summary_id      BIGINT UNIQUE,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES messages (message_id) ON DELETE CASCADE,
     CONSTRAINT fk_summary FOREIGN KEY (summary_id) REFERENCES point_in_time_summaries (summary_id) ON DELETE CASCADE
 );

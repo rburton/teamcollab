@@ -74,7 +74,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.outputTokens}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.llmModel.label}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.llmModel.provider.name}"></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.message != null ? #temporals.format(metric.message.createdAt, 'MM/dd/yy hh:mm a') : (metric.pointInTimeSummary != null ? #temporals.format(metric.pointInTimeSummary.createdAt, 'MM/dd/yy hh:mm a') : 'N/A')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${#temporals.format(metric.createdAt, 'MM/dd/yy hh:mm a')}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${metric.message != null ? 'Message' : (metric.pointInTimeSummary != null ? 'Point in Time Summary' : 'Decision')}"></td>
                         </tr>
                     </th:block>
