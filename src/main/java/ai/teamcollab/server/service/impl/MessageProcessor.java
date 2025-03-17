@@ -32,6 +32,7 @@ import static java.time.Instant.now;
 @Component
 @RequiredArgsConstructor
 public class MessageProcessor {
+    private final AssistantInteractionDecider assistantInteractionDecider;
     private final MessageRepository messageRepository;
     private final AiModelFactory aiModelFactory;
     private final PromptBuilder promptBuilder;
@@ -46,8 +47,8 @@ public class MessageProcessor {
      * @param chatContext  the chat context
      * @return a CompletableFuture containing the message response
      */
-    public CompletableFuture<MessageResponse> process(@NonNull Conversation conversation, @NonNull Message recent,
-                                                      @NonNull ChatContext chatContext) {
+    public CompletableFuture<Optional<MessageResponse>> process(@NonNull Conversation conversation, @NonNull Message recent,
+                                                                @NonNull ChatContext chatContext) {
 
         log.debug("Asynchronously processing message for conversation: {}, message: {}", conversation.getId(), recent.getId());
         log.debug("Using chat context - Purpose: {}, Project Overview: {}, History Size: {}",
@@ -62,6 +63,11 @@ public class MessageProcessor {
 
         // Check if the company has exceeded its monthly spending limit
         checkMonthlySpendingLimit(company);
+
+        final var ids = assistantInteractionDecider.decideAssistantsToRespond(conversation, recent, conversation.getAssistants());
+        if (ids.isEmpty()) {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -99,10 +105,10 @@ public class MessageProcessor {
 
                 log.debug("Received response from OpenAI: {}", response);
 
-                return MessageResponse.builder()
+                return Optional.of(MessageResponse.builder()
                         .content(response)
                         .metrics(metrics)
-                        .build();
+                        .build());
 
             } catch (IllegalArgumentException e) {
                 log.error("Invalid argument while processing message: {}", e.getMessage(), e);

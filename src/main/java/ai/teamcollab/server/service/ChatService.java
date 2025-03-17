@@ -6,6 +6,7 @@ import ai.teamcollab.server.domain.PointInTimeSummary;
 import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageResponse;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface ChatService {
@@ -17,7 +18,7 @@ public interface ChatService {
      * @param chatContext The enhanced context containing conversation history, purpose and project overview
      * @return CompletableFuture<MessageResponse> containing the LLM response and associated metrics
      */
-    CompletableFuture<MessageResponse> process(Conversation conversation, Message recent, ChatContext chatContext);
+    CompletableFuture<Optional<MessageResponse>> process(Conversation conversation, Message recent, ChatContext chatContext);
 
     /**
      * Generates a point-in-time summary for a conversation.

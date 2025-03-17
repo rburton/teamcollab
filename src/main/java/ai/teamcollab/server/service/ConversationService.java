@@ -11,6 +11,7 @@ import ai.teamcollab.server.service.domain.ChatContext;
 import ai.teamcollab.server.service.domain.MessageRow;
 import ai.teamcollab.server.templates.ThymeleafTemplateRender;
 import ai.teamcollab.server.ws.domain.WsMessageResponse;
+import io.swagger.v3.oas.annotations.links.Link;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -159,26 +161,33 @@ public class ConversationService {
             chatService.generatePointInTimeSummary(conversation, chatContext);
 
             return chatService.process(conversation, message, chatContext)
-                    .thenAccept(response -> {
-                        final var responseMessage = Message.builder()
-                                .content(response.getContent())
-                                .assistant(message.getAssistant())
-                                .createdAt(LocalDateTime.now())
-                                .build();
+                    .thenAccept(optionalResponse -> {
+                        final var responses = new LinkedList<String>();
 
-                        // Save the response message to the conversation
-                        final var savedMessage = messageService.createMessage(responseMessage, conversation.getId(), message.getUser());
-                        if (nonNull(response.getMetrics())) {
-                            savedMessage.addMetrics(response.getMetrics());
-                            messageRepository.save(savedMessage);
-                        }
-
-                        final var row = MessageRow.from(responseMessage);
-                        final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
                         final var assistants = conversation.getAssistants();
-                        final var htmlStatus = thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Ready"));
+                        responses.add( thymeleafTemplateRender.renderToHtml(ASSISTANT_STATUSES_TEMPLATE, Map.of(ASSISTANTS, assistants, STATUS, "Ready")));
 
-                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(List.of(html, htmlStatus)));
+                        if (optionalResponse.isPresent()) {
+
+                            final var response = optionalResponse.get();
+                            final var responseMessage = Message.builder()
+                                    .content(response.getContent())
+                                    .assistant(message.getAssistant())
+                                    .createdAt(LocalDateTime.now())
+                                    .build();
+
+                            // Save the response message to the conversation
+                            final var savedMessage = messageService.createMessage(responseMessage, conversation.getId(), message.getUser());
+                            if (nonNull(response.getMetrics())) {
+                                savedMessage.addMetrics(response.getMetrics());
+                                messageRepository.save(savedMessage);
+                            }
+
+                            final var row = MessageRow.from(responseMessage);
+                            final var html = thymeleafTemplateRender.renderToHtml(CONVERSATION_MESSAGE_TEMPLATE, Map.of(MESSAGE, row));
+                            responses.add(html);
+                        }
+                        messagingTemplate.convertAndSendToUser(sessionId, DIRECT_MESSAGE_TOPIC, WsMessageResponse.turbo(responses));
                         log.debug("Message processed successfully for conversation: {}", message.getId());
                     })
                     .exceptionally(throwable -> {

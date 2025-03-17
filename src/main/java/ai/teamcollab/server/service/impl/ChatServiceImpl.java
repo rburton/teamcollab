@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,7 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final SummaryGenerator summaryGenerator;
 
     @Override
-    public CompletableFuture<MessageResponse> process(Conversation conversation, Message recent, ChatContext chatContext) {
+    public CompletableFuture<Optional<MessageResponse>> process(Conversation conversation, Message recent, ChatContext chatContext) {
         log.debug("Delegating message processing to MessageProcessor");
         return messageProcessor.process(conversation, recent, chatContext);
     }
