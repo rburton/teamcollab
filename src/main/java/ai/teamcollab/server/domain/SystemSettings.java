@@ -40,6 +40,10 @@ public class SystemSettings implements Serializable {
     @JoinColumn(name = "summary_llm_model_id", nullable = false)
     private LlmModel summaryLlmModel;
 
+    @ManyToOne
+    @JoinColumn(name = "assistant_interaction_llm_model_id", nullable = false)
+    private LlmModel assistantInteractionLlmModel;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -55,8 +55,8 @@ public class AssistantInteractionDecider {
             // Build the prompt for the LLM
             final var prompt = buildPrompt(message, activeAssistants);
 
-            // Get the LLM model from system settings
-            var chatModel = aiModelFactory.createModel(conversation);
+            // Get the LLM model specifically for assistant interaction decisions
+            var chatModel = aiModelFactory.createAssistantInteractionModel();
 
             // Call the LLM
             var response = chatModel.call(prompt);
@@ -90,11 +90,11 @@ public class AssistantInteractionDecider {
         final var systemPrompt = """
                 You are an expert at analyzing messages and determining which assistants should respond.
                 Analyze the user message and determine which assistants should respond based on the following criteria:
-                
+
                 1. If an assistant is mentioned by name
                 2. If the message contains a question related to an assistant's expertise
                 3. If the message contains a question directed to everyone in the chat
-                
+
                 Respond with a JSON array of objects with the following structure:
                 [
                   {
@@ -103,7 +103,7 @@ public class AssistantInteractionDecider {
                   },
                   ...
                 ]
-                
+
                 Only include assistants that should respond (triggered=true) in your response.
                 """;
 

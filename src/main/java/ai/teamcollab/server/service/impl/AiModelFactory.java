@@ -58,6 +58,20 @@ public class AiModelFactory {
     }
 
     /**
+     * Creates an OpenAI chat model specifically for assistant interaction decisions.
+     * Uses the assistantInteractionLlmModel from SystemSettings.
+     *
+     * @return a configured OpenAiChatModel for assistant interaction decisions
+     */
+    public ChatModel createAssistantInteractionModel() {
+        final var currentSettings = systemSettingsService.getCurrentSettings();
+        final var assistantInteractionLlmModel = currentSettings.getAssistantInteractionLlmModel();
+
+        log.debug("Creating assistant interaction model using: {}", assistantInteractionLlmModel.getName());
+        return createChatModelFromLlmModel(assistantInteractionLlmModel);
+    }
+
+    /**
      * Helper method to create a ChatModel from an LlmModel.
      *
      * @param llmModel the LLM model to use

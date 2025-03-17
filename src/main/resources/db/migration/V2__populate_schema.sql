@@ -91,8 +91,8 @@ COMMENT ON TABLE llm_providers IS 'Stores information about LLM providers such a
 COMMENT ON TABLE llm_models IS 'Stores information about LLM models, their configurations, and pricing';
 
 -- Insert default settings
-INSERT INTO system_settings (system_setting_id, llm_model_id, summary_llm_model_id)
-SELECT 1, llm_model_id, llm_model_id
+INSERT INTO system_settings (system_setting_id, llm_model_id, summary_llm_model_id, assistant_interaction_llm_model_id)
+SELECT 1, llm_model_id, llm_model_id, llm_model_id
   FROM llm_models
  WHERE model_id = 'gpt-3.5-turbo'
  LIMIT 1

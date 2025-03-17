@@ -219,11 +219,12 @@ CREATE INDEX idx_metrics_summary_id ON metrics (summary_id);
 
 CREATE TABLE system_settings
 (
-    system_setting_id    BIGINT PRIMARY KEY,
-    llm_model_id         BIGINT REFERENCES llm_models (llm_model_id),
-    summary_llm_model_id BIGINT REFERENCES llm_models (llm_model_id),
-    summary_batch_size   INT       NOT NULL DEFAULT 10,
-    created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    system_setting_id                  BIGINT PRIMARY KEY,
+    llm_model_id                       BIGINT REFERENCES llm_models (llm_model_id),
+    summary_llm_model_id               BIGINT REFERENCES llm_models (llm_model_id),
+    assistant_interaction_llm_model_id BIGINT REFERENCES llm_models (llm_model_id),
+    summary_batch_size                 INT       NOT NULL DEFAULT 10,
+    created_at                         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE plans
